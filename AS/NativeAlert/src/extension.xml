@@ -1,12 +1,19 @@
 <extension xmlns="http://ns.adobe.com/air/extension/2.5">
-    <id>uk.co.betadesigns.extension.nativealert.NativeAlert</id>
-    <versionNumber>0.0.1</versionNumber>
+    <id>pl.mateuszmackowiak.nativeANE.NativeAlert</id>
+    <versionNumber>0.6</versionNumber>
     <platforms>
         <platform name="iPhone-ARM">
             <applicationDeployment>
                 <nativeLibrary>libNativeAlert.a</nativeLibrary>
                 <initializer>ExtInitializer</initializer>
                 <finalizer>ExtFinalizer</finalizer>
+            </applicationDeployment>
+        </platform>
+		<platform name="Windows-x86">
+            <applicationDeployment>
+                <nativeLibrary>NativeAlertCbDll.dll</nativeLibrary>
+                <initializer>initializer</initializer>
+                <finalizer>finalizer</finalizer>
             </applicationDeployment>
         </platform>
     </platforms>

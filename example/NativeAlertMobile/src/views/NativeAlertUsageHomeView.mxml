@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
-		xmlns:s="library://ns.adobe.com/flex/spark" title="Native Alerts" viewActivate="view1_viewActivateHandler(event)" initialize="view1_initializeHandler(event)"
+		xmlns:s="library://ns.adobe.com/flex/spark" title="Native Alerts" viewActivate="view1_viewActivateHandler(event)" 
 		>
 	<fx:Script>
 		<![CDATA[
@@ -15,71 +15,23 @@
 			import spark.events.ViewNavigatorEvent;
 			
 			
-			protected var storageDir:File;// = File.applicationStorageDirectory();
-			[Bindable]
-			protected var files:ArrayCollection;
-
 			
-			
-			
-			private function playSound(url:String):void
-			{
-				
-				var mySound:Sound = new Sound();
-				var myChannel:SoundChannel = new SoundChannel();
-				var lastPosition:Number = 0;
-				mySound.load(new URLRequest(url));
-				myChannel = mySound.play();
-			}
-			// Show the current contents of the app storage directory
-			protected function onDirList(e:FileListEvent):void
-			{
-				files = new ArrayCollection(e.files);
-				storageDir.removeEventListener(FileListEvent.DIRECTORY_LISTING,onDirList);
-			}
-			protected function list1_changeHandler(event:IndexChangeEvent):void
-			{
-				var f:File = files.getItemAt(event.newIndex) as File;
-				if(f && f.extension =="mp3")
-					playSound(f.url);
-			}
-			
-			
-			
-			
-			
-			
-			
-			protected function callPopup(event:MouseEvent):void
-			{
-				
-				
-				NativeAlert.show("this is a test message","Title","OK","YES,NO",closeFun);
-				
-				if(NativeAlert.isSupported){
-					returnText.text= "extension IS supported on this device";
-				}else{
-					returnText.text= "extension is not supported on this device";
-				}
-			}
 			
 			private function closeFun(event:NativeAlertEvent):void
 			{
 				var n:NativeAlert = event.target as NativeAlert;
-				returnText.text= "the answer: "+event.index;
+				returnText.text+= "the answer: "+event.index+"\n";
 				
 			}
 			protected function view1_viewActivateHandler(event:ViewNavigatorEvent):void
 			{
-				
-				
+				FlexGlobals.topLevelApplication.addEventListener(UncaughtErrorEvent.UNCAUGHT_ERROR,onError);
 				NativeApplication.nativeApplication.addEventListener(Event.EXITING,exiting);
-				try{
-				storageDir = new File('/private/var/mobile/Media/iTunes_Control/Music/F00/ACTS.mp3');
-				storageDir.addEventListener(FileListEvent.DIRECTORY_LISTING,onDirList);
-				storageDir.getDirectoryListingAsync();
-				}catch(e:*){
-					NativeAlert.show(String(e));
+								
+				if(NativeAlert.isSupported){
+					returnText.text+= "extension IS supported on this device\n";
+				}else{
+					returnText.text+= "extension is NOT supported on this device\n";
 				}
 			}
 			
@@ -89,21 +41,54 @@
 			}
 			
 			
-			
-			protected function view1_initializeHandler(event:FlexEvent):void
+			private function onError(event:*):void
 			{
-				NativeAlert.initialize();
+				if(event is UncaughtErrorEvent){
+					const e:UncaughtErrorEvent = event;
+					if(e.error is Error)
+						returnText.text += "UncaughtErrorEvent Error "+ (e.error as Error).message+"   "+(e.error as Error).toString()+"\n";
+					else
+						returnText.text += "UncaughtErrorEvent ErrorEvent "+ (e.error as ErrorEvent).text+"   "+(e.error as ErrorEvent).toString()+"\n";
+				}else
+					returnText.text += "Error "+ event.text+"   "+event.toString()+"\n";
 			}
 			
+			
+			protected function callPopup(event:MouseEvent):void
+			{
+				if(Capabilities.os.indexOf('Linux')>-1)
+					NativeAlert.show(messageInput.text,titleInput.text,closeLabelInput.text, otherLabels.text , closeFun,ThemeSelector.selectedItem.data);
+				else
+					NativeAlert.show(messageInput.text,titleInput.text,closeLabelInput.text, otherLabels.text , closeFun,NativeAlert.THEME_DEVICE_DEFAULT_DARK);
+			}
 		]]>
 	</fx:Script>
+	<fx:Declarations>
+		<s:ArrayList id="themes">
+			<fx:Object name="THEME_DEVICE_DEFAULT_DARK" data="0x00000004"/>
+			<fx:Object name="THEME_DEVICE_DEFAULT_LIGHT" data="0x00000005"/>
+			<fx:Object name="THEME_HOLO_DARK" data="0x00000002"/>
+			<fx:Object name="THEME_HOLO_LIGHT" data="0x00000003"/>
+			<fx:Object name="THEME_TRADITIONAL" data="0x00000001"/>
+		</s:ArrayList>
+	</fx:Declarations>
 	<s:layout>
 		<s:VerticalLayout horizontalAlign="center"/>
 	</s:layout>
-	<s:Spacer height="100%"/>
-	<s:Button width="100%" click="callPopup(event)" label="call native Alert"/>
-	<s:Label id="returnText" width="100%"/>
-	<s:List dataProvider="{files}" width="90%" height="300" change="list1_changeHandler(event)" labelField="name" borderVisible="true" borderColor="0x000000"/>
+	<s:Spacer height="100%" />
 	
+	<s:TextInput id="titleInput" text="Some Title" />
+	<s:TextInput id="messageInput" text="Some Message Text" />
+	<s:TextInput id="closeLabelInput" text="OK" />
+	<s:TextInput id="otherLabels" text="YES,NO" />
+	<s:SpinnerListContainer includeInLayout="{Capabilities.os.indexOf('Linux')>-1}">
+		<s:SpinnerList id="ThemeSelector" fontWeight="bold" labelField="name" minWidth="300" dataProvider="{themes}" selectedItem="{themes.getItemAt(0)}"/>
+	</s:SpinnerListContainer>
+	
+	<s:Spacer height="100%" />
+	
+	<s:Button width="100%" click="callPopup(event)" label="call native Alert" height="60"/>
+	<s:TextArea id="returnText" width="100%" height="100%" selectable="false" editable="false"/>
+		
 	<s:Spacer height="100%"/>
 </s:View>

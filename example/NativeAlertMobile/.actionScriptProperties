@@ -28,7 +28,7 @@
         </excludedEntries>
       </libraryPathEntry>
       <libraryPathEntry kind="1" linkType="1" path="libs"/>
-      <libraryPathEntry kind="5" linkType="2" path="${DOCUMENTS}/NativeAlertLib/FINAL_ANE/NativeAlert.ane"/>
+      <libraryPathEntry kind="5" linkType="2" path="C:/Users/mateusz/git/NativeAlert/build/release/NativeAlert.ane"/>
     </libraryPath>
     <sourceAttachmentPath/>
   </compiler>
@@ -42,13 +42,17 @@
   <flashCatalyst validateFlashCatalystCompatibility="false"/>
   <buildTargets>
     <buildTarget buildTargetName="com.adobe.flexide.multiplatform.ios.platform" iosSettingsVersion="1" provisioningFile="" releasePackageType="ipa-ad-hoc">
-      <multiPlatformSettings enabled="true" includePlatformLibs="false" platformID="com.adobe.flexide.multiplatform.ios.platform" version="2"/>
       <airSettings airCertificatePath="" airTimestamp="true" anePathSet="true" version="1">
-        <airExcludes/>
+        <airExcludes>
+          <pathEntry path="NativeAlert.ane"/>
+          <pathEntry path="NativeAlertUsage.swf"/>
+          <pathEntry path="NativeAlertUsage-app.xml"/>
+        </airExcludes>
         <anePaths>
-          <anePathEntry path="C:/Users/mateusz/Adobe Flash Builder 4.6/NativeAlertLib/FINAL_ANE/NativeAlert.ane"/>
+          <anePathEntry path="C:/Users/mateusz/git/NativeAlert/build/release/NativeAlert.ane"/>
         </anePaths>
       </airSettings>
+      <multiPlatformSettings enabled="true" includePlatformLibs="false" platformID="com.adobe.flexide.multiplatform.ios.platform" version="2"/>
       <actionScriptSettings version="1"/>
     </buildTarget>
     <buildTarget buildTargetName="default">
@@ -67,12 +71,14 @@
       <multiPlatformSettings enabled="false" includePlatformLibs="false" platformID="com.qnx.flexide.multiplatform.qnx.platform" version="2"/>
       <actionScriptSettings version="1"/>
     </buildTarget>
-    <buildTarget airDownloadURL="" androidSettingsVersion="1" buildTargetName="com.adobe.flexide.multiplatform.android.platform">
-      <airSettings airCertificatePath="" airTimestamp="true" anePathSet="true" version="1">
+    <buildTarget airDownloadURL="https://market.android.com/details?id=com.adobe.air" androidSettingsVersion="1" buildTargetName="com.adobe.flexide.multiplatform.android.platform">
+      <airSettings airCertificatePath="C:/Users/mateusz/Adobe Flash Builder 4.5/CERTYFIKATY DLA IPODA/android.p12" airTimestamp="true" anePathSet="true" version="1">
         <airExcludes/>
-        <anePaths/>
+        <anePaths>
+          <anePathEntry path="C:/Users/mateusz/git/NativeAlert/build/release/NativeAlert.ane"/>
+        </anePaths>
       </airSettings>
-      <multiPlatformSettings enabled="false" includePlatformLibs="false" platformID="com.adobe.flexide.multiplatform.android.platform" version="2"/>
+      <multiPlatformSettings enabled="true" includePlatformLibs="false" platformID="com.adobe.flexide.multiplatform.android.platform" version="2"/>
       <actionScriptSettings version="1"/>
     </buildTarget>
   </buildTargets>

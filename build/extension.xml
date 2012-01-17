@@ -16,5 +16,12 @@
                 <finalizer>finalizer</finalizer>
             </applicationDeployment>
         </platform>
+		<platform name="Android-ARM">
+            <applicationDeployment>
+                <nativeLibrary>nativealert.jar</nativeLibrary>
+                <initializer>pl.mateuszmackowiak.nativeANE.NativeAlert.NativeAlert</initializer>
+                <finalizer>pl.mateuszmackowiak.nativeANE.NativeAlert.NativeAlert</finalizer>
+            </applicationDeployment>
+        </platform>
     </platforms>
 </extension>

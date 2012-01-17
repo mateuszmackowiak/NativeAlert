@@ -9,17 +9,15 @@ package pl.mateuszmackowiak.nativeANE
 {
 	//import com.pialabs.eskimo.controls.SkinnableAlert;
 	
+	
 	import flash.events.ErrorEvent;
 	import flash.events.EventDispatcher;
 	import flash.events.StatusEvent;
 	import flash.external.ExtensionContext;
 	import flash.system.Capabilities;
 	
-	import mx.core.FlexGlobals;
-	import mx.events.CloseEvent;
-	
 
-	
+		
 	/**
 	 * Evant dispatched when the Alert is closed
 	 * @eventType pl.mateuszmackowiak.nativeANE.NativeAlertEvent.CLOSED
@@ -49,38 +47,69 @@ package pl.mateuszmackowiak.nativeANE
 		
 		private static const EXTENSION_ID : String = "pl.mateuszmackowiak.nativeANE.NativeAlert";
 		
-		private static var context:ExtensionContext;
+		public static const THEME_DEVICE_DEFAULT_DARK:int = 0x00000004;
+		public static const THEME_DEVICE_DEFAULT_LIGHT:int = 0x00000005;
+		public static const THEME_HOLO_DARK:int = 0x00000002;
+		public static const THEME_HOLO_LIGHT:int = 0x00000003;
+		public static const THEME_TRADITIONAL:int = 0x00000001;
 		
 		//---------------------------------------------------------------------
 		//
 		// Private Properties.
 		//
 		//---------------------------------------------------------------------
-		//private var context:ExtensionContext;
+		private static var context:ExtensionContext;
 		private static var _set:Boolean = false;
 		private static var _isSupp:Boolean = false;
+		private static var _theme:int = THEME_DEVICE_DEFAULT_DARK;
 		
+		//---------------------------------------------------------------------
+		//
+		// public Properties.
+		//
+		//---------------------------------------------------------------------
 		public var title:String="";
 		public var message:String="";
 		public var closeLabel:String="OK";
 		public var otherLabels:String ="";
+		private var androidTheme:int = THEME_DEVICE_DEFAULT_DARK;
 		//---------------------------------------------------------------------
 		//
 		// Public Methods.
 		//
 		//---------------------------------------------------------------------
-		
+		/** 
+		 * @author Mateusz Maćkowiak
+		 * @see http://www.mateuszmackowiak.art.pl/blog
+		 * @since 2011
+		 *  this project is based on a project by Liquid-Photo
+		 * @see http://www.liquid-photo.com/2011/10/28/native-extension-for-adobe-air-and-ios-101/
+		 */
 		public function NativeAlert()
 		{
-			
+			if(context==null){
+				try{
+					context = ExtensionContext.createExtensionContext(EXTENSION_ID, null);
+				}catch(e:Error){
+					showError(e.message);
+				}
+			}
 		}
 		
-		
-		public static function initialize():void{
-			context = ExtensionContext.createExtensionContext(EXTENSION_ID, null);
-		}
+		/*private static var s:*;
+		public static function initialize(reference:*):void{
+			s = reference;
+			if(context==null){
+				try{
+					context = ExtensionContext.createExtensionContext(EXTENSION_ID, null);
+				}catch(e:Error){
+					showError(e.message);
+				}
+			}
+		}**/
 		public static function dispose():void{
-			context.dispose();
+			if(context)
+				context.dispose();
 		}
 		/**
 		 * @param title Title to be displayed in the Alert.
@@ -89,32 +118,42 @@ package pl.mateuszmackowiak.nativeANE
 		 * @param otherLabels shoud be a comma separated sting of button labels.
 		 * for example "one,two,three"
 		 */
-		public function showAlert( title : String ="", message : String ="", closeLabel : String ="OK", otherLabels : String = "" ) : void
+		public function showAlert( title : String ="", message : String ="", closeLabel : String ="OK", otherLabels : String = "" ,androidTheme:int = NaN) : void
 		{
-			if(title!==null && title!=="")
-				this.title = title;
-			if(message!==null && message!=="")
-				this.message = message;
-			if(closeLabel!==null && closeLabel!=="")
-				this.closeLabel = closeLabel;
-			if(otherLabels!==null && otherLabels!=="")
-				this.otherLabels = otherLabels;
-			
 			try{
-				context.addEventListener(StatusEvent.STATUS, onAlertHandler);
+				if(title!==null && title!=="")
+					this.title = title;
+				if(message!==null && message!=="")
+					this.message = message;
+				if(closeLabel!==null && closeLabel!=="")
+					this.closeLabel = closeLabel;
+				if(otherLabels!==null && otherLabels!=="")
+					this.otherLabels = otherLabels;
+				if(!isNaN(androidTheme))
+					this.androidTheme = androidTheme;
+				else
+					this.androidTheme = _theme;
 				
-				context.call("showAlertWithTitleAndMessage", this.title, this.message, this.closeLabel,this.otherLabels );
+				context.addEventListener(StatusEvent.STATUS, onAlertHandler);
+				if(Capabilities.os.indexOf("Linux")>-1)
+					context.call("showAlertWithTitleAndMessage", this.title, this.message, this.closeLabel,this.otherLabels, this.androidTheme);
+				else
+					context.call("showAlertWithTitleAndMessage", this.title, this.message, this.closeLabel,this.otherLabels);
 				
 			}catch(e:Error){
-				if(hasEventListener(ErrorEvent.ERROR))
-					dispatchEvent(new ErrorEvent(ErrorEvent.ERROR,false,false,e.message,e.errorID));
-				else
-					trace(e);
+				showError(e.message);
 			}
 		}
 		
 		
-		
+		public function set defaultAndroidTheme(value:int):void
+		{
+			_theme = value;
+		}
+		public function get defaultAndroidTheme():int
+		{
+			return _theme;
+		}
 		/**
 		 * Create and show an Alert control
 		 * @param text     Text showed in the Alert control
@@ -123,7 +162,7 @@ package pl.mateuszmackowiak.nativeANE
 		 * @param otherLabels Text of the other buttons. Sepperated with "," adds aditional buttons (work on IOS) in the close event answer is the string representing the label
 		 * @param closeHandler  Close function callback
 		 */
-		public static function show(message:String = "", title:String = "Error", closeLabel : String="OK", otherLabels : String = "" , closeHandler:Function = null):NativeAlert
+		public static function show(message:String = "", title:String = "Error", closeLabel : String="OK", otherLabels : String = "" , closeHandler:Function = null,androidTheme:int = NaN):NativeAlert
 		{
 				try{
 					var alert:NativeAlert = new NativeAlert();
@@ -134,11 +173,11 @@ package pl.mateuszmackowiak.nativeANE
 						/*if(Capabilities.isDebugger && Capabilities.os.indexOf("Win")>-1)
 							closeHandler(new NativeAlertEvent(NativeAlertEvent.CLOSE,"0"));*/
 					}
-					alert.showAlert(title,message,closeLabel,otherLabels);
+					alert.showAlert(title,message,closeLabel,otherLabels,androidTheme);
 					
 					return alert;
 				}catch(e:Error){
-					trace(e);
+					showError(e.message);
 				}
 			return null;
 		}
@@ -152,14 +191,18 @@ package pl.mateuszmackowiak.nativeANE
 					_set = true;
 					//var context:ExtensionContext = ExtensionContext.createExtensionContext( EXTENSION_ID, null );
 					_isSupp = context.call("isSupported");
+					
 					//context.dispose();
 				}catch(e:Error){
-					trace(e);
+					showError(e.message);
 					return _isSupp;
 				}
 			}	
 			return _isSupp;
 		}
+		
+		
+		
 		//---------------------------------------------------------------------
 		//
 		// Private Methods.
@@ -174,19 +217,30 @@ package pl.mateuszmackowiak.nativeANE
 		 */
 		private function onAlertHandler( event : StatusEvent ) : void
 		{
-			(event.target as ExtensionContext).removeEventListener( StatusEvent.STATUS, onAlertHandler );
-			//NativeAlert.show("level:  "+event.level+"     code:"+event.code,"ODPOWIEDZ");
-			if( event.code == NativeAlertEvent.CLOSE)
-			{
-				var level:int = int(event.level);
-				if(Capabilities.os.indexOf("Win")>-1)
-					level--;
-				dispatchEvent(new NativeAlertEvent(NativeAlertEvent.CLOSE,level.toString()))
-			}else{
-				if(hasEventListener(ErrorEvent.ERROR))
-					dispatchEvent(new ErrorEvent(ErrorEvent.ERROR,false,false,event.toString(),0));
+			try{
+				(event.target as ExtensionContext).removeEventListener( StatusEvent.STATUS, onAlertHandler );
+				
+				if( event.code == NativeAlertEvent.CLOSE)
+				{
+					var level:int = int(event.level);
+					if(Capabilities.os.indexOf("Win")>-1)
+						level--;
+					dispatchEvent(new NativeAlertEvent(NativeAlertEvent.CLOSE,level.toString()))
+				}else{
+					showError(event.toString());
+				}
+			}catch(e:Error){
+				showError(e.message);
 			}
 		}
 
+		
+		
+		private static function showError(message:String):void
+		{
+			trace(message);
+			//dispatchEvent(new ErrorEvent(ErrorEvent.ERROR,false,false,message,0));
+			//FlexGlobals.topLevelApplication.dispatchEvent(new ErrorEvent(ErrorEvent.ERROR,false,false,message,0));
+		}
 	}
 }

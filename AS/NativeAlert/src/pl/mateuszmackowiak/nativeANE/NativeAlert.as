@@ -146,11 +146,11 @@ package pl.mateuszmackowiak.nativeANE
 		}
 		
 		
-		public function set defaultAndroidTheme(value:int):void
+		public static function set defaultAndroidTheme(value:int):void
 		{
 			_theme = value;
 		}
-		public function get defaultAndroidTheme():int
+		public static function get defaultAndroidTheme():int
 		{
 			return _theme;
 		}
@@ -162,7 +162,7 @@ package pl.mateuszmackowiak.nativeANE
 		 * @param otherLabels Text of the other buttons. Sepperated with "," adds aditional buttons (work on IOS) in the close event answer is the string representing the label
 		 * @param closeHandler  Close function callback
 		 */
-		public static function show(message:String = "", title:String = "Error", closeLabel : String="OK", otherLabels : String = "" , closeHandler:Function = null,androidTheme:int = NaN):NativeAlert
+		public static function show(message:String = "", title:String = "Error", closeLabel : String="OK", otherLabels : String = "" , closeHandler:Function = null , androidTheme:int = NaN):NativeAlert
 		{
 				try{
 					var alert:NativeAlert = new NativeAlert();
@@ -189,7 +189,8 @@ package pl.mateuszmackowiak.nativeANE
 			if(!_set){// checks if a value was set before
 				try{
 					_set = true;
-					//var context:ExtensionContext = ExtensionContext.createExtensionContext( EXTENSION_ID, null );
+					if(context==null)
+						context = ExtensionContext.createExtensionContext(EXTENSION_ID, null);
 					_isSupp = context.call("isSupported");
 					
 					//context.dispose();

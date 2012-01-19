@@ -21,7 +21,7 @@ public class showAlertFunction implements FREFunction{
     {
         String message="";
         String title="",closeLabel="",otherLabel="";
-        int theme=AlertDialog.THEME_HOLO_DARK;        
+        int theme=AlertDialog.THEME_HOLO_DARK;  
         try{
             title = args[0].getAsString();
         }catch (IllegalStateException e){
@@ -90,24 +90,34 @@ public class showAlertFunction implements FREFunction{
     	
     	if (otherLabel==null || otherLabel.isEmpty())
     	{
-            builder.setTitle(title);
-            builder.setMessage(message);
+    		if(!title.isEmpty())
+    			builder.setTitle(title);
+    		if(!message.isEmpty())
+    			builder.setMessage(message);
         	builder.setNeutralButton(closeLabel, new AlertListener(context));    		
     	}
     	else
     	{
-    		builder.setCancelable(false);
-	    	String[] als=otherLabel.split(",");
+	    	String[] als = otherLabel.split(",");
 	        if (als.length==1)
 	        {
-	            builder.setTitle(title);
-	            builder.setMessage(message);
+	        	if(!title.isEmpty())
+	        		builder.setTitle(title);
+	        	if(!message.isEmpty())
+	        		builder.setMessage(message);
 	        	builder.setPositiveButton(otherLabel, new AlertListener(context))
-	                   .setNegativeButton(closeLabel, new AlertListener(context));
+	                   .setNegativeButton(closeLabel, new AlertListener(context))
+	                   .setOnCancelListener(new CancelListener(context));
+	        			
 	        }
 	        else
 	        {
-	        	builder.setTitle(title+": "+message);
+	        	if(!title.isEmpty())
+	        		builder.setTitle(title);
+	        	else if(!message.isEmpty())
+	        		builder.setTitle(message);
+	        	else
+	        		builder.setTitle(title+": "+message);
 	        	String[] als2 = new String[als.length+1];
 	         	als2[0]=closeLabel;
 	         	for (int i=0;i<als.length;i++)
@@ -119,6 +129,19 @@ public class showAlertFunction implements FREFunction{
         alert.show();
     }
     
+    private class CancelListener implements DialogInterface.OnCancelListener{
+    	private FREContext context; 
+    	CancelListener(FREContext context)
+    	{
+    		this.context=context;
+    	}
+ 
+        public void onCancel(DialogInterface dialog) 
+        {
+     	    context.dispatchStatusEventAsync("ALERT_CLOSED",String.valueOf(-1));        
+            dialog.cancel();
+        }
+    }
     private class AlertListener implements DialogInterface.OnClickListener
     {
     	private FREContext context; 

@@ -4,6 +4,9 @@
     <classEntry path="uk.co.betadesigns.extension.nativealert.NativeAlert"/>
     <classEntry path="uk.co.betadesigns.extension.nativealert.INativeAlert"/>
     <classEntry path="uk.co.betadesigns.extension.nativealert.NativeAlertEvent"/>
+    <classEntry path="pl.mateuszmackowiak.nativeANE.NativeExtensionErrorEvent"/>
+    <classEntry path="pl.mateuszmackowiak.nativeANE.progress.NativeProgress"/>
+    <classEntry path="pl.mateuszmackowiak.nativeANE.progress.NativeProgressEvent"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests/>

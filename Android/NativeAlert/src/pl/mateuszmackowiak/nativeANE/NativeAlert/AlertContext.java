@@ -24,6 +24,7 @@ public class AlertContext extends FREContext{
         Map<String, FREFunction> map = new HashMap<String, FREFunction>();
         map.put(showAlertFunction.KEY, new showAlertFunction());
         map.put(isSupportedFunction.KEY, new isSupportedFunction());
+        map.put(showProgressPopup.KEY, new showProgressPopup());
         return map;
         
     }

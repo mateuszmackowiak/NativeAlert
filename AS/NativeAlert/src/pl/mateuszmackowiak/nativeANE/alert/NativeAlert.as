@@ -5,7 +5,7 @@
 *  this project is based on a project by Liquid-Photo
 * @see http://www.liquid-photo.com/2011/10/28/native-extension-for-adobe-air-and-ios-101/
 */
-package pl.mateuszmackowiak.nativeANE
+package pl.mateuszmackowiak.nativeANE.alert
 {
 	//import com.pialabs.eskimo.controls.SkinnableAlert;
 	
@@ -16,13 +16,15 @@ package pl.mateuszmackowiak.nativeANE
 	import flash.external.ExtensionContext;
 	import flash.system.Capabilities;
 	
+	import mx.core.FlexGlobals;
+	
 
 		
 	/**
 	 * Evant dispatched when the Alert is closed
 	 * @eventType pl.mateuszmackowiak.nativeANE.NativeAlertEvent.CLOSED
 	 */
-	[Event(name ="ALERT_CLOSED", type = "pl.mateuszmackowiak.nativeANE.NativeAlertEvent")] // NO PMD
+	[Event(name ="ALERT_CLOSED", type = "pl.mateuszmackowiak.nativeANE.alert.NativeAlertEvent")] // NO PMD
 	
 	/**
 	 * Evant dispatched when an Error acures
@@ -45,7 +47,7 @@ package pl.mateuszmackowiak.nativeANE
 		//
 		//---------------------------------------------------------------------
 		
-		private static const EXTENSION_ID : String = "pl.mateuszmackowiak.nativeANE.NativeAlert";
+		public static const EXTENSION_ID : String = "pl.mateuszmackowiak.nativeANE.NativeAlert";
 		
 		public static const THEME_DEVICE_DEFAULT_DARK:int = 0x00000004;
 		public static const THEME_DEVICE_DEFAULT_LIGHT:int = 0x00000005;
@@ -61,7 +63,7 @@ package pl.mateuszmackowiak.nativeANE
 		private static var context:ExtensionContext;
 		private static var _set:Boolean = false;
 		private static var _isSupp:Boolean = false;
-		private static var _theme:int = THEME_DEVICE_DEFAULT_DARK;
+		private static var _theme:int = THEME_HOLO_LIGHT;
 		
 		//---------------------------------------------------------------------
 		//
@@ -72,7 +74,7 @@ package pl.mateuszmackowiak.nativeANE
 		public var message:String="";
 		public var closeLabel:String="OK";
 		public var otherLabels:String ="";
-		private var androidTheme:int = THEME_DEVICE_DEFAULT_DARK;
+		private var androidTheme:int = -1;
 		//---------------------------------------------------------------------
 		//
 		// Public Methods.
@@ -90,23 +92,13 @@ package pl.mateuszmackowiak.nativeANE
 			if(context==null){
 				try{
 					context = ExtensionContext.createExtensionContext(EXTENSION_ID, null);
+					showError("utworzył context");
 				}catch(e:Error){
-					showError(e.message);
+					showError(e.message,e.errorID);
 				}
 			}
 		}
-		
-		/*private static var s:*;
-		public static function initialize(reference:*):void{
-			s = reference;
-			if(context==null){
-				try{
-					context = ExtensionContext.createExtensionContext(EXTENSION_ID, null);
-				}catch(e:Error){
-					showError(e.message);
-				}
-			}
-		}**/
+
 		public static function dispose():void{
 			if(context)
 				context.dispose();
@@ -118,7 +110,7 @@ package pl.mateuszmackowiak.nativeANE
 		 * @param otherLabels shoud be a comma separated sting of button labels.
 		 * for example "one,two,three"
 		 */
-		public function showAlert( title : String ="", message : String ="", closeLabel : String ="OK", otherLabels : String = "" ,androidTheme:int = NaN) : void
+		public function showAlert( title : String ="", message : String ="", closeLabel : String ="OK", otherLabels : String = "" ,androidTheme:int = -1) : void
 		{
 			try{
 				if(title!==null && title!=="")
@@ -129,26 +121,28 @@ package pl.mateuszmackowiak.nativeANE
 					this.closeLabel = closeLabel;
 				if(otherLabels!==null && otherLabels!=="")
 					this.otherLabels = otherLabels;
-				if(!isNaN(androidTheme))
+				if(androidTheme==THEME_DEVICE_DEFAULT_DARK || androidTheme==THEME_DEVICE_DEFAULT_LIGHT || androidTheme==THEME_HOLO_DARK || androidTheme==THEME_HOLO_LIGHT || androidTheme==THEME_TRADITIONAL)
 					this.androidTheme = androidTheme;
 				else
 					this.androidTheme = _theme;
 				
 				context.addEventListener(StatusEvent.STATUS, onAlertHandler);
+				
 				if(Capabilities.os.indexOf("Linux")>-1)
 					context.call("showAlertWithTitleAndMessage", this.title, this.message, this.closeLabel,this.otherLabels, this.androidTheme);
 				else
 					context.call("showAlertWithTitleAndMessage", this.title, this.message, this.closeLabel,this.otherLabels);
 				
 			}catch(e:Error){
-				showError(e.message);
+				showError(e.message,e.errorID);
 			}
 		}
 		
 		
 		public static function set defaultAndroidTheme(value:int):void
 		{
-			_theme = value;
+			if(value==THEME_DEVICE_DEFAULT_DARK || value==THEME_DEVICE_DEFAULT_LIGHT || value==THEME_HOLO_DARK || value==THEME_HOLO_LIGHT || value==THEME_TRADITIONAL)
+				_theme = value;
 		}
 		public static function get defaultAndroidTheme():int
 		{
@@ -167,17 +161,12 @@ package pl.mateuszmackowiak.nativeANE
 				try{
 					var alert:NativeAlert = new NativeAlert();
 					if (closeHandler !== null)
-					{
 						alert.addEventListener(NativeAlertEvent.CLOSE, closeHandler);
-						
-						/*if(Capabilities.isDebugger && Capabilities.os.indexOf("Win")>-1)
-							closeHandler(new NativeAlertEvent(NativeAlertEvent.CLOSE,"0"));*/
-					}
 					alert.showAlert(title,message,closeLabel,otherLabels,androidTheme);
-					
+		
 					return alert;
 				}catch(e:Error){
-					showError(e.message);
+					showError(e.message,e.errorID);
 				}
 			return null;
 		}
@@ -192,10 +181,8 @@ package pl.mateuszmackowiak.nativeANE
 					if(context==null)
 						context = ExtensionContext.createExtensionContext(EXTENSION_ID, null);
 					_isSupp = context.call("isSupported");
-					
-					//context.dispose();
 				}catch(e:Error){
-					showError(e.message);
+					showError(e.message,e.errorID);
 					return _isSupp;
 				}
 			}	
@@ -231,17 +218,16 @@ package pl.mateuszmackowiak.nativeANE
 					showError(event.toString());
 				}
 			}catch(e:Error){
-				showError(e.message);
+				showError(e.message,e.errorID);
 			}
 		}
 
 		
 		
-		private static function showError(message:String):void
+		private static function showError(message:String,id:int=0):void
 		{
 			trace(message);
-			//dispatchEvent(new ErrorEvent(ErrorEvent.ERROR,false,false,message,0));
-			//FlexGlobals.topLevelApplication.dispatchEvent(new ErrorEvent(ErrorEvent.ERROR,false,false,message,0));
+			//FlexGlobals.topLevelApplication.dispatchEvent(new NativeAlertErrorEvent(NativeAlertErrorEvent.ERROR,false,false,message,id));
 		}
 	}
 }

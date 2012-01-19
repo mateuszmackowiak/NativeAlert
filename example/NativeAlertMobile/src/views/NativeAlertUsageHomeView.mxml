@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
-		xmlns:s="library://ns.adobe.com/flex/spark" title="Native Alerts" viewActivate="view1_viewActivateHandler(event)" 
+		xmlns:s="library://ns.adobe.com/flex/spark" title="Native Alerts" viewActivate="view1_viewActivateHandler(event)" backKeyPressed="view1_backKeyPressedHandler(event)"
 		>
 	<fx:Script>
 		<![CDATA[
@@ -8,8 +8,11 @@
 			import mx.core.FlexGlobals;
 			import mx.events.FlexEvent;
 			
-			import pl.mateuszmackowiak.nativeANE.NativeAlert;
-			import pl.mateuszmackowiak.nativeANE.NativeAlertEvent;
+			import pl.mateuszmackowiak.nativeANE.NativeExtensionErrorEvent;
+			import pl.mateuszmackowiak.nativeANE.alert.NativeAlert;
+			import pl.mateuszmackowiak.nativeANE.alert.NativeAlertEvent;
+			import pl.mateuszmackowiak.nativeANE.progress.NativeProgress;
+			import pl.mateuszmackowiak.nativeANE.progress.NativeProgressEvent;
 			
 			import spark.events.IndexChangeEvent;
 			import spark.events.ViewNavigatorEvent;
@@ -19,13 +22,14 @@
 			
 			private function closeFun(event:NativeAlertEvent):void
 			{
+				
 				var n:NativeAlert = event.target as NativeAlert;
 				returnText.text+= "the answer: "+event.index+"\n";
-				
 			}
 			protected function view1_viewActivateHandler(event:ViewNavigatorEvent):void
 			{
 				FlexGlobals.topLevelApplication.addEventListener(UncaughtErrorEvent.UNCAUGHT_ERROR,onError);
+				FlexGlobals.topLevelApplication.addEventListener(NativeExtensionErrorEvent.ERROR,onError);
 				NativeApplication.nativeApplication.addEventListener(Event.EXITING,exiting);
 								
 				if(NativeAlert.isSupported){
@@ -37,6 +41,8 @@
 			
 			protected function exiting(event:Event):void
 			{
+				if(progressPopup)
+					progressPopup.kill();
 				NativeAlert.dispose();
 			}
 			
@@ -61,6 +67,68 @@
 				else
 					NativeAlert.show(messageInput.text,titleInput.text,closeLabelInput.text, otherLabels.text , closeFun,NativeAlert.THEME_DEVICE_DEFAULT_DARK);
 			}
+			
+			private var progressPopup:NativeProgress;
+			private var p:int = 0;
+			private var myTimer:Timer = new Timer(100);
+			protected function button1_clickHandler(style:int):void
+			{
+				try{
+					progressPopup = new NativeProgress(style);
+					progressPopup.theme = ThemeSelector.selectedItem.data;
+					progressPopup.show(0, titleInput.text , messageInput.text,true);
+					progressPopup.addEventListener(NativeProgressEvent.CANCLED,closed);
+					progressPopup.addEventListener(NativeProgressEvent.CLOSED,closed);
+					progressPopup.addEventListener(NativeExtensionErrorEvent.ERROR,onError);
+					myTimer.addEventListener(TimerEvent.TIMER, updateProgress);
+					myTimer.start();
+				}catch(e:Error){
+					returnText.text += "Error "+ e.message+"   "+e.toString()+"\n";
+				}
+			}
+			private function closed(event:Event):void
+			{
+				returnText.text += event.toString()+"\n";
+				progressPopup.removeEventListener(NativeProgressEvent.CANCLED,closed);
+				progressPopup.removeEventListener(NativeProgressEvent.CLOSED,closed);
+				progressPopup.removeEventListener(NativeExtensionErrorEvent.ERROR,onError);
+				myTimer.removeEventListener(TimerEvent.TIMER,updateProgress);
+				myTimer.stop();
+				p = 0;
+			}
+			private function updateProgress(event:TimerEvent):void
+			{
+				p++;
+				if(p>=100){
+					p = 0;
+					progressPopup.hide();
+					progressPopup.removeEventListener(NativeExtensionErrorEvent.ERROR,onError);
+					
+					(event.target as Timer).stop();
+				}else{
+					try{
+						progressPopup.setProgress(p);
+					}catch(e:Error){
+						returnText.text += "Error "+ e.message+"   "+e.toString()+"\n";
+					}
+				}
+				
+			}
+			
+			protected function view1_backKeyPressedHandler(event:FlexEvent):void
+			{
+				event.preventDefault();
+				returnText.text +="back key pressed\n";
+				
+				myTimer.removeEventListener(TimerEvent.TIMER,updateProgress);
+				myTimer.stop();
+				p = 0;
+				if(progressPopup){
+					progressPopup.removeEventListener(NativeExtensionErrorEvent.ERROR,onError);
+					progressPopup.hide();
+				}
+			}
+			
 		]]>
 	</fx:Script>
 	<fx:Declarations>
@@ -85,10 +153,11 @@
 		<s:SpinnerList id="ThemeSelector" fontWeight="bold" labelField="name" minWidth="300" dataProvider="{themes}" selectedItem="{themes.getItemAt(0)}"/>
 	</s:SpinnerListContainer>
 	
-	<s:Spacer height="100%" />
-	
 	<s:Button width="100%" click="callPopup(event)" label="call native Alert" height="60"/>
-	<s:TextArea id="returnText" width="100%" height="100%" selectable="false" editable="false"/>
-		
-	<s:Spacer height="100%"/>
+	<s:HGroup width="100%"  includeInLayout="{Capabilities.os.indexOf('Linux')>-1}" >
+		<s:Button width="100%" label="show horizontal progress popup" click="button1_clickHandler(NativeProgress.STYLE_HORIZONTAL)" height="60"/>
+		<s:Button width="100%" label="show spinner progress popup" click="button1_clickHandler(NativeProgress.STYLE_SPINNER)" height="60"/>	
+	</s:HGroup>
+	
+	<s:TextArea id="returnText" width="100%" height="100%" selectable="false" editable="false" minHeight="350"/>
 </s:View>

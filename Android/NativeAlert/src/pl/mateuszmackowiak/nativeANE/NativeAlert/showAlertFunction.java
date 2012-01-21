@@ -105,15 +105,17 @@ public class showAlertFunction implements FREFunction{
     	builder.setCancelable(cancelable);
     	if(cancelable==true)
     		builder.setOnCancelListener(new CancelListener(context));
+    	
     	if (otherLabel==null || otherLabel.isEmpty())
     	{
     		if(!title.isEmpty())
     			builder.setTitle(title);
     		if(!message.isEmpty())
     			builder.setMessage(message);
+    		
     		if(title!=null && title.isEmpty()==false)
     			builder.setNeutralButton(closeLabel, new AlertListener(context));
-    		else if(cancelable==false){
+    		else{
     			builder.setCancelable(true);
     			builder.setOnCancelListener(new CancelListener(context));
     		}

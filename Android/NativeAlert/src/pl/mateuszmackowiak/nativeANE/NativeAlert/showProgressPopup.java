@@ -109,7 +109,7 @@ public class showProgressPopup implements FREFunction {
 	            e.printStackTrace();
 	        }
 			if(mProgressDialog==null)
-				createPopup(context,style,progress,title,message,_theme,cancleble);
+				mProgressDialog = createProgressDialog(context,style,progress,title,message,_theme,cancleble);
 			else{
 				if(title!=null && !title.isEmpty())
 					mProgressDialog.setTitle(title);
@@ -117,7 +117,7 @@ public class showProgressPopup implements FREFunction {
 					mProgressDialog.setTitle(message);
 			}
 			mProgressDialog.show();
-			context.dispatchStatusEventAsync("nativeProgress_opened",String.valueOf(-2));
+			context.dispatchStatusEventAsync(NativeAlert.OPENED,String.valueOf(-2));
 			
 		}else if(function.equals("setTitle")){
 			 	try{
@@ -181,40 +181,53 @@ public class showProgressPopup implements FREFunction {
 		}else if(function.equals("hide")){
 			if(mProgressDialog!=null && mProgressDialog.isShowing())
 				mProgressDialog.hide();
-			context.dispatchStatusEventAsync("nativeProgress_closed",String.valueOf(-2));
+			context.dispatchStatusEventAsync(NativeAlert.CLOSED,String.valueOf(-2));
 		}else if(function.equals("isShowing")){
 			FREObject b = null;
-	        try{
-	            b = FREObject.newObject(true);
-	        }catch (FREWrongThreadException e){
-	            e.printStackTrace();
-	        }
+			if(mProgressDialog!=null && mProgressDialog.isShowing()==true){
+		        try{
+		            b = FREObject.newObject(true);
+		        }catch (FREWrongThreadException e){
+		            e.printStackTrace();
+		        }
+			}else{
+				try{
+		            b = FREObject.newObject(false);
+		        }catch (FREWrongThreadException e){
+		            e.printStackTrace();
+		        }
+			}
 	        return b;
-		}else{
-			context.dispatchStatusEventAsync("nativeAlertError","No souch function "+function);
+		}/*else if(function.equals("properties")){
+			Bundle bundle  = new Bundle();
+			bundle.putString("demo_key", "some app data");
+			context.getActivity().startSearch("dupa", false,bundle,false);
+			//context.getActivity().;
+		}*/else{
+			context.dispatchStatusEventAsync(NativeAlert.ERROR_EVENT,"No souch function "+function);
 		}
 			
 		
 		return null;
 	}
 	
-	public void createPopup(FREContext context,int style,int progress,String title,String message,int theme,boolean cancleble) {
-		mProgressDialog = new ProgressDialog(context.getActivity(),theme);
+	public ProgressDialog createProgressDialog(FREContext context,int style,int progress,String title,String message,int theme,boolean cancleble) {
+		ProgressDialog mDialog = new ProgressDialog(context.getActivity(),theme);
 
 		if(title!=null && !title.trim().isEmpty())
-			mProgressDialog.setTitle(title);
+			mDialog.setTitle(title);
 		
 		if(message!=null && !message.trim().isEmpty())
-			mProgressDialog.setMessage(message);
+			mDialog.setMessage(message);
 		
-        mProgressDialog.setProgressStyle(style);
-        mProgressDialog.setMax(MAX_PROGRESS);
+        mDialog.setProgressStyle(style);
+        mDialog.setMax(MAX_PROGRESS);
         
-       	mProgressDialog.setCancelable(cancleble);
+       	mDialog.setCancelable(cancleble);
         	
-       	mProgressDialog.setOnCancelListener(new CancelListener(context));
-       	mProgressDialog.setProgress(progress);
-
+       	mDialog.setOnCancelListener(new CancelListener(context));
+       	mDialog.setProgress(progress);
+       	return mDialog;
 	}
 	
 	private class CancelListener implements DialogInterface.OnCancelListener{
@@ -226,7 +239,7 @@ public class showProgressPopup implements FREFunction {
  
         public void onCancel(DialogInterface dialog) 
         {
-     	    context.dispatchStatusEventAsync("nativeProgress_cancled",String.valueOf(-1));        
+     	    context.dispatchStatusEventAsync(NativeAlert.CANCLED,String.valueOf(-1));        
             dialog.cancel();
         }
     }

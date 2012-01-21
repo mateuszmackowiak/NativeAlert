@@ -4,7 +4,7 @@ package pl.mateuszmackowiak.nativeANE
 	
 	public class NativeExtensionErrorEvent extends ErrorEvent
 	{
-		public static const ERROR:String = "nativeAlertError";
+		public static const ERROR:String = "nativeError";
 		
 		public function NativeExtensionErrorEvent(type:String, bubbles:Boolean=false, cancelable:Boolean=false, text:String="", id:int=0)
 		{

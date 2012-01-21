@@ -6,7 +6,10 @@
     <classEntry path="uk.co.betadesigns.extension.nativealert.NativeAlertEvent"/>
     <classEntry path="pl.mateuszmackowiak.nativeANE.NativeExtensionErrorEvent"/>
     <classEntry path="pl.mateuszmackowiak.nativeANE.progress.NativeProgress"/>
-    <classEntry path="pl.mateuszmackowiak.nativeANE.progress.NativeProgressEvent"/>
+    <classEntry path="pl.mateuszmackowiak.nativeANE.NativeDialogEvent"/>
+    <classEntry path="pl.mateuszmackowiak.nativeANE.dialogs.NativeMultiChoiceDialog"/>
+    <classEntry path="pl.mateuszmackowiak.nativeANE.LogEvent"/>
+    <classEntry path="pl.mateuszmackowiak.nativeANE.NativeDialogListEvent"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests/>

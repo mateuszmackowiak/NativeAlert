@@ -7,12 +7,16 @@
 			import mx.collections.ArrayCollection;
 			import mx.core.FlexGlobals;
 			import mx.events.FlexEvent;
+			import mx.utils.ObjectUtil;
 			
+			import pl.mateuszmackowiak.nativeANE.LogEvent;
+			import pl.mateuszmackowiak.nativeANE.NativeDialogEvent;
+			import pl.mateuszmackowiak.nativeANE.NativeDialogListEvent;
 			import pl.mateuszmackowiak.nativeANE.NativeExtensionErrorEvent;
 			import pl.mateuszmackowiak.nativeANE.alert.NativeAlert;
 			import pl.mateuszmackowiak.nativeANE.alert.NativeAlertEvent;
+			import pl.mateuszmackowiak.nativeANE.dialogs.NativeMultiChoiceDialog;
 			import pl.mateuszmackowiak.nativeANE.progress.NativeProgress;
-			import pl.mateuszmackowiak.nativeANE.progress.NativeProgressEvent;
 			
 			import spark.events.IndexChangeEvent;
 			import spark.events.ViewNavigatorEvent;
@@ -20,16 +24,20 @@
 			
 			
 			
-			private function closeFun(event:NativeAlertEvent):void
-			{
-				
-				var n:NativeAlert = event.target as NativeAlert;
-				returnText.text+= "the answer: "+event.index+"\n";
-			}
+			private var progressPopup:NativeProgress;
+			private var p:int = 0;
+			private var myTimer:Timer = new Timer(100);
+			private var multChDialog:NativeMultiChoiceDialog;
+			private var choces:Vector.<String>;
+			private var checkedItems:Vector.<Boolean>;
+			
+			
+			
 			protected function view1_viewActivateHandler(event:ViewNavigatorEvent):void
 			{
 				FlexGlobals.topLevelApplication.addEventListener(UncaughtErrorEvent.UNCAUGHT_ERROR,onError);
 				FlexGlobals.topLevelApplication.addEventListener(NativeExtensionErrorEvent.ERROR,onError);
+				
 				NativeApplication.nativeApplication.addEventListener(Event.EXITING,exiting);
 								
 				if(NativeAlert.isSupported){
@@ -37,16 +45,19 @@
 				}else{
 					returnText.text+= "extension is NOT supported on this device\n";
 				}
+				choces = new Vector.<String>();
+				choces.push("one","two","three","four");
+				checkedItems = new Vector.<Boolean>();
+				checkedItems.push(true,false,false,true);
 			}
-			
 			protected function exiting(event:Event):void
 			{
 				if(progressPopup)
 					progressPopup.kill();
+				if(multChDialog)
+					multChDialog.kill();
 				NativeAlert.dispose();
 			}
-			
-			
 			private function onError(event:*):void
 			{
 				if(event is UncaughtErrorEvent){
@@ -58,40 +69,82 @@
 				}else
 					returnText.text += "Error "+ event.text+"   "+event.toString()+"\n";
 			}
-			
-			
-			protected function callPopup(event:MouseEvent):void
+			private function traceEvent(event:*):void
 			{
-				if(Capabilities.os.indexOf('Linux')>-1)
-					NativeAlert.show(messageInput.text,titleInput.text,closeLabelInput.text, otherLabels.text , closeFun,ThemeSelector.selectedItem.data);
+				if(event.hasOwnProperty("text"))
+					returnText.text += event.toString()+"  "+event.text+"\n";
 				else
-					NativeAlert.show(messageInput.text,titleInput.text,closeLabelInput.text, otherLabels.text , closeFun,NativeAlert.THEME_DEVICE_DEFAULT_DARK);
+					returnText.text += event.toString()+"\n";
+			}
+			protected function view1_backKeyPressedHandler(event:FlexEvent):void
+			{
+				event.preventDefault();
+				returnText.text +="back key pressed\n";
+				
+				myTimer.removeEventListener(TimerEvent.TIMER,updateProgress);
+				myTimer.stop();
+				p = 0;
+				if(progressPopup){
+					progressPopup.hide();
+				}
 			}
 			
-			private var progressPopup:NativeProgress;
-			private var p:int = 0;
-			private var myTimer:Timer = new Timer(100);
-			protected function button1_clickHandler(style:int):void
+			
+			
+			
+			
+			
+			
+			
+			
+			protected function callNativeAlret(event:MouseEvent):void
+			{
+				if(Capabilities.os.indexOf('Linux')>-1)
+					NativeAlert.show(messageInput.text,titleInput.text,closeLabelInput.text, otherLabels.text , closeFun,canclebleCheckbox.selected,ThemeSelector.selectedItem.data);
+				else
+					NativeAlert.show(messageInput.text,titleInput.text,closeLabelInput.text, otherLabels.text , closeFun);
+			}
+			private function closeFun(event:NativeAlertEvent):void
+			{
+				var n:NativeAlert = event.target as NativeAlert;
+				returnText.text+= "the answer: "+event.index+"\n";
+			}
+			
+			
+			
+			
+			
+			
+			
+			
+			protected function openProgressPopup(style:int):void
 			{
 				try{
 					progressPopup = new NativeProgress(style);
 					progressPopup.theme = ThemeSelector.selectedItem.data;
-					progressPopup.show(0, titleInput.text , messageInput.text,true);
-					progressPopup.addEventListener(NativeProgressEvent.CANCLED,closed);
-					progressPopup.addEventListener(NativeProgressEvent.CLOSED,closed);
+					progressPopup.setMax(50);
+					
+					progressPopup.addEventListener(NativeDialogEvent.CANCLED,closeNativeProcessHandler);
+					progressPopup.addEventListener(NativeDialogEvent.OPENED,traceEvent);
+					progressPopup.addEventListener(NativeDialogEvent.CLOSED,closeNativeProcessHandler);
 					progressPopup.addEventListener(NativeExtensionErrorEvent.ERROR,onError);
+					
+					progressPopup.show(0, titleInput.text , messageInput.text,canclebleCheckbox.selected);
 					myTimer.addEventListener(TimerEvent.TIMER, updateProgress);
 					myTimer.start();
 				}catch(e:Error){
 					returnText.text += "Error "+ e.message+"   "+e.toString()+"\n";
 				}
 			}
-			private function closed(event:Event):void
+			private function closeNativeProcessHandler(event:Event):void
 			{
 				returnText.text += event.toString()+"\n";
-				progressPopup.removeEventListener(NativeProgressEvent.CANCLED,closed);
-				progressPopup.removeEventListener(NativeProgressEvent.CLOSED,closed);
+				progressPopup.removeEventListener(NativeDialogEvent.CANCLED,closeNativeProcessHandler);
+				progressPopup.removeEventListener(NativeDialogEvent.CLOSED,closeNativeProcessHandler);
+				progressPopup.removeEventListener(NativeDialogEvent.OPENED,traceEvent);
 				progressPopup.removeEventListener(NativeExtensionErrorEvent.ERROR,onError);
+				
+				progressPopup.kill();
 				myTimer.removeEventListener(TimerEvent.TIMER,updateProgress);
 				myTimer.stop();
 				p = 0;
@@ -99,11 +152,9 @@
 			private function updateProgress(event:TimerEvent):void
 			{
 				p++;
-				if(p>=100){
+				if(p>=50){
 					p = 0;
 					progressPopup.hide();
-					progressPopup.removeEventListener(NativeExtensionErrorEvent.ERROR,onError);
-					
 					(event.target as Timer).stop();
 				}else{
 					try{
@@ -115,20 +166,66 @@
 				
 			}
 			
-			protected function view1_backKeyPressedHandler(event:FlexEvent):void
+			
+			
+			
+			
+			
+			
+			
+			
+			protected function openMultiChoiceDialog(event:MouseEvent):void
 			{
-				event.preventDefault();
-				returnText.text +="back key pressed\n";
+				multChDialog = new NativeMultiChoiceDialog();
+				multChDialog.theme = ThemeSelector.selectedItem.data;
 				
-				myTimer.removeEventListener(TimerEvent.TIMER,updateProgress);
-				myTimer.stop();
-				p = 0;
-				if(progressPopup){
-					progressPopup.removeEventListener(NativeExtensionErrorEvent.ERROR,onError);
-					progressPopup.hide();
+				multChDialog.addEventListener(NativeDialogEvent.CANCLED,closeNativeDialogHandler);
+				multChDialog.addEventListener(NativeDialogEvent.OPENED,traceEvent);
+				multChDialog.addEventListener(NativeDialogEvent.CLOSED,closeNativeDialogHandler);
+				multChDialog.addEventListener(LogEvent.LOG_EVENT,traceEvent);
+				multChDialog.addEventListener(NativeExtensionErrorEvent.ERROR,onError);
+				multChDialog.addEventListener(NativeDialogListEvent.LIST_CHANGE,onListChange);
+				try{
+					var a:Array = otherLabels.text.split(",");
+					var buttons:Vector.<String> = new Vector.<String>();
+					if(a==null || a.length==0)
+						buttons.push(closeLabelInput.text);
+					else{
+						a.unshift(closeLabelInput.text);
+						for each (var button:String in a) 
+						{
+							buttons.push(button);
+						}
+					}
+					
+					multChDialog.show(choces,checkedItems,buttons,titleInput.text,canclebleCheckbox.selected);
+				}catch(e:Error){
+					returnText.text += "Error "+ e.message+"   "+e.toString()+"\n";
 				}
 			}
 			
+			private function onListChange(event:NativeDialogListEvent):void
+			{
+				returnText.text += "NativeDialogListEvent "+ event.index+"   "+event.selected+"\n";
+				const a:Vector.<String> = multChDialog.selectedLabels;
+				if(a.length>0){
+					for (var i:int = 0; i < a.length; i++) 
+					{
+						returnText.text += a[i]+"\n";
+					}
+				}
+				
+			}
+			public function closeNativeDialogHandler(event:NativeDialogEvent):void
+			{
+				returnText.text += event.toString()+"\n";
+				multChDialog.removeEventListener(NativeDialogEvent.CANCLED,closeNativeDialogHandler);
+				multChDialog.removeEventListener(NativeDialogEvent.CLOSED,closeNativeDialogHandler);
+				multChDialog.removeEventListener(NativeDialogEvent.OPENED,traceEvent);
+				multChDialog.removeEventListener(NativeExtensionErrorEvent.ERROR,onError);
+				multChDialog.removeEventListener(LogEvent.LOG_EVENT,traceEvent);
+				multChDialog.kill();
+			}
 		]]>
 	</fx:Script>
 	<fx:Declarations>
@@ -143,21 +240,30 @@
 	<s:layout>
 		<s:VerticalLayout horizontalAlign="center"/>
 	</s:layout>
-	<s:Spacer height="100%" />
-	
-	<s:TextInput id="titleInput" text="Some Title" />
-	<s:TextInput id="messageInput" text="Some Message Text" />
-	<s:TextInput id="closeLabelInput" text="OK" />
-	<s:TextInput id="otherLabels" text="YES,NO" />
-	<s:SpinnerListContainer includeInLayout="{Capabilities.os.indexOf('Linux')>-1}">
-		<s:SpinnerList id="ThemeSelector" fontWeight="bold" labelField="name" minWidth="300" dataProvider="{themes}" selectedItem="{themes.getItemAt(0)}"/>
-	</s:SpinnerListContainer>
-	
-	<s:Button width="100%" click="callPopup(event)" label="call native Alert" height="60"/>
-	<s:HGroup width="100%"  includeInLayout="{Capabilities.os.indexOf('Linux')>-1}" >
-		<s:Button width="100%" label="show horizontal progress popup" click="button1_clickHandler(NativeProgress.STYLE_HORIZONTAL)" height="60"/>
-		<s:Button width="100%" label="show spinner progress popup" click="button1_clickHandler(NativeProgress.STYLE_SPINNER)" height="60"/>	
+		
+	<s:HGroup height="100%" width="100%">
+		<s:Spacer width="100%"/>
+		<s:VGroup>
+			<s:TextInput id="titleInput" text="Some Title" />
+			<s:TextInput id="messageInput" text="Some Message Text" />
+			<s:TextInput id="closeLabelInput" text="OK" />
+			<s:TextInput id="otherLabels" text="YES,NO" />
+			<s:CheckBox id="canclebleCheckbox" label="cancleble" selected="true"/>
+		</s:VGroup>
+		<s:SpinnerListContainer includeInLayout="{Capabilities.os.indexOf('Linux')>-1}">
+			<s:SpinnerList id="ThemeSelector" fontWeight="bold" labelField="name" minWidth="300" dataProvider="{themes}" selectedItem="{themes.getItemAt(0)}"/>
+		</s:SpinnerListContainer>
+		<s:Spacer width="100%"/>
 	</s:HGroup>
 	
-	<s:TextArea id="returnText" width="100%" height="100%" selectable="false" editable="false" minHeight="350"/>
+	
+	
+	<s:Button width="100%" click="callNativeAlret(event)" label="call native Alert" height="60"/>
+	<s:HGroup width="100%"  includeInLayout="{Capabilities.os.indexOf('Linux')>-1}" >
+		<s:Button width="100%" label="show horizontal progress popup" click="openProgressPopup(NativeProgress.STYLE_HORIZONTAL)" height="60"/>
+		<s:Button width="100%" label="show spinner progress popup" click="openProgressPopup(NativeProgress.STYLE_SPINNER)" height="60"/>	
+	</s:HGroup>
+	<s:Button width="100%" click="openMultiChoiceDialog(event)" label="open Mulit Choice Dialog" height="60" includeInLayout="{Capabilities.os.indexOf('Linux')>-1}"/>
+	
+	<s:TextArea id="returnText" width="100%" height="100%" selectable="false" editable="false" minHeight="500"/>
 </s:View>

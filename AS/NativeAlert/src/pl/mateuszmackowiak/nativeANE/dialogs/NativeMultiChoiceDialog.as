@@ -3,23 +3,27 @@
  * @see http://www.mateuszmackowiak.art.pl/blog
  * @since 2011
  */
-package pl.mateuszmackowiak.nativeANE.progress
+package pl.mateuszmackowiak.nativeANE.dialogs
 {
 	import flash.events.EventDispatcher;
 	import flash.events.IEventDispatcher;
 	import flash.events.StatusEvent;
 	import flash.external.ExtensionContext;
 	
-	import pl.mateuszmackowiak.nativeANE.NativeExtensionErrorEvent;
+	import pl.mateuszmackowiak.nativeANE.LogEvent;
 	import pl.mateuszmackowiak.nativeANE.NativeDialogEvent;
+	import pl.mateuszmackowiak.nativeANE.NativeDialogListEvent;
+	import pl.mateuszmackowiak.nativeANE.NativeExtensionErrorEvent;
 	
-	public class NativeProgress extends EventDispatcher
+	public class NativeMultiChoiceDialog extends EventDispatcher
 	{
 		//---------------------------------------------------------------------
 		//
 		// Constants
 		//
 		//---------------------------------------------------------------------
+		public static const EXTENSION_ID : String = "pl.mateuszmackowiak.nativeANE.NativeAlert";
+		
 		public static const STYLE_HORIZONTAL:int = 0x00000001;
 		public static const STYLE_SPINNER:int = 0x00000000;
 		
@@ -29,47 +33,26 @@ package pl.mateuszmackowiak.nativeANE.progress
 		public static const THEME_HOLO_LIGHT:int = 0x00000003;
 		public static const THEME_TRADITIONAL:int = 0x00000001;
 		
-		
-		public static const EXTENSION_ID : String = "pl.mateuszmackowiak.nativeANE.NativeAlert";
-		
-			
 		private static var _defaultTheme:int = THEME_HOLO_LIGHT;
 		private static var _set:Boolean = false;
 		private static var _isSupp:Boolean = false;
+		
 		//---------------------------------------------------------------------
 		//
 		// Private Properties.
 		//
 		//---------------------------------------------------------------------
 		private var context:ExtensionContext;
-		private var _progress:int=0;
 		private var _title:String="";
-		private var _message:String = "";
-		private var _style:int = STYLE_HORIZONTAL;
+		private var _buttons:Vector.<String>=null;
 		private var _theme:int = -1;
-		private var _maxProgress:int  = 100;
-	
+		private var _cancleble:Boolean = false;
+		private var _list:Vector.<Object> = null;
 		
-		//---------------------------------------------------------------------
-		//
-		// Public Methods.
-		//
-		//---------------------------------------------------------------------
-		/** 
-		 * @author Mateusz Maćkowiak
-		 * @see http://www.mateuszmackowiak.art.pl/blog
-		 * @since 2011
-		 */
-		public function NativeProgress(style:int = 0x00000001,title:String ="",message:String = "")
+		public function NativeMultiChoiceDialog()
 		{
-			if(title!= null && title!=="")
-				_title = title;
-			if(style == STYLE_HORIZONTAL || style==STYLE_SPINNER)
-				_style = style;
-			if(message!=null && message!=="")
-				_message = message;
 			try{
-				context = ExtensionContext.createExtensionContext(EXTENSION_ID, "ProgressContext");
+				context = ExtensionContext.createExtensionContext(EXTENSION_ID, "MultiChoiceDialogContext");
 				context.addEventListener(StatusEvent.STATUS, onStatus);
 			}catch(e:Error){
 				showError("Error initiating contex of the extension "+e.message,e.errorID);
@@ -77,23 +60,38 @@ package pl.mateuszmackowiak.nativeANE.progress
 		}
 		
 		
+		
 
 		
 
-		public function show(progress:int=-1,title:String="",message:String="",cancleble:Boolean=false):Boolean
+		public function show(labels:Vector.<String>,checkedLabels:Vector.<Boolean>,buttons:Vector.<String>=null,title:String="",cancleble:Object=null):Boolean
 		{
-			if(!isNaN(progress) && progress>=0 && progress<= _maxProgress)
-				_progress = progress;
 			if(title!= null && title!=="")
 				_title = title;
 			if(_theme ==-1)
 				_theme = defaultTheme;
-			if(message!=null && message!=="")
-				_message = message;
-
+			if(buttons!=null)
+				_buttons = buttons;
+			if(cancleble!==null)
+				_cancleble = cancleble;
 			
+			if(labels!==null && labels.length>0){
+				_list = new Vector.<Object>();
+				for each (var label:String in labels) 
+				{
+					_list.push({label:label,selected:false});
+				}
+				const l:int = checkedLabels.length;
+				if(checkedLabels!=null && labels.length == l){
+					for (var i:int = 0; i < l; i++) 
+					{
+						_list[i].selected = checkedLabels[i];
+					}
+				}
+			}
+				
 			try{
-				context.call("NativeProgress","showPopup",progress,_style,_title,_message,cancleble,_theme);
+				context.call("showMultiChoiceDialog","showPopup",_title,_buttons,labels,checkedLabels,_cancleble,_theme);
 				return true;
 			}catch(e:Error){
 				showError("Error calling show method "+e.message,e.errorID);
@@ -101,92 +99,83 @@ package pl.mateuszmackowiak.nativeANE.progress
 			return false;
 		}
 		
-		public function setProgress(value:int):Boolean{
-			if(!isNaN(value) && _progress!==value  && value>=0 && value<= _maxProgress){
-				try{
-					context.call("NativeProgress","update",value);
-					_progress = value;
-					return true;
-				}catch(e:Error){
-					showError("Error setting progress "+e.message,e.errorID);
+		public function get labels():Vector.<String>{
+			var lab:Vector.<String> = new Vector.<String>();
+			if(_list!==null){
+				for each (var obj:Object in _list) 
+				{
+					lab.push(obj.label);
 				}
 			}
-			return false;
+			return lab;
 		}
-		
-		public function getProgress():int{
-			return _progress;
+		public function get selectedLabels():Vector.<String>{
+			var lab:Vector.<String> = new Vector.<String>();
+			if(_list!==null){
+				
+				for each (var obj:Object in _list) 
+				{
+					if(obj.selected == true)
+						lab.push(obj.label);
+				}
+
+			}
+			return lab;
 		}
-		
-		
-		public function setMax(value:int):Boolean{
-			if(!isNaN(value) && _maxProgress!==value){
-				try{
-					context.call("NativeProgress","max",value);
-					_progress = value;
-					return true;
-				}catch(e:Error){
-					showError("Error setting MAX "+e.message,e.errorID);
+		public function get selectedIndexes():Vector.<int>{
+			var indexes:Vector.<int> = new Vector.<int>();
+			if(_list!==null && _list.length>0){
+				for (var i:int = 0; i < _list.length; i++) 
+				{
+					if(_list[i].selected == true)
+						indexes.push(i);;
 				}
 			}
-			return false;
-		}
-		
-		public function getMax():int{
-			return _maxProgress;
-		}
-		
-		
-		public function getMessage():String
-		{
-			return _message;
-		}
-		
-		public function setMessage(value:String):Boolean
-		{
-			if(value!=null && value!==_message){
-				try{
-					context.call("NativeProgress","setMessage",value);
-					_message = value;
-					return true;
-				}catch(e:Error){
-					showError("Error setting message "+e.message,e.errorID);
-				}
-			}
-			return false;
-		}
-		
-		public function getTitle():String
-		{
-			return _title;
-		}
-		
-		public function setTitle(value:String):Boolean
-		{
-			if(value!=null && value!==_title){
-				try{
-					context.call("NativeProgress","setTitle",value);
-					_title = value;
-					return true;
-				}catch(e:Error){
-					showError("Error setting title "+e.message,e.errorID);
-				}
-			}
-			return false;
+			return indexes;
 		}
 		
 		public function isShowing():Boolean{
 			if(context){
-				return context.call("NativeProgress","isShowing");
+				return context.call("showMultiChoiceDialog","isShowing");
 			}else
 				return false;
-				
+			
+		}
+
+		
+		
+		public function get title():String
+		{
+			return _title;
 		}
 		
+		public function set title(value:String):void
+		{
+			if(value!=null && value!==_title){
+				_title = value;
+			}
+		}
+		public function get cancleble():Boolean
+		{
+			return _cancleble;
+		}
+		public function set cancleble(value:Boolean):void
+		{
+			_cancleble = value;
+		}
 		
 		public function get theme():int
 		{
 			return _theme;
+		}
+		public function get buttons():Vector.<String>
+		{
+			return _buttons;
+		}
+		
+		public function set buttons(value:Vector.<String>):void
+		{
+			_buttons = value;
 		}
 		
 		public function set theme(value:int):void
@@ -200,7 +189,7 @@ package pl.mateuszmackowiak.nativeANE.progress
 		public function hide():Boolean
 		{
 			try{
-				context.call("NativeProgress","hide");
+				context.call("showMultiChoiceDialog","hide");
 				return true;
 			}catch(e:Error){
 				showError("Error calling hide method "+e.message,e.errorID);
@@ -210,8 +199,9 @@ package pl.mateuszmackowiak.nativeANE.progress
 		public function kill():Boolean
 		{
 			try{
-				context.call("NativeProgress","hide");
+				context.call("showMultiChoiceDialog","hide");
 				context.dispose();
+				context.removeEventListener(StatusEvent.STATUS, onStatus);
 				return true;
 			}catch(e:Error){
 				showError("Error calling hide method "+e.message,e.errorID);
@@ -251,7 +241,6 @@ package pl.mateuszmackowiak.nativeANE.progress
 		{
 			return _defaultTheme;
 		}
-		
 		//---------------------------------------------------------------------
 		//
 		// Private Methods.
@@ -267,15 +256,25 @@ package pl.mateuszmackowiak.nativeANE.progress
 		private function onStatus(event:StatusEvent):void
 		{
 			try{
-				if(event.code == NativeDialogEvent.CLOSED)
-				{
+				if(event.code == NativeDialogEvent.CLOSED){
 					dispatchEvent(new NativeDialogEvent(NativeDialogEvent.CLOSED,event.level));
 				}else if(event.code == NativeDialogEvent.CANCLED){
 					dispatchEvent(new NativeDialogEvent(NativeDialogEvent.CANCLED,event.level));
 				}else if(event.code == NativeDialogEvent.OPENED){
 					dispatchEvent(new NativeDialogEvent(NativeDialogEvent.OPENED,event.level));
-				}else if(event.code ==NativeExtensionErrorEvent.ERROR){
-					dispatchEvent(new NativeExtensionErrorEvent(NativeExtensionErrorEvent.ERROR,false,false,event.level,0));
+				}else if(event.code ==LogEvent.LOG_EVENT){
+					dispatchEvent(new LogEvent(LogEvent.LOG_EVENT,event.level));
+				}else if(event.code ==NativeDialogListEvent.LIST_CHANGE){
+					
+					const args:Array = event.level.split("_");
+					const index:int = int(args[0]);
+					var selected:Boolean=false;
+					const selectedStr:String= String(args[1]).toLocaleLowerCase();
+					if(selectedStr=="true" || selectedStr=="1")
+						selected = true;
+					_list[index].selected = selected;
+					
+					dispatchEvent(new NativeDialogListEvent(NativeDialogListEvent.LIST_CHANGE,index,selected));
 				}else{
 					showError(event.toString());
 				}

@@ -72,7 +72,7 @@ package pl.mateuszmackowiak.nativeANE.alert
 		//---------------------------------------------------------------------
 		public var title:String="";
 		public var message:String="";
-		public var closeLabel:String="OK";
+		public var closeLabel:String="";
 		public var otherLabels:String ="";
 		private var androidTheme:int = -1;
 		//---------------------------------------------------------------------
@@ -110,7 +110,7 @@ package pl.mateuszmackowiak.nativeANE.alert
 		 * @param otherLabels shoud be a comma separated sting of button labels.
 		 * for example "one,two,three"
 		 */
-		public function showAlert( title : String ="", message : String ="", closeLabel : String ="OK", otherLabels : String = "" ,androidTheme:int = -1) : void
+		public function showAlert( title : String ="", message : String ="", closeLabel : String ="OK", otherLabels : String = "" ,cancelable:Boolean = true,androidTheme:int = -1) : void
 		{
 			try{
 				if(title!==null && title!=="")
@@ -129,7 +129,7 @@ package pl.mateuszmackowiak.nativeANE.alert
 				context.addEventListener(StatusEvent.STATUS, onAlertHandler);
 				
 				if(Capabilities.os.indexOf("Linux")>-1)
-					context.call("showAlertWithTitleAndMessage", this.title, this.message, this.closeLabel,this.otherLabels, this.androidTheme);
+					context.call("showAlertWithTitleAndMessage", this.title, this.message, this.closeLabel,this.otherLabels, cancelable, this.androidTheme);
 				else
 					context.call("showAlertWithTitleAndMessage", this.title, this.message, this.closeLabel,this.otherLabels);
 				
@@ -156,13 +156,13 @@ package pl.mateuszmackowiak.nativeANE.alert
 		 * @param otherLabels Text of the other buttons. Sepperated with "," adds aditional buttons (work on IOS) in the close event answer is the string representing the label
 		 * @param closeHandler  Close function callback
 		 */
-		public static function show(message:String = "", title:String = "Error", closeLabel : String="OK", otherLabels : String = "" , closeHandler:Function = null , androidTheme:int = NaN):NativeAlert
+		public static function show(message:String = "", title:String = "Error", closeLabel : String="OK", otherLabels : String = "" , closeHandler:Function = null ,cancelable:Boolean = true, androidTheme:int = NaN):NativeAlert
 		{
 				try{
 					var alert:NativeAlert = new NativeAlert();
 					if (closeHandler !== null)
 						alert.addEventListener(NativeAlertEvent.CLOSE, closeHandler);
-					alert.showAlert(title,message,closeLabel,otherLabels,androidTheme);
+					alert.showAlert(title,message,closeLabel,otherLabels,cancelable,androidTheme);
 		
 					return alert;
 				}catch(e:Error){
@@ -214,7 +214,14 @@ package pl.mateuszmackowiak.nativeANE.alert
 					if(Capabilities.os.indexOf("Win")>-1)
 						level--;
 					dispatchEvent(new NativeAlertEvent(NativeAlertEvent.CLOSE,level.toString()))
-				}else{
+				}/*else if( event.code == NativeAlertEvent.OPENED)
+				{
+					dispatchEvent(new NativeAlertEvent(NativeAlertEvent.OPENED,event.level));
+				}else if( event.code == NativeAlertEvent.OPENED)
+				{
+					dispatchEvent(new NativeAlertEvent(NativeAlertEvent.OPENED,event.level));
+				}*/
+				else{
 					showError(event.toString());
 				}
 			}catch(e:Error){

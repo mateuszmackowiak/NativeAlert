@@ -111,9 +111,9 @@ public class showProgressPopup implements FREFunction {
 			if(mProgressDialog==null)
 				createPopup(context,style,progress,title,message,_theme,cancleble);
 			else{
-				if(title!=null && !title.trim().isEmpty())
+				if(title!=null && !title.isEmpty())
 					mProgressDialog.setTitle(title);
-				if(message!=null && !message.trim().isEmpty())
+				if(message!=null && !message.isEmpty())
 					mProgressDialog.setTitle(message);
 			}
 			mProgressDialog.show();
@@ -191,7 +191,7 @@ public class showProgressPopup implements FREFunction {
 	        }
 	        return b;
 		}else{
-			context.dispatchStatusEventAsync("NATIVE_PROGRESS_ERROR","No souch function "+function);
+			context.dispatchStatusEventAsync("nativeAlertError","No souch function "+function);
 		}
 			
 		

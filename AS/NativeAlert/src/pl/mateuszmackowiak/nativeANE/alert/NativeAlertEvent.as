@@ -10,6 +10,12 @@ package pl.mateuszmackowiak.nativeANE.alert
 	{
 		public static const CLOSE:String = "ALERT_CLOSED";
 		
+		/**
+		 * only on Android
+		 *public static const OPENED:String = "nativeAlert_opened";
+		 * only on Android
+		 *public static const CANCLED:String = "nativeAlert_cancled";*/
+		
 		private var _index:String;
 		
 		public function NativeAlertEvent(type:String, index:String, bubbles:Boolean=false, cancelable:Boolean=false)

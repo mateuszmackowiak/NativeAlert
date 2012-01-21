@@ -19,8 +19,8 @@ public class showAlertFunction implements FREFunction{
     @Override
     public FREObject call(FREContext context, FREObject[] args)
     {
-        String message="";
-        String title="",closeLabel="",otherLabel="";
+        String message="",title="",closeLabel="",otherLabel="";
+        boolean cancelable=false;
         int theme=AlertDialog.THEME_HOLO_DARK;  
         try{
             title = args[0].getAsString();
@@ -69,7 +69,7 @@ public class showAlertFunction implements FREFunction{
         if (args.length>=5)
         {
 	        try{
-	            theme= args[4].getAsInt();
+	        	cancelable= args[4].getAsBool();
 	        }catch (IllegalStateException e){
 	            e.printStackTrace();
 	        }catch (FRETypeMismatchException e){
@@ -79,22 +79,45 @@ public class showAlertFunction implements FREFunction{
 	        }catch (FREWrongThreadException e){
 	            e.printStackTrace();
 	        }
+		    if (args.length>=6)
+		    {
+		        try{
+		            theme= args[5].getAsInt();
+		        }catch (IllegalStateException e){
+		            e.printStackTrace();
+		        }catch (FRETypeMismatchException e){
+		            e.printStackTrace();
+		        }catch (FREInvalidObjectException e){
+		            e.printStackTrace();
+		        }catch (FREWrongThreadException e){
+		            e.printStackTrace();
+		        }
+		    }
         }
-        showAlertWithTitleAndMessage(context,message,title,closeLabel,otherLabel,theme);        
+        showAlertWithTitleAndMessage(context,message,title,closeLabel,otherLabel,cancelable,theme);        
         return null;
     }
     
-    private void showAlertWithTitleAndMessage(FREContext context,String message,String title,String closeLabel,String otherLabel,int theme)
+    private void showAlertWithTitleAndMessage(FREContext context,String message,String title,String closeLabel,String otherLabel,boolean cancelable,int theme)
     {  
     	AlertDialog.Builder builder = new AlertDialog.Builder(context.getActivity(),theme);
     	
+    	builder.setCancelable(cancelable);
+    	if(cancelable==true)
+    		builder.setOnCancelListener(new CancelListener(context));
     	if (otherLabel==null || otherLabel.isEmpty())
     	{
     		if(!title.isEmpty())
     			builder.setTitle(title);
     		if(!message.isEmpty())
     			builder.setMessage(message);
-        	builder.setNeutralButton(closeLabel, new AlertListener(context));    		
+    		if(title!=null && title.isEmpty()==false)
+    			builder.setNeutralButton(closeLabel, new AlertListener(context));
+    		else if(cancelable==false){
+    			builder.setCancelable(true);
+    			builder.setOnCancelListener(new CancelListener(context));
+    		}
+    			
     	}
     	else
     	{
@@ -106,18 +129,17 @@ public class showAlertFunction implements FREFunction{
 	        	if(!message.isEmpty())
 	        		builder.setMessage(message);
 	        	builder.setPositiveButton(otherLabel, new AlertListener(context))
-	                   .setNegativeButton(closeLabel, new AlertListener(context))
-	                   .setOnCancelListener(new CancelListener(context));
-	        			
+	                   .setNegativeButton(closeLabel, new AlertListener(context));
 	        }
 	        else
 	        {
-	        	if(!title.isEmpty())
+	        	if(!title.isEmpty() && !message.isEmpty())
+	        		builder.setTitle(title+": "+message);
+	        	else if(!title.isEmpty())
 	        		builder.setTitle(title);
 	        	else if(!message.isEmpty())
 	        		builder.setTitle(message);
-	        	else
-	        		builder.setTitle(title+": "+message);
+	        		
 	        	String[] als2 = new String[als.length+1];
 	         	als2[0]=closeLabel;
 	         	for (int i=0;i<als.length;i++)

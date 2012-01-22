@@ -185,23 +185,18 @@
 				multChDialog.addEventListener(LogEvent.LOG_EVENT,traceEvent);
 				multChDialog.addEventListener(NativeExtensionErrorEvent.ERROR,onError);
 				multChDialog.addEventListener(NativeDialogListEvent.LIST_CHANGE,onListChange);
-				try{
-					var a:Array = otherLabels.text.split(",");
-					var buttons:Vector.<String> = new Vector.<String>();
-					if(a==null || a.length==0)
-						buttons.push(closeLabelInput.text);
-					else{
-						a.unshift(closeLabelInput.text);
-						for each (var button:String in a) 
-						{
-							buttons.push(button);
-						}
+				var a:Array = otherLabels.text.split(",");
+				var buttons:Vector.<String> = new Vector.<String>();
+				if(a==null || a.length==0)
+					buttons.push(closeLabelInput.text);
+				else{
+					a.unshift(closeLabelInput.text);
+					for each (var button:String in a) 
+					{
+						buttons.push(button);
 					}
-					
-					multChDialog.show(choces,checkedItems,buttons,titleInput.text,canclebleCheckbox.selected);
-				}catch(e:Error){
-					returnText.text += "Error "+ e.message+"   "+e.toString()+"\n";
 				}
+				multChDialog.show(choces,checkedItems,buttons,titleInput.text,canclebleCheckbox.selected);
 			}
 			
 			private function onListChange(event:NativeDialogListEvent):void

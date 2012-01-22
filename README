@@ -1,0 +1,185 @@
+This is a evolution on a project by liquid-photo (https://github.com/mccormicka/NativeAlert).
+Se more info on : http://mateuszmackowiak.wordpress.com/
+
+///////////////------------------------////////////////////////
+Native Extension for adobe air for mobile projects.
+///////////////------------------------////////////////////////
+
+
+
+///////////////------------------------////////////////////////
+NativeAlert class is supported for platforms:
+Android
+IOS
+Windows
+
+Native Alert popup.
+
+Available themes for android:
+THEME_DEVICE_DEFAULT_DARK
+THEME_DEVICE_DEFAULT_LIGHT
+THEME_HOLO_DARK
+THEME_HOLO_LIGHT
+THEME_TRADITIONAL
+
+
+/////////////////
+Usage:
+[code lang="as3"]
+NativeAlert.defaultAndroidTheme = NativeAlert.THEME_DEVICE_DEFAULT_DARK;
+
+if(NativeAlert.isSuported())
+NativeAlert.show( "some message" , "title" , "first button label" , "otherButtons,LabelsSeperated,WithAComma" , someAnswerFunction);
+
+NativeAlert.dispose(); //!!!!
+[/code]
+
+
+///////////////------------------------////////////////////////
+
+///////////////
+NativeProgress class is supported only on Android
+
+The ability to display the native dialog showing a progress bar or a spinner.
+
+Available themes for android:
+THEME_DEVICE_DEFAULT_DARK
+THEME_DEVICE_DEFAULT_LIGHT
+THEME_HOLO_DARK
+THEME_HOLO_LIGHT
+THEME_TRADITIONAL
+
+
+/////////////////
+Usage:
+[code lang="as3"]
+private var progressPopup:NativeProgress;
+private var p:int = 0;
+private var myTimer:Timer = new Timer(100);
+
+protected function openProgressPopup(style:int):void
+{
+     progressPopup = new NativeProgress(style);
+     progressPopup.theme = NativeProgress.THEME_HOLO_DARK;
+
+     progressPopup.addEventListener(NativeDialogEvent.OPENED,traceEvent);
+     progressPopup.addEventListener(NativeDialogEvent.CANCLED,closeNativeProcessHandler);
+     progressPopup.addEventListener(NativeDialogEvent.CLOSED,closeNativeProcessHandler);
+     progressPopup.addEventListener(NativeExtensionErrorEvent.ERROR,onError);
+
+     progressPopup.show(0, titleInput.text , messageInput.text,true);
+
+     myTimer.addEventListener(TimerEvent.TIMER, updateProgress);
+     myTimer.start();
+}
+
+private function closeNativeProcessHandler(event:Event):void
+{
+     progressPopup.removeEventListener(NativeDialogEvent.CANCLED,closeNativeProcessHandler);
+     progressPopup.removeEventListener(NativeDialogEvent.CLOSED,closeNativeProcessHandler);
+     progressPopup.removeEventListener(NativeExtensionErrorEvent.ERROR,onError);
+     progressPopup.removeEventListener(NativeDialogEvent.OPENED,traceEvent);
+
+     progressPopup.kill();
+
+     myTimer.removeEventListener(TimerEvent.TIMER,updateProgress);
+     myTimer.stop();
+     p = 0;
+}
+private function updateProgress(event:TimerEvent):void
+{
+     p++;
+     if(p>=100){
+          p = 0;
+          progressPopup.hide();
+	  (event.target as Timer).stop();
+     }else
+	progressPopup.setProgress(p);
+}
+			
+protected function viewBackKeyPressedHandler(event:FlexEvent):void
+{
+     event.preventDefault();
+     myTimer.removeEventListener(TimerEvent.TIMER,updateProgress);
+     myTimer.stop();
+     p = 0;
+     if(progressPopup){
+	progressPopup.hide();
+     }
+}
+//NativeApplication.nativeApplication.addEventListener(Event.EXITING,exiting);
+protected function exiting(event:Event):void
+{
+     if(progressPopup)
+	progressPopup.kill();
+}
+[/code]
+
+
+///////////////------------------------////////////////////////
+
+///////////////
+NativeMultiChoiceDialog class is supported only on Android
+
+NativeMultiChoiceDialog has the ability to show a native android popup dialog inside a Adobe Air project.
+
+Available themes for android:
+THEME_DEVICE_DEFAULT_DARK
+THEME_DEVICE_DEFAULT_LIGHT
+THEME_HOLO_DARK
+THEME_HOLO_LIGHT
+THEME_TRADITIONAL
+
+
+/////////////////
+Usage:
+[code lang="as3"]
+private var multChDialog:NativeMultiChoiceDialog;
+private var choces:Vector.<String>;
+private var buttons:Vector.<String>;
+private var checkedItems:Vector.<Boolean>;
+
+protected function view1_viewActivateHandler(event:ViewNavigatorEvent):void
+{
+      choces = new Vector.<String>();
+//the text of the items to be displayed in the list.
+      choces.push("one","two","three","four");
+      checkedItems = new Vector.<Boolean>();  
+// specifies which items are checked. It should be null in which case no items are checked. If non null it must be exactly the same length as the array of items.
+      checkedItems.push(true,false,false,true);
+      buttons = new Vector.<String>();
+//the labels for the buttons. It should be null in which case there will be only one button "OK". If non null max length 3 buttons
+      buttons.push("OK","Settings","Cancle");
+}
+protected function openMultiChoiceDialog(event:MouseEvent):void
+{
+      multChDialog = new NativeMultiChoiceDialog();
+      multChDialog.theme = NativeMultiChoiceDialog.THEME_HOLO_DARK;
+      multChDialog.addEventListener(NativeDialogEvent.CANCLED,closeNativeDialogHandler);
+      multChDialog.addEventListener(NativeDialogEvent.OPENED,traceEvent);
+      multChDialog.addEventListener(NativeDialogEvent.CLOSED,closeNativeDialogHandler);
+      multChDialog.addEventListener(NativeExtensionErrorEvent.ERROR,onError);
+      multChDialog.addEventListener(NativeDialogListEvent.LIST_CHANGE,onListChange);
+      multChDialog.title ="Some Title";
+      multChDialog.cancleble = true;
+      multChDialog.show(choces,checkedItems,buttons);
+}
+
+public function closeNativeDialogHandler(event:NativeDialogEvent):void
+{
+	multChDialog.removeEventListener(NativeDialogEvent.CANCLED,closeNativeDialogHandler);
+	multChDialog.removeEventListener(NativeDialogEvent.CLOSED,closeNativeDialogHandler);
+	multChDialog.removeEventListener(NativeDialogEvent.OPENED,traceEvent);
+	multChDialog.removeEventListener(NativeExtensionErrorEvent.ERROR,onError);
+	multChDialog.removeEventListener(LogEvent.LOG_EVENT,traceEvent);
+	multChDialog.kill();
+}
+
+private function onListChange(event:NativeDialogListEvent):void
+{
+         trace(event.index+"   selected:  "+event.selected);
+         trace(multChDialog.selectedLabels);
+	//multChDialog.selectedIndexes;
+	//multChDialog.labels;
+}
+[/code]

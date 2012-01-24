@@ -5,14 +5,12 @@ Se more info on : http://mateuszmackowiak.wordpress.com/
 Native Extension for adobe air for mobile projects.
 ///////////////------------------------////////////////////////
 
-
-
-///////////////------------------------////////////////////////
-NativeAlert class is supported for platforms:
+Extension supports platforms:
 Android
 IOS
 Windows
 
+///////////////------------------------////////////////////////
 Native Alert popup.
 
 Available themes for android:
@@ -61,12 +59,13 @@ protected function openProgressPopup(style:int):void
 {
      progressPopup = new NativeProgress(style);
      progressPopup.theme = NativeProgress.THEME_HOLO_DARK;
-
+	 progressPopup.setSecondaryProgress(45);
      progressPopup.addEventListener(NativeDialogEvent.OPENED,traceEvent);
      progressPopup.addEventListener(NativeDialogEvent.CANCLED,closeNativeProcessHandler);
      progressPopup.addEventListener(NativeDialogEvent.CLOSED,closeNativeProcessHandler);
      progressPopup.addEventListener(NativeExtensionErrorEvent.ERROR,onError);
-
+	 progressPopup.setMax(50);
+	 progressPopup.setIndeterminate = true;
      progressPopup.show(0, titleInput.text , messageInput.text,true);
 
      myTimer.addEventListener(TimerEvent.TIMER, updateProgress);
@@ -89,7 +88,7 @@ private function closeNativeProcessHandler(event:Event):void
 private function updateProgress(event:TimerEvent):void
 {
      p++;
-     if(p>=100){
+     if(p>=50){
           p = 0;
           progressPopup.hide();
 	  (event.target as Timer).stop();
@@ -104,14 +103,14 @@ protected function viewBackKeyPressedHandler(event:FlexEvent):void
      myTimer.stop();
      p = 0;
      if(progressPopup){
-	progressPopup.hide();
+	       progressPopup.hide();
      }
 }
 //NativeApplication.nativeApplication.addEventListener(Event.EXITING,exiting);
 protected function exiting(event:Event):void
 {
-     if(progressPopup)
-	progressPopup.kill();
+    if(progressPopup)
+	     progressPopup.kill();
 }
 [/code]
 
@@ -119,9 +118,9 @@ protected function exiting(event:Event):void
 ///////////////------------------------////////////////////////
 
 ///////////////
-NativeMultiChoiceDialog class is supported only on Android
+NativeListDialog class is supported only on Android
 
-NativeMultiChoiceDialog has the ability to show a native android popup dialog inside a Adobe Air project.
+NativeListDialog has the ability to show a native android popup dialog with a multi-choice or single-choice inside a Adobe Air project.
 
 Available themes for android:
 THEME_DEVICE_DEFAULT_DARK
@@ -134,10 +133,11 @@ THEME_TRADITIONAL
 /////////////////
 Usage:
 [code lang="as3"]
-private var multChDialog:NativeMultiChoiceDialog;
+private var multChDialog:NativeListDialog;
 private var choces:Vector.<String>;
 private var buttons:Vector.<String>;
 private var checkedItems:Vector.<Boolean>;
+private var selectedIndex:int = -1;
 
 protected function view1_viewActivateHandler(event:ViewNavigatorEvent):void
 {
@@ -153,8 +153,8 @@ protected function view1_viewActivateHandler(event:ViewNavigatorEvent):void
 }
 protected function openMultiChoiceDialog(event:MouseEvent):void
 {
-      multChDialog = new NativeMultiChoiceDialog();
-      multChDialog.theme = NativeMultiChoiceDialog.THEME_HOLO_DARK;
+      multChDialog = new NativeListDialog();
+      multChDialog.theme = NativeListDialog.THEME_HOLO_DARK;
       multChDialog.addEventListener(NativeDialogEvent.CANCLED,closeNativeDialogHandler);
       multChDialog.addEventListener(NativeDialogEvent.OPENED,traceEvent);
       multChDialog.addEventListener(NativeDialogEvent.CLOSED,closeNativeDialogHandler);
@@ -162,24 +162,68 @@ protected function openMultiChoiceDialog(event:MouseEvent):void
       multChDialog.addEventListener(NativeDialogListEvent.LIST_CHANGE,onListChange);
       multChDialog.title ="Some Title";
       multChDialog.cancleble = true;
-      multChDialog.show(choces,checkedItems,buttons);
+      multChDialog.showMultiChoice(choces,checkedItems,buttons);
 }
+
+
+public function openSingleChoiceDialog(event:MouseEvent):void
+{
+	singleChDialog = new NativeListDialog();
+	singleChDialog.theme = ThemeSelector.selectedItem.data;
+	singleChDialog.addEventListener(NativeDialogEvent.CANCLED,closeNativeDialogHandler);
+	singleChDialog.addEventListener(NativeDialogEvent.OPENED,traceEvent);
+	singleChDialog.addEventListener(NativeDialogEvent.CLOSED,closeNativeDialogHandler);
+	singleChDialog.addEventListener(LogEvent.LOG_EVENT,traceEvent);
+	singleChDialog.addEventListener(NativeExtensionErrorEvent.ERROR,onError);
+	singleChDialog.addEventListener(NativeDialogListEvent.LIST_CHANGE,onListChange);
+	singleChDialog.cancleble = true;
+	singleChDialog.showSingleChoice(choces,selectedIndex,buttons,titleInput.text);
+}
+
+
 
 public function closeNativeDialogHandler(event:NativeDialogEvent):void
 {
-	multChDialog.removeEventListener(NativeDialogEvent.CANCLED,closeNativeDialogHandler);
-	multChDialog.removeEventListener(NativeDialogEvent.CLOSED,closeNativeDialogHandler);
-	multChDialog.removeEventListener(NativeDialogEvent.OPENED,traceEvent);
-	multChDialog.removeEventListener(NativeExtensionErrorEvent.ERROR,onError);
-	multChDialog.removeEventListener(LogEvent.LOG_EVENT,traceEvent);
-	multChDialog.kill();
+	var dialog:NativeListDialog = (event.target  as NativeListDialog);
+	dialog.removeEventListener(NativeDialogEvent.CANCLED,closeNativeDialogHandler);
+	dialog.removeEventListener(NativeDialogEvent.CLOSED,closeNativeDialogHandler);
+	dialog.removeEventListener(NativeDialogEvent.OPENED,traceEvent);
+	dialog.removeEventListener(NativeExtensionErrorEvent.ERROR,onError);
+	dialog.kill();
 }
 
 private function onListChange(event:NativeDialogListEvent):void
 {
-         trace(event.index+"   selected:  "+event.selected);
-         trace(multChDialog.selectedLabels);
-	//multChDialog.selectedIndexes;
-	//multChDialog.labels;
+    var dialog:NativeListDialog = (event.target as NativeListDialog)
+	if(dialog.selectedIndex>-1){
+		selectedIndex = dialog.selectedIndex;
+	}else{
+		const a:Vector.<String> = dialog.selectedLabels;
+		if(a.length>0){
+			for (var i:int = 0; i < a.length; i++) 
+			{
+				trace(a[i]);
+			}
+		}
+	}
 }
+[/code]
+
+
+///////////////------------------------////////////////////////
+
+///////////////
+Toast (only on Android)
+
+
+Usage:
+[code lang="as3"]
+
+Toast.show("some message",Toast.LENGTH_LONG);
+
+
+var randX:int = Math.random()*600;
+var randY:int = Math.random()*600;
+Toast.showWithDifferentGravit("some message",Toast.LENGTH_SHORT,Toast.GRAVITY_LEFT,randX,randY);
+
 [/code]

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
-		xmlns:s="library://ns.adobe.com/flex/spark" title="Native Alerts" viewActivate="view1_viewActivateHandler(event)" backKeyPressed="view1_backKeyPressedHandler(event)"
+		xmlns:s="library://ns.adobe.com/flex/spark" title="Native Alerts" creationComplete="view_creationComplete()" backKeyPressed="view1_backKeyPressedHandler(event)"
 		>
 	<fx:Script>
 		<![CDATA[
@@ -15,8 +15,10 @@
 			import pl.mateuszmackowiak.nativeANE.NativeExtensionErrorEvent;
 			import pl.mateuszmackowiak.nativeANE.alert.NativeAlert;
 			import pl.mateuszmackowiak.nativeANE.alert.NativeAlertEvent;
-			import pl.mateuszmackowiak.nativeANE.dialogs.NativeMultiChoiceDialog;
+			import pl.mateuszmackowiak.nativeANE.dialogs.NativeListDialog;
+			import pl.mateuszmackowiak.nativeANE.dialogs.NativeTextInputDialog;
 			import pl.mateuszmackowiak.nativeANE.progress.NativeProgress;
+			import pl.mateuszmackowiak.nativeANE.toast.Toast;
 			
 			import spark.events.IndexChangeEvent;
 			import spark.events.ViewNavigatorEvent;
@@ -27,13 +29,14 @@
 			private var progressPopup:NativeProgress;
 			private var p:int = 0;
 			private var myTimer:Timer = new Timer(100);
-			private var multChDialog:NativeMultiChoiceDialog;
-			private var choces:Vector.<String>;
-			private var checkedItems:Vector.<Boolean>;
-			
-			
-			
-			protected function view1_viewActivateHandler(event:ViewNavigatorEvent):void
+			private var multChDialog:NativeListDialog=null;
+			private var singleChDialog:NativeListDialog=null;
+			private var textInputDialog:NativeTextInputDialog=null;
+			private var choces:Vector.<String>=null;
+			private var checkedItems:Vector.<Boolean>=null;
+			private var selectedIndex:int = -1;
+		
+			protected function view_creationComplete():void
 			{
 				FlexGlobals.topLevelApplication.addEventListener(UncaughtErrorEvent.UNCAUGHT_ERROR,onError);
 				FlexGlobals.topLevelApplication.addEventListener(NativeExtensionErrorEvent.ERROR,onError);
@@ -49,6 +52,14 @@
 				choces.push("one","two","three","four");
 				checkedItems = new Vector.<Boolean>();
 				checkedItems.push(true,false,false,true);
+				
+				if(Capabilities.os.indexOf("Linux")>-1){
+					titleInput.text = "Some <b>simple HTML</b> Title";
+					messageInput.text = "Some <i>simple HTML</i> Message Text";
+				}else{
+					titleInput.text = "Some Title";
+					messageInput.text = "Some Message Text";
+				}
 			}
 			protected function exiting(event:Event):void
 			{
@@ -57,6 +68,8 @@
 				if(multChDialog)
 					multChDialog.kill();
 				NativeAlert.dispose();
+				if(textInputDialog)
+					textInputDialog.kill();
 			}
 			private function onError(event:*):void
 			{
@@ -73,6 +86,8 @@
 			{
 				if(event.hasOwnProperty("text"))
 					returnText.text += event.toString()+"  "+event.text+"\n";
+				else if(event.hasOwnProperty("index"))
+					returnText.text += event.toString()+"  "+event.index+"\n";
 				else
 					returnText.text += event.toString()+"\n";
 			}
@@ -121,30 +136,32 @@
 			{
 				try{
 					progressPopup = new NativeProgress(style);
-					progressPopup.theme = ThemeSelector.selectedItem.data;
-					progressPopup.setMax(50);
-					
+					progressPopup.setSecondaryProgress(45);
 					progressPopup.addEventListener(NativeDialogEvent.CANCLED,closeNativeProcessHandler);
 					progressPopup.addEventListener(NativeDialogEvent.OPENED,traceEvent);
 					progressPopup.addEventListener(NativeDialogEvent.CLOSED,closeNativeProcessHandler);
 					progressPopup.addEventListener(NativeExtensionErrorEvent.ERROR,onError);
+					progressPopup.addEventListener(LogEvent.LOG_EVENT,traceEvent);
+					progressPopup.theme = ThemeSelector.selectedItem.data;
+					progressPopup.setMax(50);
 					
-					progressPopup.show(0, titleInput.text , messageInput.text,canclebleCheckbox.selected);
+					progressPopup.show(0, titleInput.text , messageInput.text,canclebleCheckbox.selected,indeterminateInput.selected);
 					myTimer.addEventListener(TimerEvent.TIMER, updateProgress);
 					myTimer.start();
 				}catch(e:Error){
 					returnText.text += "Error "+ e.message+"   "+e.toString()+"\n";
 				}
 			}
-			private function closeNativeProcessHandler(event:Event):void
+			private function closeNativeProcessHandler(event:*):void
 			{
 				returnText.text += event.toString()+"\n";
 				progressPopup.removeEventListener(NativeDialogEvent.CANCLED,closeNativeProcessHandler);
 				progressPopup.removeEventListener(NativeDialogEvent.CLOSED,closeNativeProcessHandler);
 				progressPopup.removeEventListener(NativeDialogEvent.OPENED,traceEvent);
 				progressPopup.removeEventListener(NativeExtensionErrorEvent.ERROR,onError);
-				
+				progressPopup.removeEventListener(LogEvent.LOG_EVENT,traceEvent);
 				progressPopup.kill();
+				
 				myTimer.removeEventListener(TimerEvent.TIMER,updateProgress);
 				myTimer.stop();
 				p = 0;
@@ -158,7 +175,8 @@
 					(event.target as Timer).stop();
 				}else{
 					try{
-						progressPopup.setProgress(p);
+						if(progressPopup.getIndeterminate()==false)
+							progressPopup.setProgress(p);
 					}catch(e:Error){
 						returnText.text += "Error "+ e.message+"   "+e.toString()+"\n";
 					}
@@ -169,22 +187,31 @@
 			
 			
 			
-			
-			
-			
-			
-			
-			protected function openMultiChoiceDialog(event:MouseEvent):void
+			public function showToast(event:MouseEvent):void
 			{
-				multChDialog = new NativeMultiChoiceDialog();
-				multChDialog.theme = ThemeSelector.selectedItem.data;
+				Toast.show(messageInput.text,Toast.LENGTH_LONG);
+			}
+			
+			public function showCenteredToast(event:MouseEvent):void
+			{
+				var randX:int = Math.random()*600;
+				var randY:int = Math.random()*600;
+				Toast.showWithDifferentGravit(messageInput.text,Toast.LENGTH_SHORT,Toast.GRAVITY_LEFT,randX,randY);
+			}
+			
+			
+			
+			
+			
+			public function openTextInputDialog(event:MouseEvent):void{
+				textInputDialog = new NativeTextInputDialog();
+				textInputDialog.theme = ThemeSelector.selectedItem.data;
+				textInputDialog.addEventListener(NativeDialogEvent.CANCLED,closeTextInputDialogHandler);
+				textInputDialog.addEventListener(NativeDialogEvent.OPENED,traceEvent);
+				textInputDialog.addEventListener(NativeDialogEvent.CLOSED,closeTextInputDialogHandler);
+				textInputDialog.addEventListener(NativeExtensionErrorEvent.ERROR,onError);
+				textInputDialog.addEventListener(LogEvent.LOG_EVENT,traceEvent);
 				
-				multChDialog.addEventListener(NativeDialogEvent.CANCLED,closeNativeDialogHandler);
-				multChDialog.addEventListener(NativeDialogEvent.OPENED,traceEvent);
-				multChDialog.addEventListener(NativeDialogEvent.CLOSED,closeNativeDialogHandler);
-				multChDialog.addEventListener(LogEvent.LOG_EVENT,traceEvent);
-				multChDialog.addEventListener(NativeExtensionErrorEvent.ERROR,onError);
-				multChDialog.addEventListener(NativeDialogListEvent.LIST_CHANGE,onListChange);
 				var a:Array = otherLabels.text.split(",");
 				var buttons:Vector.<String> = new Vector.<String>();
 				if(a==null || a.length==0)
@@ -196,30 +223,107 @@
 						buttons.push(button);
 					}
 				}
-				multChDialog.show(choces,checkedItems,buttons,titleInput.text,canclebleCheckbox.selected);
+
+				textInputDialog.show(titleInput.text,buttons);
+			}
+			public function closeTextInputDialogHandler(event:NativeDialogEvent):void
+			{
+				if(event.hasOwnProperty("index"))
+					returnText.text += event.toString()+"   "+event.index+"\n";
+				else
+					returnText.text += event.toString()+"\n";
+				textInputDialog.removeEventListener(NativeDialogEvent.CANCLED,closeTextInputDialogHandler);
+				textInputDialog.removeEventListener(NativeDialogEvent.CLOSED,closeTextInputDialogHandler);
+				textInputDialog.removeEventListener(NativeDialogEvent.OPENED,traceEvent);
+				textInputDialog.removeEventListener(NativeExtensionErrorEvent.ERROR,onError);
+				textInputDialog.removeEventListener(LogEvent.LOG_EVENT,traceEvent);
+				textInputDialog.kill();
+			}
+			
+			
+			
+			
+			public function openSingleChoiceDialog(event:MouseEvent):void
+			{
+				singleChDialog = new NativeListDialog();
+				singleChDialog.theme = ThemeSelector.selectedItem.data;
+				
+				singleChDialog.addEventListener(NativeDialogEvent.CANCLED,closeNativeDialogHandler);
+				singleChDialog.addEventListener(NativeDialogEvent.OPENED,traceEvent);
+				singleChDialog.addEventListener(NativeDialogEvent.CLOSED,closeNativeDialogHandler);
+				singleChDialog.addEventListener(LogEvent.LOG_EVENT,traceEvent);
+				singleChDialog.addEventListener(NativeExtensionErrorEvent.ERROR,onError);
+				singleChDialog.addEventListener(NativeDialogListEvent.LIST_CHANGE,onListChange);
+				var a:Array = otherLabels.text.split(",");
+				var buttons:Vector.<String> = new Vector.<String>();
+				if(a==null || a.length==0)
+					buttons.push(closeLabelInput.text);
+				else{
+					a.unshift(closeLabelInput.text);
+					for each (var button:String in a) 
+					{
+						buttons.push(button);
+					}
+				}
+				singleChDialog.showSingleChoice(choces,selectedIndex,buttons,titleInput.text,canclebleCheckbox.selected);
+			}
+			
+			
+			protected function openMultiChoiceDialog(event:MouseEvent):void
+			{
+				multChDialog = new NativeListDialog();
+				multChDialog.theme = ThemeSelector.selectedItem.data;
+				
+				multChDialog.addEventListener(NativeDialogEvent.CANCLED,closeNativeDialogHandler);
+				multChDialog.addEventListener(NativeDialogEvent.OPENED,traceEvent);
+				multChDialog.addEventListener(NativeDialogEvent.CLOSED,closeNativeDialogHandler);
+				multChDialog.addEventListener(NativeExtensionErrorEvent.ERROR,onError);
+				multChDialog.addEventListener(NativeDialogListEvent.LIST_CHANGE,onListChange);
+				multChDialog.addEventListener(LogEvent.LOG_EVENT,traceEvent);
+				var a:Array = otherLabels.text.split(",");
+				var buttons:Vector.<String> = new Vector.<String>();
+				if(a==null || a.length==0)
+					buttons.push(closeLabelInput.text);
+				else{
+					a.unshift(closeLabelInput.text);
+					for each (var button:String in a) 
+					{
+						buttons.push(button);
+					}
+				}
+				multChDialog.showMultiChoice(choces,checkedItems,buttons,titleInput.text,canclebleCheckbox.selected);
 			}
 			
 			private function onListChange(event:NativeDialogListEvent):void
 			{
+				var dialog:NativeListDialog = (event.target as NativeListDialog)
 				returnText.text += "NativeDialogListEvent "+ event.index+"   "+event.selected+"\n";
-				const a:Vector.<String> = multChDialog.selectedLabels;
-				if(a.length>0){
-					for (var i:int = 0; i < a.length; i++) 
-					{
-						returnText.text += a[i]+"\n";
+				if(dialog.selectedIndex>-1){
+					selectedIndex = dialog.selectedIndex;
+					returnText.text += "selectedIndex   "+selectedIndex+"\n";
+				}else{
+					const a:Vector.<String> = dialog.selectedLabels;
+					returnText.text +="selectedIndexes : \n";
+					if(a.length>0){
+						for (var i:int = 0; i < a.length; i++) 
+						{
+							returnText.text +="   "+a[i]+"\n";
+						}
 					}
 				}
-				
+					 
 			}
 			public function closeNativeDialogHandler(event:NativeDialogEvent):void
 			{
 				returnText.text += event.toString()+"\n";
-				multChDialog.removeEventListener(NativeDialogEvent.CANCLED,closeNativeDialogHandler);
-				multChDialog.removeEventListener(NativeDialogEvent.CLOSED,closeNativeDialogHandler);
-				multChDialog.removeEventListener(NativeDialogEvent.OPENED,traceEvent);
-				multChDialog.removeEventListener(NativeExtensionErrorEvent.ERROR,onError);
-				multChDialog.removeEventListener(LogEvent.LOG_EVENT,traceEvent);
-				multChDialog.kill();
+				var dialog:NativeListDialog = (event.target  as NativeListDialog);
+				dialog.removeEventListener(NativeDialogEvent.CANCLED,closeNativeDialogHandler);
+				dialog.removeEventListener(NativeDialogEvent.CLOSED,closeNativeDialogHandler);
+				dialog.removeEventListener(NativeDialogEvent.OPENED,traceEvent);
+				dialog.removeEventListener(NativeExtensionErrorEvent.ERROR,onError);
+				dialog.removeEventListener(LogEvent.LOG_EVENT,traceEvent);
+				dialog.removeEventListener(LogEvent.LOG_EVENT,traceEvent);
+				dialog.kill();
 			}
 		]]>
 	</fx:Script>
@@ -239,8 +343,8 @@
 	<s:HGroup height="100%" width="100%">
 		<s:Spacer width="100%"/>
 		<s:VGroup>
-			<s:TextInput id="titleInput" text="Some Title" />
-			<s:TextInput id="messageInput" text="Some Message Text" />
+			<s:TextInput id="titleInput" />
+			<s:TextInput id="messageInput" />
 			<s:TextInput id="closeLabelInput" text="OK" />
 			<s:TextInput id="otherLabels" text="YES,NO" />
 			<s:CheckBox id="canclebleCheckbox" label="cancleble" selected="true"/>
@@ -254,11 +358,26 @@
 	
 	
 	<s:Button width="100%" click="callNativeAlret(event)" label="call native Alert" height="60"/>
-	<s:HGroup width="100%"  includeInLayout="{Capabilities.os.indexOf('Linux')>-1}" >
-		<s:Button width="100%" label="show horizontal progress popup" click="openProgressPopup(NativeProgress.STYLE_HORIZONTAL)" height="60"/>
-		<s:Button width="100%" label="show spinner progress popup" click="openProgressPopup(NativeProgress.STYLE_SPINNER)" height="60"/>	
-	</s:HGroup>
-	<s:Button width="100%" click="openMultiChoiceDialog(event)" label="open Mulit Choice Dialog" height="60" includeInLayout="{Capabilities.os.indexOf('Linux')>-1}"/>
 	
+	<s:VGroup width="100%" height="100%" includeInLayout="{Capabilities.os.indexOf('Linux')>-1}">
+		
+	
+		<s:HGroup width="100%">
+			<s:Button width="100%" label="show horizontal progress popup" click="openProgressPopup(NativeProgress.STYLE_HORIZONTAL)" height="60"/>
+			<s:CheckBox id="indeterminateInput" label="indeterminate" selected="true"/>
+			<s:Button width="100%" label="show spinner progress popup" click="openProgressPopup(NativeProgress.STYLE_SPINNER)" height="60"/>
+		</s:HGroup>
+		<s:HGroup width="100%">
+			<s:Button width="100%" click="openMultiChoiceDialog(event)" label="open Multi Choice Dialog" height="60" />
+			<s:Button width="100%" click="openSingleChoiceDialog(event)" label="open Single Choice Dialog" height="60" />
+		</s:HGroup>
+		<s:HGroup width="100%"  includeInLayout="{Capabilities.os.indexOf('Linux')>-1}" >
+			<s:Button width="100%" click="showToast(event)" label="show Toast" height="60"/>
+			<s:Button width="100%" click="showCenteredToast(event)" label="show Toast in random gravity" height="60"/>
+		</s:HGroup>
+	
+		<s:Button width="100%" click="openTextInputDialog(event)" label="open Text Input Dialog" height="60" />
+	</s:VGroup>
+		
 	<s:TextArea id="returnText" width="100%" height="100%" selectable="false" editable="false" minHeight="500"/>
 </s:View>

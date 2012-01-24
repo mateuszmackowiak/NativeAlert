@@ -7,31 +7,15 @@
 */
 package pl.mateuszmackowiak.nativeANE.alert
 {
-	//import com.pialabs.eskimo.controls.SkinnableAlert;
 	
 	
-	import flash.events.ErrorEvent;
 	import flash.events.EventDispatcher;
 	import flash.events.StatusEvent;
 	import flash.external.ExtensionContext;
 	import flash.system.Capabilities;
 	
-	import mx.core.FlexGlobals;
-	
 
 		
-	/**
-	 * Evant dispatched when the Alert is closed
-	 * @eventType pl.mateuszmackowiak.nativeANE.NativeAlertEvent.CLOSED
-	 */
-	[Event(name ="ALERT_CLOSED", type = "pl.mateuszmackowiak.nativeANE.alert.NativeAlertEvent")] // NO PMD
-	
-	/**
-	 * Evant dispatched when an Error acures
-	 * @eventType flash.events.ErrorEvent.ERROR
-	 */
-	[Event(name = "error", type = "flash.events.ErrorEvent")]
-	
 	/**
 	 * Simple NativeAlert extension that allows you to
 	 * Open device specific alerts and recieve information about
@@ -92,7 +76,6 @@ package pl.mateuszmackowiak.nativeANE.alert
 			if(context==null){
 				try{
 					context = ExtensionContext.createExtensionContext(EXTENSION_ID, null);
-					showError("utworzył context");
 				}catch(e:Error){
 					showError(e.message,e.errorID);
 				}
@@ -100,9 +83,11 @@ package pl.mateuszmackowiak.nativeANE.alert
 		}
 
 		public static function dispose():void{
-			if(context)
+			if(context){
 				context.dispose();
+			}
 		}
+			
 		/**
 		 * @param title Title to be displayed in the Alert.
 		 * @param message Message to be displayed in the Alert.
@@ -213,14 +198,8 @@ package pl.mateuszmackowiak.nativeANE.alert
 					var level:int = int(event.level);
 					if(Capabilities.os.indexOf("Win")>-1)
 						level--;
-					dispatchEvent(new NativeAlertEvent(NativeAlertEvent.CLOSE,level.toString()))
-				}/*else if( event.code == NativeAlertEvent.OPENED)
-				{
-					dispatchEvent(new NativeAlertEvent(NativeAlertEvent.OPENED,event.level));
-				}else if( event.code == NativeAlertEvent.OPENED)
-				{
-					dispatchEvent(new NativeAlertEvent(NativeAlertEvent.OPENED,event.level));
-				}*/
+					dispatchEvent(new NativeAlertEvent(NativeAlertEvent.CLOSE,level.toString()));
+				}
 				else{
 					showError(event.toString());
 				}
@@ -234,7 +213,6 @@ package pl.mateuszmackowiak.nativeANE.alert
 		private static function showError(message:String,id:int=0):void
 		{
 			trace(message);
-			//FlexGlobals.topLevelApplication.dispatchEvent(new NativeAlertErrorEvent(NativeAlertErrorEvent.ERROR,false,false,message,id));
 		}
 	}
 }

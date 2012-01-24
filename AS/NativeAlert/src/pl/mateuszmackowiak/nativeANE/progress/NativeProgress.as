@@ -10,8 +10,9 @@ package pl.mateuszmackowiak.nativeANE.progress
 	import flash.events.StatusEvent;
 	import flash.external.ExtensionContext;
 	
-	import pl.mateuszmackowiak.nativeANE.NativeExtensionErrorEvent;
+	import pl.mateuszmackowiak.nativeANE.LogEvent;
 	import pl.mateuszmackowiak.nativeANE.NativeDialogEvent;
+	import pl.mateuszmackowiak.nativeANE.NativeExtensionErrorEvent;
 	
 	public class NativeProgress extends EventDispatcher
 	{
@@ -43,12 +44,13 @@ package pl.mateuszmackowiak.nativeANE.progress
 		//---------------------------------------------------------------------
 		private var context:ExtensionContext;
 		private var _progress:int=0;
+		private var _secondary:int=NaN;
 		private var _title:String="";
 		private var _message:String = "";
 		private var _style:int = STYLE_HORIZONTAL;
 		private var _theme:int = -1;
 		private var _maxProgress:int  = 100;
-	
+		private var _indeterminate:Boolean = false;
 		
 		//---------------------------------------------------------------------
 		//
@@ -80,7 +82,7 @@ package pl.mateuszmackowiak.nativeANE.progress
 
 		
 
-		public function show(progress:int=-1,title:String="",message:String="",cancleble:Boolean=false):Boolean
+		public function show(progress:int=-1,title:String="",message:String="",cancleble:Boolean=false,indeterminate:Object=null):Boolean
 		{
 			if(!isNaN(progress) && progress>=0 && progress<= _maxProgress)
 				_progress = progress;
@@ -90,15 +92,84 @@ package pl.mateuszmackowiak.nativeANE.progress
 				_theme = defaultTheme;
 			if(message!=null && message!=="")
 				_message = message;
-
+			if(indeterminate!==null)
+				_indeterminate = indeterminate;
 			
 			try{
-				context.call("NativeProgress","showPopup",progress,_style,_title,_message,cancleble,_theme);
+				context.call("NativeProgress","showPopup",_progress,_secondary,_style,_title,_message,cancleble,_indeterminate,_theme);
 				return true;
 			}catch(e:Error){
 				showError("Error calling show method "+e.message,e.errorID);
 			}
 			return false;
+		}
+		public function showIndeterminate(title:String="",message:String="",cancleble:Boolean=false):Boolean
+		{
+			if(title!= null && title!=="")
+				_title = title;
+			if(_theme ==-1)
+				_theme = defaultTheme;
+			if(message!=null && message!=="")
+				_message = message;
+			_indeterminate = true;
+			try{
+				context.call("NativeProgress","showPopup",null,null,STYLE_HORIZONTAL,_title,_message,cancleble,true,_theme);
+				return true;
+			}catch(e:Error){
+				showError("Error calling show method "+e.message,e.errorID);
+			}
+			return false;
+		}
+		public function showSpinner(title:String="",message:String="",cancleble:Boolean=false):Boolean
+		{
+			if(title!= null && title!=="")
+				_title = title;
+			if(_theme ==-1)
+				_theme = defaultTheme;
+			if(message!=null && message!=="")
+				_message = message;
+			try{
+				context.call("NativeProgress","showPopup",null,null,STYLE_SPINNER,_title,_message,cancleble,false,_theme);
+				return true;
+			}catch(e:Error){
+				showError("Error calling show method "+e.message,e.errorID);
+			}
+			return false;
+		}
+		
+		public function setIndeterminate(value:Boolean):Boolean{
+			if(_indeterminate!==value  && value>=0 && value<= _maxProgress){
+				try{
+					context.call("NativeProgress","setIndeterminate",value);
+					_indeterminate = value;
+					return true;
+				}catch(e:Error){
+					showError("Error setting progress "+e.message,e.errorID);
+				}
+			}
+			return false;
+		}
+		
+		public function getIndeterminate():Boolean{
+			return _indeterminate;
+		}
+		
+		
+		public function setSecondaryProgress(value:int):Boolean{
+			if(_secondary!==value  && value>=0 && value<= _maxProgress){
+				try{
+					context.call("NativeProgress","setSecondary",value);
+					_secondary = value;
+					return true;
+				}catch(e:Error){
+					showError("Error setting progress "+e.message,e.errorID);
+				}
+			}
+			return false;
+		}
+		
+		public function getSecondaryProgress():int{
+			return _secondary;
 		}
 		
 		public function setProgress(value:int):Boolean{
@@ -117,7 +188,6 @@ package pl.mateuszmackowiak.nativeANE.progress
 		public function getProgress():int{
 			return _progress;
 		}
-		
 		
 		public function setMax(value:int):Boolean{
 			if(!isNaN(value) && _maxProgress!==value){
@@ -191,8 +261,7 @@ package pl.mateuszmackowiak.nativeANE.progress
 		
 		public function set theme(value:int):void
 		{
-			if(value==THEME_DEVICE_DEFAULT_DARK || value==THEME_DEVICE_DEFAULT_LIGHT || value==THEME_HOLO_DARK || value==THEME_HOLO_LIGHT || value==THEME_TRADITIONAL)
-				_theme = value;
+			_theme = value;
 		}
 		
 		
@@ -210,7 +279,6 @@ package pl.mateuszmackowiak.nativeANE.progress
 		public function kill():Boolean
 		{
 			try{
-				context.call("NativeProgress","hide");
 				context.dispose();
 				return true;
 			}catch(e:Error){
@@ -274,6 +342,8 @@ package pl.mateuszmackowiak.nativeANE.progress
 					dispatchEvent(new NativeDialogEvent(NativeDialogEvent.CANCLED,event.level));
 				}else if(event.code == NativeDialogEvent.OPENED){
 					dispatchEvent(new NativeDialogEvent(NativeDialogEvent.OPENED,event.level));
+				}else if(event.code == LogEvent.LOG_EVENT){
+					dispatchEvent(new LogEvent(LogEvent.LOG_EVENT,event.level));
 				}else if(event.code ==NativeExtensionErrorEvent.ERROR){
 					dispatchEvent(new NativeExtensionErrorEvent(NativeExtensionErrorEvent.ERROR,false,false,event.level,0));
 				}else{

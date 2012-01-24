@@ -7,9 +7,11 @@
     <classEntry path="pl.mateuszmackowiak.nativeANE.NativeExtensionErrorEvent"/>
     <classEntry path="pl.mateuszmackowiak.nativeANE.progress.NativeProgress"/>
     <classEntry path="pl.mateuszmackowiak.nativeANE.NativeDialogEvent"/>
-    <classEntry path="pl.mateuszmackowiak.nativeANE.dialogs.NativeMultiChoiceDialog"/>
+    <classEntry path="pl.mateuszmackowiak.nativeANE.dialogs.NativeListDialog"/>
     <classEntry path="pl.mateuszmackowiak.nativeANE.LogEvent"/>
     <classEntry path="pl.mateuszmackowiak.nativeANE.NativeDialogListEvent"/>
+    <classEntry path="pl.mateuszmackowiak.nativeANE.toast.Toast"/>
+    <classEntry path="pl.mateuszmackowiak.nativeANE.dialogs.NativeTextInputDialog"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests/>

@@ -4,7 +4,7 @@ package pl.mateuszmackowiak.nativeANE
 	
 	public class NativeDialogListEvent extends Event
 	{
-		public static const LIST_CHANGE:String = "nativeExtensionList_change";
+		public static const LIST_CHANGE:String = "nativeListDialog_change";
 		
 		private var _index:int=-1;
 		private var _selected:Boolean=false;

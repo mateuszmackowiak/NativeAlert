@@ -12,6 +12,9 @@
     <classEntry path="pl.mateuszmackowiak.nativeANE.NativeDialogListEvent"/>
     <classEntry path="pl.mateuszmackowiak.nativeANE.toast.Toast"/>
     <classEntry path="pl.mateuszmackowiak.nativeANE.dialogs.NativeTextInputDialog"/>
+    <classEntry path="pl.mateuszmackowiak.nativeANE.properties.SystemProperties"/>
+    <classEntry path="pl.mateuszmackowiak.nativeANE.dialogs.NativeTextInput"/>
+    <classEntry path="pl.mateuszmackowiak.nativeANE.dialogs.NativeTextInputDialogEvent"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests/>

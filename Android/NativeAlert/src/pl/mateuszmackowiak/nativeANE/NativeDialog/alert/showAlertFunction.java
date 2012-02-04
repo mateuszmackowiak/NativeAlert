@@ -133,8 +133,8 @@ public class showAlertFunction implements FREFunction{
 	        		builder.setTitle(Html.fromHtml(title));
 	        	if(!message.isEmpty())
 	        		builder.setMessage(Html.fromHtml(message));
-	        	builder.setPositiveButton(otherLabel, new AlertListener(context))
-	                   .setNegativeButton(closeLabel, new AlertListener(context));
+	        	builder.setPositiveButton(closeLabel, new AlertListener(context))
+	                   .setNegativeButton(otherLabel, new AlertListener(context));
 	        }
 	        else
 	        {

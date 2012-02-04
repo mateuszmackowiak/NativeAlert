@@ -9,6 +9,7 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 	import flash.events.IEventDispatcher;
 	import flash.events.StatusEvent;
 	import flash.external.ExtensionContext;
+	import flash.system.Capabilities;
 	
 	import pl.mateuszmackowiak.nativeANE.LogEvent;
 	import pl.mateuszmackowiak.nativeANE.NativeDialogEvent;
@@ -224,8 +225,7 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 		
 		public function set theme(value:int):void
 		{
-			if(value==THEME_DEVICE_DEFAULT_DARK || value==THEME_DEVICE_DEFAULT_LIGHT || value==THEME_HOLO_DARK || value==THEME_HOLO_LIGHT || value==THEME_TRADITIONAL)
-				_theme = value;
+			_theme = value;
 		}
 		
 		
@@ -265,9 +265,12 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 			if(!_set){// checks if a value was set before
 				try{
 					_set = true;
-					var context:ExtensionContext = ExtensionContext.createExtensionContext(EXTENSION_ID, null);
-					_isSupp = context.call("isSupported");
-					context.dispose();
+					if(Capabilities.os.indexOf("Linux")>-1){
+						var context:ExtensionContext = ExtensionContext.createExtensionContext(EXTENSION_ID, "ListDialogContext");
+						_isSupp = context.call("isSupported");
+						context.dispose();
+					}else
+						_isSupp = false;
 				}catch(e:Error){
 					return _isSupp;
 				}

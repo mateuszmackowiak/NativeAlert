@@ -4,6 +4,7 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 	import flash.events.IEventDispatcher;
 	import flash.events.StatusEvent;
 	import flash.external.ExtensionContext;
+	import flash.system.Capabilities;
 	
 	import pl.mateuszmackowiak.nativeANE.LogEvent;
 	import pl.mateuszmackowiak.nativeANE.NativeDialogEvent;
@@ -64,17 +65,19 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 		}
 		
 		
-		public function show(title:String="",buttons:Vector.<String>=null,theme:int=-1):Boolean{
+		public function show(title:String,textInputs:Vector.<NativeTextInput>,buttons:Vector.<String>=null):Boolean{
 			if(title!= null && title!=="")
 				_title = title;
-			if(theme ==-1)
-				_theme = defaultTheme;
-			else
-				_theme = theme;
+			
 			if(buttons!=null)
 				_buttons = buttons;
+			
+			if(textInputs==null || textInputs.length==0){
+				throw new Error("textInputs cannot be null");
+				return false;
+			}
 			try{
-				context.call(FRE_FUNCTIONL,"show",_title,"some mesage",buttons,_theme);
+				context.call(FRE_FUNCTIONL,"show",_title,textInputs,buttons,_theme);
 				return true;
 			}catch(e:Error){
 				showError("Error calling show method "+e.message,e.errorID);
@@ -168,9 +171,12 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 			if(!_set){// checks if a value was set before
 				try{
 					_set = true;
-					var context:ExtensionContext = ExtensionContext.createExtensionContext(EXTENSION_ID, null);
-					_isSupp = context.call("isSupported");
-					context.dispose();
+					if(Capabilities.os.indexOf("Linux")>-1){
+						var context:ExtensionContext = ExtensionContext.createExtensionContext(EXTENSION_ID, "TextInputDialogContext");
+						_isSupp = context.call("isSupported");
+						context.dispose();
+					}else
+						_isSupp = false;
 				}catch(e:Error){
 					return _isSupp;
 				}
@@ -202,9 +208,18 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 		private function onStatus(event:StatusEvent):void
 		{
 			try{
-				if(event.code == NativeDialogEvent.CLOSED)
-					dispatchEvent(new NativeDialogEvent(NativeDialogEvent.CLOSED,event.level));
-				else if(event.code == NativeDialogEvent.CANCLED)
+				if(event.code == NativeDialogEvent.CLOSED){
+					var v:Vector.<NativeTextInput> = new Vector.<NativeTextInput>();
+					const a:Array = event.level.split("#_#");
+					var nt:NativeTextInput=null;
+					for (var i:int = 1; i < a.length; i+=2) 
+					{
+						nt=new NativeTextInput(a[i]);
+						nt.text = a[i+1];
+						v.push(nt);
+					}
+					dispatchEvent(new NativeTextInputDialogEvent(NativeTextInputDialogEvent.CLOSED,a[0],v));
+				}else if(event.code == NativeDialogEvent.CANCLED)
 					dispatchEvent(new NativeDialogEvent(NativeDialogEvent.CANCLED,event.level));
 				else if(event.code == NativeDialogEvent.OPENED)
 					dispatchEvent(new NativeDialogEvent(NativeDialogEvent.OPENED,event.level));

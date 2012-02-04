@@ -37,6 +37,8 @@ public class NativeExtension implements FREExtension{
 			return new ListDialogContext();
 		else if(arg0.equals(ToastContext.KEY))
 			return new ToastContext();
+		else if(arg0.equals(systemProperties.KEY))
+			return new systemProperties();
 		else if(arg0.equals(TextInputDialogContext.KEY))
 			return new TextInputDialogContext();
 		else

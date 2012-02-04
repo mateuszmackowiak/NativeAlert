@@ -9,6 +9,7 @@ package pl.mateuszmackowiak.nativeANE.progress
 	import flash.events.IEventDispatcher;
 	import flash.events.StatusEvent;
 	import flash.external.ExtensionContext;
+	import flash.system.Capabilities;
 	
 	import pl.mateuszmackowiak.nativeANE.LogEvent;
 	import pl.mateuszmackowiak.nativeANE.NativeDialogEvent;
@@ -300,10 +301,14 @@ package pl.mateuszmackowiak.nativeANE.progress
 			if(!_set){// checks if a value was set before
 				try{
 					_set = true;
-					var context:ExtensionContext = ExtensionContext.createExtensionContext(EXTENSION_ID, null);
-					_isSupp = context.call("isSupported");
-					context.dispose();
+					if(Capabilities.os.indexOf("Linux")>-1){
+						var context:ExtensionContext = ExtensionContext.createExtensionContext(EXTENSION_ID, "ProgressContext");
+						_isSupp = context.call("isSupported")==true;
+						context.dispose();
+					}else
+						_isSupp = false;
 				}catch(e:Error){
+					trace("NativeProcess Extension is not supported on this platform");
 					return _isSupp;
 				}
 			}	
@@ -312,8 +317,7 @@ package pl.mateuszmackowiak.nativeANE.progress
 		
 		public static function set defaultTheme(value:int):void
 		{
-			if(value==THEME_DEVICE_DEFAULT_DARK || value==THEME_DEVICE_DEFAULT_LIGHT || value==THEME_HOLO_DARK || value==THEME_HOLO_LIGHT || value==THEME_TRADITIONAL)
-				_defaultTheme = value;
+			_defaultTheme = value;
 		}
 		public static function get defaultTheme():int
 		{

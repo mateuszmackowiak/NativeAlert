@@ -16,8 +16,11 @@
 			import pl.mateuszmackowiak.nativeANE.alert.NativeAlert;
 			import pl.mateuszmackowiak.nativeANE.alert.NativeAlertEvent;
 			import pl.mateuszmackowiak.nativeANE.dialogs.NativeListDialog;
+			import pl.mateuszmackowiak.nativeANE.dialogs.NativeTextInput;
 			import pl.mateuszmackowiak.nativeANE.dialogs.NativeTextInputDialog;
+			import pl.mateuszmackowiak.nativeANE.dialogs.NativeTextInputDialogEvent;
 			import pl.mateuszmackowiak.nativeANE.progress.NativeProgress;
+			import pl.mateuszmackowiak.nativeANE.properties.SystemProperties;
 			import pl.mateuszmackowiak.nativeANE.toast.Toast;
 			
 			import spark.events.IndexChangeEvent;
@@ -60,6 +63,23 @@
 					titleInput.text = "Some Title";
 					messageInput.text = "Some Message Text";
 				}
+				if(SystemProperties.isSupported()){
+					var dictionary:Dictionary = SystemProperties.getAndroidProperites(); 
+					
+					returnText.text += SystemProperties.ARCHITECTURE+"  "+dictionary[SystemProperties.ARCHITECTURE]+"\n";
+					returnText.text += SystemProperties.JAVA_NUMBER+"  "+dictionary[SystemProperties.JAVA_NUMBER]+"\n";
+					returnText.text += SystemProperties.LANGUAGE+"  "+dictionary[SystemProperties.LANGUAGE]+"\n";
+					returnText.text += SystemProperties.OS+"  "+dictionary[SystemProperties.OS]+"\n";
+					returnText.text += SystemProperties.VERSION+"  "+dictionary[SystemProperties.VERSION]+"\n";
+					
+					returnText.text += SystemProperties.PACKAGE_DIRECTORY+"  "+dictionary[SystemProperties.PACKAGE_DIRECTORY]+"\n";
+					returnText.text += SystemProperties.PACKAGE_NAME+"  "+dictionary[SystemProperties.PACKAGE_NAME]+"\n";
+					returnText.text += SystemProperties.APP_UID+"  "+dictionary[SystemProperties.APP_UID]+"\n";
+					returnText.text += SystemProperties.UID+"  "+dictionary[SystemProperties.UID]+"\n";
+					
+					dictionary = null;
+				}
+				
 			}
 			protected function exiting(event:Event):void
 			{
@@ -67,9 +87,11 @@
 					progressPopup.kill();
 				if(multChDialog)
 					multChDialog.kill();
-				NativeAlert.dispose();
 				if(textInputDialog)
 					textInputDialog.kill();
+				
+				NativeAlert.dispose();
+				Toast.dispose();
 			}
 			private function onError(event:*):void
 			{
@@ -198,20 +220,26 @@
 				var randY:int = Math.random()*600;
 				Toast.showWithDifferentGravit(messageInput.text,Toast.LENGTH_SHORT,Toast.GRAVITY_LEFT,randX,randY);
 			}
+
 			
-			
-			
-			
+			private function onTextInputDialogClosedHandler(event:NativeTextInputDialogEvent):void
+			{
+				for each (var n:NativeTextInput in event.list) 
+				{
+					returnText.text +=n.name+":  "+n.text+"\n";
+				}
+				returnText.text +="button selected "+event.buttonIndex.toString()+"\n";
+				
+			}
 			
 			public function openTextInputDialog(event:MouseEvent):void{
 				textInputDialog = new NativeTextInputDialog();
 				textInputDialog.theme = ThemeSelector.selectedItem.data;
 				textInputDialog.addEventListener(NativeDialogEvent.CANCLED,closeTextInputDialogHandler);
 				textInputDialog.addEventListener(NativeDialogEvent.OPENED,traceEvent);
-				textInputDialog.addEventListener(NativeDialogEvent.CLOSED,closeTextInputDialogHandler);
 				textInputDialog.addEventListener(NativeExtensionErrorEvent.ERROR,onError);
 				textInputDialog.addEventListener(LogEvent.LOG_EVENT,traceEvent);
-				
+				textInputDialog.addEventListener(NativeTextInputDialogEvent.CLOSED,onTextInputDialogClosedHandler);
 				var a:Array = otherLabels.text.split(",");
 				var buttons:Vector.<String> = new Vector.<String>();
 				if(a==null || a.length==0)
@@ -224,7 +252,18 @@
 					}
 				}
 
-				textInputDialog.show(titleInput.text,buttons);
+				var v:Vector.<NativeTextInput> = new Vector.<NativeTextInput>();
+				var ti1:NativeTextInput = new NativeTextInput("name");
+				ti1.inputType = NativeTextInput.text;
+				ti1.messageBefore ="name:";
+				ti1.text = "jacek";
+				v.push(ti1);
+				var ti2:NativeTextInput = new NativeTextInput("password");
+				ti2.inputType = NativeTextInput.textPassword;
+				ti2.messageBefore ="password:";
+				ti2.text = "dddd";
+				v.push(ti2);
+				textInputDialog.show(titleInput.text,v,buttons);
 			}
 			public function closeTextInputDialogHandler(event:NativeDialogEvent):void
 			{
@@ -253,6 +292,7 @@
 				singleChDialog.addEventListener(NativeDialogEvent.CLOSED,closeNativeDialogHandler);
 				singleChDialog.addEventListener(LogEvent.LOG_EVENT,traceEvent);
 				singleChDialog.addEventListener(NativeExtensionErrorEvent.ERROR,onError);
+				
 				singleChDialog.addEventListener(NativeDialogListEvent.LIST_CHANGE,onListChange);
 				var a:Array = otherLabels.text.split(",");
 				var buttons:Vector.<String> = new Vector.<String>();
@@ -359,24 +399,22 @@
 	
 	<s:Button width="100%" click="callNativeAlret(event)" label="call native Alert" height="60"/>
 	
-	<s:VGroup width="100%" height="100%" includeInLayout="{Capabilities.os.indexOf('Linux')>-1}">
-		
-	
-		<s:HGroup width="100%">
+	<s:VGroup width="100%" height="100%" >
+		<s:HGroup width="100%" includeInLayout="{NativeProgress.isSupported}">
 			<s:Button width="100%" label="show horizontal progress popup" click="openProgressPopup(NativeProgress.STYLE_HORIZONTAL)" height="60"/>
 			<s:CheckBox id="indeterminateInput" label="indeterminate" selected="true"/>
 			<s:Button width="100%" label="show spinner progress popup" click="openProgressPopup(NativeProgress.STYLE_SPINNER)" height="60"/>
 		</s:HGroup>
-		<s:HGroup width="100%">
+		<s:HGroup width="100%" includeInLayout="{NativeListDialog.isSupported}">
 			<s:Button width="100%" click="openMultiChoiceDialog(event)" label="open Multi Choice Dialog" height="60" />
 			<s:Button width="100%" click="openSingleChoiceDialog(event)" label="open Single Choice Dialog" height="60" />
 		</s:HGroup>
-		<s:HGroup width="100%"  includeInLayout="{Capabilities.os.indexOf('Linux')>-1}" >
+		<s:HGroup width="100%"  includeInLayout="{Toast.isSupported}" >
 			<s:Button width="100%" click="showToast(event)" label="show Toast" height="60"/>
 			<s:Button width="100%" click="showCenteredToast(event)" label="show Toast in random gravity" height="60"/>
 		</s:HGroup>
 	
-		<s:Button width="100%" click="openTextInputDialog(event)" label="open Text Input Dialog" height="60" />
+		<s:Button width="100%" click="openTextInputDialog(event)" label="open Text Input Dialog" height="60" includeInLayout="{NativeTextInputDialog.isSupported}" />
 	</s:VGroup>
 		
 	<s:TextArea id="returnText" width="100%" height="100%" selectable="false" editable="false" minHeight="500"/>

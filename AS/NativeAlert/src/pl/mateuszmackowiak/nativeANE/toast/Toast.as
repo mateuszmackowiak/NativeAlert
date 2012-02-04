@@ -61,7 +61,7 @@ package pl.mateuszmackowiak.nativeANE.toast
 				
 				context.call("Toast",message,durration);
 			}else
-				trace("Toast Extension is not supported on This platform");
+				trace("Toast extension is not supported on this platform");
 		}
 		
 		public static function showWithDifferentGravit(message:String , durration:int , gravity:int=NaN , xOffset:int=0 , yOffset:int=0 ):void
@@ -84,7 +84,7 @@ package pl.mateuszmackowiak.nativeANE.toast
 				
 				context.call("Toast", message, durration, gravity, xOffset, yOffset);
 			}else
-				trace("Toast Extension is not supported on This platform");
+				trace("Toast extension is not supported on this platform");
 		}
 		
 		
@@ -97,10 +97,11 @@ package pl.mateuszmackowiak.nativeANE.toast
 				try{
 					_set = true;
 					if(context==null)
-						context = ExtensionContext.createExtensionContext(EXTENSION_ID, null);
-					_isSupp = context.call("isSupported");
+						context = ExtensionContext.createExtensionContext(EXTENSION_ID, "ToastContext");
+					_isSupp = context.call("isSupported")==true;
 				}catch(e:Error){
-					showError(e.message,e.errorID);
+					//showError(e.message,e.errorID);
+					trace("Toast extension is not supported on this platform");
 					return _isSupp;
 				}
 			}	

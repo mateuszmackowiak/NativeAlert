@@ -1,12 +1,8 @@
-# Native Extension for adobe air for mobile projects. #
-Se more info [here](http://mateuszmackowiak.wordpress.com/)
+# Native Dialogs - Adobe air Native Extension #
+Se more info [here](mateuszmackowiak.wordpress.com)
 ###### This is a evolution on a project by [liquid-photo](https://github.com/mccormicka/NativeAlert).
 
-
-
-
-## Native Alert popup. (IOS/Android/Windows) ##
-
+This extension enables showing native dialogs within a Air based project.
 
 Available themes for android:
 
@@ -15,6 +11,10 @@ Available themes for android:
 * THEME\_HOLO_DARK
 * THEME\_HOLO_LIGHT
 * THEME\_TRADITIONAL
+
+
+## NativeAlert (IOS/Android/Windows) ##
+Displays a native alert dialog.
 
 *Usage:*
 
@@ -32,15 +32,6 @@ Available themes for android:
 # NativeProgress (Android)#
 
 The ability to display the native dialog showing a progress bar or a spinner.
-
-Available themes for android:
-
-* THEME\_DEVICE\_DEFAULT\_DARK
-* THEME\_DEVICE\_DEFAULT\_LIGHT
-* THEME\_HOLO_DARK
-* THEME\_HOLO_LIGHT
-* THEME\_TRADITIONAL
-
 
 *Usage:*
 
@@ -108,15 +99,6 @@ Available themes for android:
 # NativeListDialog(Android) #
 
 NativeListDialog has the ability to show a native android popup dialog with a multi-choice or single-choice inside a Adobe Air project.
-
-Available themes for android:
-
-* THEME\_DEVICE\_DEFAULT\_DARK
-* THEME\_DEVICE\_DEFAULT\_LIGHT
-* THEME\_HOLO_DARK
-* THEME\_HOLO_LIGHT
-* THEME\_TRADITIONAL
-
 
 *Usage:*
 

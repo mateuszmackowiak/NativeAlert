@@ -1,6 +1,6 @@
 # Native Dialogs - Adobe air Native Extension #
 Se more info [here](mateuszmackowiak.wordpress.com)
-###### This is a evolution on a project by [liquid-photo](https://github.com/mccormicka/NativeAlert).
+###### This project has been started based on [liquid-photo](https://github.com/mccormicka/NativeAlert).
 
 This extension enables showing native dialogs within a Air based project.
 

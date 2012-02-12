@@ -23,7 +23,7 @@ public class showAlertFunction implements FREFunction{
     {
         String message="",title="",closeLabel="",otherLabel="";
         boolean cancelable=false;
-        int theme=AlertDialog.THEME_HOLO_DARK;  
+        int theme=1;  
         try{
             title = args[0].getAsString();
         }catch (IllegalStateException e){
@@ -103,7 +103,7 @@ public class showAlertFunction implements FREFunction{
     
     private void showAlertWithTitleAndMessage(FREContext context,String message,String title,String closeLabel,String otherLabel,boolean cancelable,int theme)
     {  
-    	AlertDialog.Builder builder = new AlertDialog.Builder(context.getActivity(),theme);
+    	AlertDialog.Builder builder = (Integer.parseInt(android.os.Build.VERSION.SDK)<11)?new AlertDialog.Builder(context.getActivity()): new AlertDialog.Builder(context.getActivity(),theme);
     	
     	builder.setCancelable(cancelable);
     	if(cancelable==true)

@@ -36,7 +36,7 @@ public class showTextInputDialog implements FREFunction {
 	public FREObject call(FREContext freContext, FREObject[] args) {
 		String title="",function="";
 		boolean cancelable=true;
-		int theme = AlertDialog.THEME_HOLO_DARK;
+		int theme = 1;
 		try{
 			function = args[0].getAsString();
 			
@@ -60,7 +60,7 @@ public class showTextInputDialog implements FREFunction {
 						}
 					}
 					
-					TextInputDialog textInputDialog = new TextInputDialog(freContext.getActivity(),theme,textInputs);
+					AlertDialog.Builder textInputDialog = (Integer.parseInt(android.os.Build.VERSION.SDK)<11)?new TextInputDialogWithoutTheme(freContext.getActivity(),textInputs):new TextInputDialog(freContext.getActivity(),theme,textInputs);
 					if(title!=null)
 						textInputDialog.setTitle(Html.fromHtml(title));
 					
@@ -69,13 +69,13 @@ public class showTextInputDialog implements FREFunction {
 				    	textInputDialog.setOnCancelListener(new CancelListener(freContext));
 
 				    if(buttons!=null && buttons.length>0){
-				    	textInputDialog.setPositiveButton(buttons[0], new ClickListener(freContext,textInputDialog));
+				    	textInputDialog.setPositiveButton(buttons[0], new ClickListener(freContext,(ITextInput)textInputDialog));
 						if(buttons.length>1)
-							textInputDialog.setNeutralButton(buttons[1], new ClickListener(freContext,textInputDialog));
+							textInputDialog.setNeutralButton(buttons[1], new ClickListener(freContext,(ITextInput)textInputDialog));
 						if(buttons.length>2)
-							textInputDialog.setNegativeButton(buttons[2], new ClickListener(freContext,textInputDialog));
+							textInputDialog.setNeutralButton(buttons[2], new ClickListener(freContext,(ITextInput)textInputDialog));
 					}else
-						textInputDialog.setPositiveButton("OK",new ClickListener(freContext,textInputDialog));
+						textInputDialog.setPositiveButton("OK",new ClickListener(freContext,(ITextInput)textInputDialog));
 				    
 				    mDialog = textInputDialog.create();
 				    textInputDialog.show();
@@ -128,22 +128,25 @@ public class showTextInputDialog implements FREFunction {
 	
 	
 
-/////////////////////////////////////////	
-	private class TextInputDialog extends AlertDialog.Builder
+/////////////////////////////////////////
+	private interface ITextInput{
+		TextInput textInputs[] = new TextInput[0];
+	}
+	private class TextInputDialog extends AlertDialog.Builder implements ITextInput
 	{
 
 		TextInput textInputs[];
-		public TextInputDialog(Context arg0, int arg1, FREArray fretextInputs) throws IllegalArgumentException, FREInvalidObjectException, FREWrongThreadException, IllegalStateException, FRETypeMismatchException, FREASErrorException, FRENoSuchNameException 
+		public TextInputDialog(Context context, int theme, FREArray fretextInputs) throws IllegalArgumentException, FREInvalidObjectException, FREWrongThreadException, IllegalStateException, FRETypeMismatchException, FREASErrorException, FRENoSuchNameException 
 		{
-			super(arg0, arg1);
+			super(context,theme);
 			/*input = new EditText(arg0);
 			setView(input);*/
 			int length = (int)fretextInputs.getLength();
 			textInputs = new TextInput[length];
 			TextInput textInput = null;
 			String name ="";
-			ScrollView sv = new ScrollView(arg0);
-			LinearLayout ll = new LinearLayout(arg0);
+			ScrollView sv = new ScrollView(context);
+			LinearLayout ll = new LinearLayout(context);
 			ll.setOrientation(LinearLayout.VERTICAL);
 			sv.addView(ll);
 			int type=0;
@@ -152,11 +155,56 @@ public class showTextInputDialog implements FREFunction {
 				name = (fretextInput.getProperty("name")!=null)?fretextInput.getProperty("name").getAsString():"";
 				if(name!=null && name.length()>0){
 					if(fretextInput.getProperty("messageBefore")!=null){
-						TextView tv = new TextView(arg0);
+						TextView tv = new TextView(context);
 						tv.setText(fretextInput.getProperty("messageBefore").getAsString());
 						ll.addView(tv);
 					}
-					textInput = new TextInput(arg0,name);
+					textInput = new TextInput(context,name);
+					
+					if(fretextInput.getProperty("text")!=null)
+						textInput.setText(fretextInput.getProperty("text").getAsString());
+					if(fretextInput.getProperty("inputType")!=null){
+						type = fretextInput.getProperty("inputType").getAsInt();
+						textInput.setInputType(type);
+					}
+					ll.addView(textInput);
+					
+					textInputs[i] = textInput;
+				}
+			}
+			setView(sv);
+			
+		}		
+	}
+	
+
+	private class TextInputDialogWithoutTheme extends AlertDialog.Builder implements ITextInput
+	{
+
+		TextInput textInputs[];
+		public TextInputDialogWithoutTheme(Context context, FREArray fretextInputs) throws IllegalArgumentException, FREInvalidObjectException, FREWrongThreadException, IllegalStateException, FRETypeMismatchException, FREASErrorException, FRENoSuchNameException 
+		{
+			super(context);
+			
+			int length = (int)fretextInputs.getLength();
+			textInputs = new TextInput[length];
+			TextInput textInput = null;
+			String name ="";
+			ScrollView sv = new ScrollView(context);
+			LinearLayout ll = new LinearLayout(context);
+			ll.setOrientation(LinearLayout.VERTICAL);
+			sv.addView(ll);
+			int type=0;
+			for (int i = 0; i < length; i++) {
+				FREObject fretextInput = fretextInputs.getObjectAt(i);
+				name = (fretextInput.getProperty("name")!=null)?fretextInput.getProperty("name").getAsString():"";
+				if(name!=null && name.length()>0){
+					if(fretextInput.getProperty("messageBefore")!=null){
+						TextView tv = new TextView(context);
+						tv.setText(fretextInput.getProperty("messageBefore").getAsString());
+						ll.addView(tv);
+					}
+					textInput = new TextInput(context,name);
 					
 					if(fretextInput.getProperty("text")!=null)
 						textInput.setText(fretextInput.getProperty("text").getAsString());
@@ -176,6 +224,13 @@ public class showTextInputDialog implements FREFunction {
 	
 	
 	
+	
+	
+	
+	
+	
+	
+	
 	private class TextInput extends EditText{
 		
 		String name="";
@@ -189,9 +244,9 @@ public class showTextInputDialog implements FREFunction {
 	private class ClickListener implements DialogInterface.OnClickListener
 	{
     	private FREContext context;
-    	private TextInputDialog dlg;
+    	private ITextInput dlg;
     	
-    	ClickListener(FREContext context,TextInputDialog dlg)
+    	ClickListener(FREContext context,ITextInput dlg)
     	{
     		this.dlg = dlg;
     		this.context=context;

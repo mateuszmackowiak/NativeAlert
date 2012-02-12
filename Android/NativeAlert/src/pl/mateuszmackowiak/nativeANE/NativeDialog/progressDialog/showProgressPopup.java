@@ -1,7 +1,6 @@
 package pl.mateuszmackowiak.nativeANE.NativeDialog.progressDialog;
 
 import pl.mateuszmackowiak.nativeANE.NativeDialog.NativeExtension;
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.text.Html;
@@ -23,7 +22,7 @@ public class showProgressPopup implements FREFunction {
 	public FREObject call(FREContext context, FREObject[] args) {
 		
 		String function="",title="", message="";
-		int max=0,  style=ProgressDialog.STYLE_HORIZONTAL , theme = AlertDialog.THEME_HOLO_DARK;
+		int max=0,  style=ProgressDialog.STYLE_HORIZONTAL , theme = 0;
 		Integer secondaryProgress = null,progress=null;
 		boolean cancleble = false,indeterminate =false;
 		

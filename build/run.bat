@@ -7,5 +7,5 @@ set dll_Library=NativeAlertCbDll.dll
 
 unzip -o %library_SWC%
 del catalog.xml
-adt -package %signing_options% -target ane "%dest_ANE%" "%extension_XML%" -swc "%library_SWC%" -platform Windows-x86 library.swf %dll_Library% -platform iPhone-ARM library.swf libNativeAlert.a -platform Android-ARM library.swf nativealert.jar
+adt -package %signing_options% -target ane "%dest_ANE%" "%extension_XML%" -swc "%library_SWC%" -platform Windows-x86 library.swf %dll_Library% -platform iPhone-ARM library.swf libNativeAlert.a -platform Android-ARM library.swf nativealert.jar  -platform default library.swf
 del %library_SWC%

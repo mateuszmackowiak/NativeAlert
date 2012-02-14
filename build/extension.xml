@@ -23,5 +23,8 @@
                 <finalizer>pl.mateuszmackowiak.nativeANE.NativeDialog.NativeExtension</finalizer>
             </applicationDeployment>
         </platform>
+		 <platform name="default"> 
+            <applicationDeployment/> 
+        </platform>
     </platforms>
 </extension>

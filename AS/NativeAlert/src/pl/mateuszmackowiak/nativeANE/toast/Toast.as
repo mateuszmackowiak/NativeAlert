@@ -96,9 +96,13 @@ package pl.mateuszmackowiak.nativeANE.toast
 			if(!_set){// checks if a value was set before
 				try{
 					_set = true;
-					if(context==null)
-						context = ExtensionContext.createExtensionContext(EXTENSION_ID, "ToastContext");
-					_isSupp = context.call("isSupported")==true;
+					if(Capabilities.os.indexOf("Linux")>-1){
+						if(context==null)
+							var context:ExtensionContext = ExtensionContext.createExtensionContext(EXTENSION_ID, "ToastContext");
+						_isSupp = context.call("isSupported")==true;
+						context.dispose();
+					}else
+						_isSupp = false;
 				}catch(e:Error){
 					//showError(e.message,e.errorID);
 					trace("Toast extension is not supported on this platform");

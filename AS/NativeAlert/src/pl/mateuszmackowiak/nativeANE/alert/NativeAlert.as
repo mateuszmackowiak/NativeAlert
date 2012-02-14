@@ -126,8 +126,7 @@ package pl.mateuszmackowiak.nativeANE.alert
 		
 		public static function set defaultAndroidTheme(value:int):void
 		{
-			if(value==THEME_DEVICE_DEFAULT_DARK || value==THEME_DEVICE_DEFAULT_LIGHT || value==THEME_HOLO_DARK || value==THEME_HOLO_LIGHT || value==THEME_TRADITIONAL)
-				_theme = value;
+			_theme = value;
 		}
 		public static function get defaultAndroidTheme():int
 		{
@@ -199,8 +198,7 @@ package pl.mateuszmackowiak.nativeANE.alert
 					if(Capabilities.os.indexOf("Win")>-1)
 						level--;
 					dispatchEvent(new NativeAlertEvent(NativeAlertEvent.CLOSE,level.toString()));
-				}
-				else{
+				}else{
 					showError(event.toString());
 				}
 			}catch(e:Error){

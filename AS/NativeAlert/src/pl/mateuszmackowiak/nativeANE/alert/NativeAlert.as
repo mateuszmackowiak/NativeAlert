@@ -106,7 +106,7 @@ package pl.mateuszmackowiak.nativeANE.alert
 					this.closeLabel = closeLabel;
 				if(otherLabels!==null && otherLabels!=="")
 					this.otherLabels = otherLabels;
-				if(androidTheme==THEME_DEVICE_DEFAULT_DARK || androidTheme==THEME_DEVICE_DEFAULT_LIGHT || androidTheme==THEME_HOLO_DARK || androidTheme==THEME_HOLO_LIGHT || androidTheme==THEME_TRADITIONAL)
+				if(androidTheme>-1)
 					this.androidTheme = androidTheme;
 				else
 					this.androidTheme = _theme;

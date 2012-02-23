@@ -201,7 +201,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = NO;
-				CONFIGURATION_BUILD_DIR = /Users/anthonymccormick/Documents/Projects/mobile/NativeExtensions/NativeAlert/build;
+				CONFIGURATION_BUILD_DIR = /Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/debug;
 				DSTROOT = /tmp/NativeAlert.dst;
 				GCC_LINK_WITH_DYNAMIC_LIBRARIES = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -220,7 +220,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = NO;
-				CONFIGURATION_BUILD_DIR = /Users/anthonymccormick/Documents/Projects/mobile/NativeExtensions/NativeAlert/build/release;
+				CONFIGURATION_BUILD_DIR = /Users/mmmackowiak/Documents/git/NativeDialog/build;
 				DSTROOT = /tmp/NativeAlert.dst;
 				GCC_LINK_WITH_DYNAMIC_LIBRARIES = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;

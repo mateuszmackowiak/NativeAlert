@@ -228,21 +228,31 @@ Show a dialog with defined by user input text fields.
 # System Properties (Android) #
 SystemProperties class can provide some of the missing properties that You can’t get in adobe air
 
+Available parameters: 
+
+* os - like in Capabilities (IOS/Androdi)
+* language - the set language in the system (Android)
+* architecture of the cpu (Android)
+* package name (Android)
+* source directory (Android)
+* application uid -always when a application is installed on device the system creates a unique id for setting up the space for it (Android)
+* UID - created a unique ID for the device based on some of the device properties (Android) - The UDID of the device (IOS)
+* name - the name of the device (IOS)
+
+
 **requires **
 
 	<uses-permission android:name="android.permission.READ_PHONE_STATE" />
 *Usage:*
 
 	if(SystemProperties.isSupported()){
-		var dictionary:Dictionary = SystemProperties.getAndroidProperites(); 
-		trace(SystemProperties.ARCHITECTURE+"  "+dictionary[SystemProperties.ARCHITECTURE]);
-		trace(SystemProperties.JAVA_NUMBER+"  "+dictionary[SystemProperties.JAVA_NUMBER]);
-		trace(SystemProperties.LANGUAGE+"  "+dictionary[SystemProperties.LANGUAGE]);
-		trace(SystemProperties.OS+"  "+dictionary[SystemProperties.OS]);
-		trace(SystemProperties.VERSION+"  "+dictionary[SystemProperties.VERSION]);
-		trace(SystemProperties.PACKAGE_DIRECTORY+"  "+dictionary[SystemProperties.PACKAGE_DIRECTORY]);
-		trace(SystemProperties.PACKAGE_NAME+"  "+dictionary[SystemProperties.PACKAGE_NAME]);
-		trace(SystemProperties.APP_UID+"  "+dictionary[SystemProperties.APP_UID]);
-		trace(SystemProperties.UID+"  "+dictionary[SystemProperties.UID]);
+		var dictionary:Dictionary = SystemProperties.getProperites(); 
+		for (var key:String in dictionary) 
+		{ 
+			var readingType:String = key; 
+			var readingValue:String = dictionary[key]; 
+			trace(readingType + "=" + readingValue); 
+		} 
+		dictionary = null;
 	}
 	

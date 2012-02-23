@@ -63,20 +63,16 @@
 					titleInput.text = "Some Title";
 					messageInput.text = "Some Message Text";
 				}
+				returnText.text += Capabilities.os+"\n";
 				if(SystemProperties.isSupported()){
-					var dictionary:Dictionary = SystemProperties.getAndroidProperites(); 
-					
-					returnText.text += SystemProperties.ARCHITECTURE+"  "+dictionary[SystemProperties.ARCHITECTURE]+"\n";
-					returnText.text += SystemProperties.JAVA_NUMBER+"  "+dictionary[SystemProperties.JAVA_NUMBER]+"\n";
-					returnText.text += SystemProperties.LANGUAGE+"  "+dictionary[SystemProperties.LANGUAGE]+"\n";
-					returnText.text += SystemProperties.OS+"  "+dictionary[SystemProperties.OS]+"\n";
-					returnText.text += SystemProperties.VERSION+"  "+dictionary[SystemProperties.VERSION]+"\n";
-					
-					returnText.text += SystemProperties.PACKAGE_DIRECTORY+"  "+dictionary[SystemProperties.PACKAGE_DIRECTORY]+"\n";
-					returnText.text += SystemProperties.PACKAGE_NAME+"  "+dictionary[SystemProperties.PACKAGE_NAME]+"\n";
-					returnText.text += SystemProperties.APP_UID+"  "+dictionary[SystemProperties.APP_UID]+"\n";
-					returnText.text += SystemProperties.UID+"  "+dictionary[SystemProperties.UID]+"\n";
-					
+					var dictionary:Dictionary = SystemProperties.getProperites(); 
+					for (var key:String in dictionary) 
+					{ 
+						var readingType:String = key; 
+						var readingValue:String = dictionary[key]; 
+						returnText.text += readingType + "=" + readingValue+"\n"; 
+					} 
+
 					dictionary = null;
 				}
 				

@@ -9,6 +9,7 @@
 #import <UIKit/UIKit.h>
 #import "MobileAlert.h"
 
+
 @interface NativeAlert : NSObject <UIAlertViewDelegate>
 
 

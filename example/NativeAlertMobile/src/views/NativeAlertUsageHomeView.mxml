@@ -361,6 +361,12 @@
 				dialog.removeEventListener(LogEvent.LOG_EVENT,traceEvent);
 				dialog.kill();
 			}
+			
+			protected function togglebutton1_changeHandler(event:Event):void
+			{
+				NativeProgress.showIOSnetworkActivityIndicator(ToggleSwitch(event.target).selected);
+			}
+			
 		]]>
 	</fx:Script>
 	<fx:Declarations>
@@ -392,7 +398,7 @@
 	</s:HGroup>
 	
 	
-	
+	<s:ToggleSwitch label="SnetworkActivityIndicator" visible="{NativeProgress.isshowIOSnetworkActivityIndicatorAvalieble()}" change="togglebutton1_changeHandler(event)"/>
 	<s:Button width="100%" click="callNativeAlret(event)" label="call native Alert" height="60"/>
 	
 	<s:VGroup width="100%" height="100%" >

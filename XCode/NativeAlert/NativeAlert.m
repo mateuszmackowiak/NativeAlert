@@ -8,6 +8,7 @@
 
 #include "FlashRuntimeExtensions.h"
 #import "MobileAlert.h"
+#import "UIApplication+UIID.h"
 
 FREObject showAlertWithTitleAndMessage(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[] )
 {
@@ -52,6 +53,25 @@ FREObject isSupported(FREContext ctx, void* funcData, uint32_t argc, FREObject a
 }
 
 
+FREObject showHidenetworkIndicator(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[] ){
+    
+    uint32_t shownetworkActivity;
+    FREGetObjectAsBool(argv[0], &shownetworkActivity);
+    
+    UIApplication* app = [UIApplication sharedApplication];
+    if(app.networkActivityIndicatorVisible != shownetworkActivity)
+        app.networkActivityIndicatorVisible = shownetworkActivity;
+    
+    FREObject retVal;
+    if(FRENewObjectFromBool(app.networkActivityIndicatorVisible, &retVal) == FRE_OK){
+        return retVal;
+    }else{
+        return nil;
+    }
+}
+
+
+
 FREObject getSystemProperties(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[] ){
     
     FREObject dic;
@@ -60,23 +80,25 @@ FREObject getSystemProperties(FREContext ctx, void* funcData, uint32_t argc, FRE
         
         const char *osCh = [[device systemName] UTF8String];
         const char *versionCh = [[device systemVersion] UTF8String];
-        const char *uidCh = [[device uniqueIdentifier] UTF8String];
+        const char *udidCh = [[device uniqueIdentifier] UTF8String];
+        const char *uidCh = "";//[[[UIApplication sharedApplication] uniqueInstallationIdentifier] UTF8String];
         const char *nameCh = [[device name] UTF8String];
-        //float batLevel = [device batteryLevel];
+        // float batLevel = [device batteryLevel];
        
         FREObject uidObj;
+        FREObject udidObj;
         FREObject osObj;
         FREObject versionObj;
         FREObject nameObj;
         
-        
+        FRENewObjectFromUTF8(strlen(udidCh)+1, (const uint8_t*)udidCh, &udidObj);
         FRENewObjectFromUTF8(strlen(uidCh)+1, (const uint8_t*)uidCh, &uidObj);
         FRENewObjectFromUTF8(strlen(osCh)+1, (const uint8_t*)osCh, &osObj);
         FRENewObjectFromUTF8(strlen(versionCh)+1, (const uint8_t*)versionCh, &versionObj);
         FRENewObjectFromUTF8(strlen(nameCh)+1, (const uint8_t*)nameCh, &nameObj);
 
-        
         FRESetObjectProperty(dic, (const uint8_t*)"UID", uidObj, NULL);
+        FRESetObjectProperty(dic, (const uint8_t*)"UDID", udidObj, NULL);
         FRESetObjectProperty(dic, (const uint8_t*)"os", osObj, NULL);
         FRESetObjectProperty(dic, (const uint8_t*)"version", versionObj, NULL);
         FRESetObjectProperty(dic, (const uint8_t*)"name", nameObj, NULL);
@@ -96,6 +118,8 @@ FREObject getSystemProperties(FREContext ctx, void* funcData, uint32_t argc, FRE
 //
 //------------------------------------
 static const char * SYSTEM_PROPERTIES_KEY = "SystemProperites";
+static const char * PROGRESS_KEY = "ProgressContext";
+
 // ContextInitializer()
 //
 // The context initializer is called when the runtime creates the extension context instance.
@@ -104,12 +128,16 @@ void ContextInitializer(void* extData, const uint8_t * ctxType, FREContext ctx,
 {
 	*numFunctionsToTest = 2;
     
-	FRENamedFunction* func = (FRENamedFunction*) malloc(sizeof(FRENamedFunction) * 1);
+	FRENamedFunction* func = (FRENamedFunction*) malloc(sizeof(FRENamedFunction) * 2);
     
     if(strcmp((const char *)ctxType, SYSTEM_PROPERTIES_KEY)==0){
         func[0].name = (const uint8_t *) "getSystemProperty";
         func[0].functionData = NULL;
         func[0].function = &getSystemProperties;
+    }else if(strcmp((const char *)ctxType, PROGRESS_KEY)==0){
+        func[0].name = (const uint8_t *) "showHidenetworkIndicator";
+        func[0].functionData = NULL;
+        func[0].function = &showHidenetworkIndicator;
     }else{
         func[0].name = (const uint8_t *) "showAlertWithTitleAndMessage";
         func[0].functionData = NULL;
@@ -121,6 +149,8 @@ void ContextInitializer(void* extData, const uint8_t * ctxType, FREContext ctx,
 
 	*functionsToSet = func;
 }
+
+
 
 // ContextFinalizer()
 //

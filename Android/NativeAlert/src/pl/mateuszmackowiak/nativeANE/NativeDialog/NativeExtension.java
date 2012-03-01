@@ -13,7 +13,7 @@ import com.adobe.fre.FREExtension;
 
 /**
  *
- * @author Mateusz Maƒákowiak
+ * @author Mateusz Maçkowiak
  */
 public class NativeExtension implements FREExtension{
     

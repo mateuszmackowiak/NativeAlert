@@ -79,7 +79,24 @@ package pl.mateuszmackowiak.nativeANE.progress
 			}
 		}
 		
-		
+		public static function isshowIOSnetworkActivityIndicatorAvalieble():Boolean{
+			if(Capabilities.os.toLowerCase().indexOf("ip")>-1){
+				return true;
+			}else
+				return false;
+		}
+		public static function showIOSnetworkActivityIndicator(show:Boolean):Boolean{
+			if(Capabilities.os.toLowerCase().indexOf("ip")>-1){
+				try{
+					var context:ExtensionContext = ExtensionContext.createExtensionContext(EXTENSION_ID, "ProgressContext");
+					var ret:Boolean = context.call("showHidenetworkIndicator",show)as Boolean;
+					context.dispose();
+					return ret;
+				}catch(e:Error){
+					trace("Error calling showIOSnetworkActivityIndicator method "+e.message,e.errorID);
+				}
+			}return false;
+		}
 
 		
 

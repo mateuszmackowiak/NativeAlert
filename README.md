@@ -1,4 +1,5 @@
 # Native Dialogs - Adobe air Native Extension #
+Checked iOS 4.3,5.1 / android 3.1 ### works with air 3.1 and beta of 3.2###
 See more info [here](http://mateuszmackowiak.wordpress.com)
 
 [See compiled demo APK on You're android tablet](https://github.com/mateuszmackowiak/NativeAlert/blob/master/example/NativeAlertMobile/NativeAlertMobile.apk?raw=true)
@@ -31,11 +32,17 @@ Displays a native alert dialog.
 
 
 
-# NativeProgress (Android)#
+# NativeProgress (Android with a function for IOS)#
+Android:
+  The ability to display the native dialog showing a progress bar or a spinner.
 
-The ability to display the native dialog showing a progress bar or a spinner.
+iOS:
+  The ability to show and hide the native status-bar networki busy indicator.
 
-*Usage:*
+	if(NativeProgress.isshowIOSnetworkActivityIndicatorAvalieble())
+		NativeProgress.showIOSnetworkActivityIndicator(true);
+
+*Usage android:*
 
 	private var progressPopup:NativeProgress;
 	private var p:int = 0;

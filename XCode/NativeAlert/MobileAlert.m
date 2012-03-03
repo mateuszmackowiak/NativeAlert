@@ -11,15 +11,73 @@
 @implementation MobileAlert
 
 @synthesize alert;
-
+@synthesize progressView;
 FREContext *context;
-
+-(void)showProgressPopup: (NSString *)title 
+                   style: (NSInteger)style
+                 message: (NSString*)message 
+                progress: (NSNumber*)progress
+            showActivity:(Boolean)showActivity
+                 context: (FREContext *)ctx
+{
+    //Hold onto the context so we can dispatch our message later.
+    context = ctx;
+    [self hideProgress];
+    //Create our alert.
+    if (showActivity) {
+        self.alert = [[[UIAlertView alloc] initWithTitle:title 
+                                                 message:message
+                                                delegate:self 
+                                       cancelButtonTitle:nil
+                                       otherButtonTitles:nil] retain];
+        
+        [alert show];
+        UIActivityIndicatorView *activityWheel = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
+        activityWheel.frame = CGRectMake(142.0f-activityWheel.bounds.size.width*.5, 80.0f, activityWheel.bounds.size.width, activityWheel.bounds.size.height);
+        [alert addSubview:activityWheel];
+        [activityWheel startAnimating];
+        [activityWheel release];
+        
+        
+    } else {
+        self.alert = [[[UIAlertView alloc] initWithTitle:title 
+                                                 message:message
+                                                delegate:self 
+                                       cancelButtonTitle:nil
+                                       otherButtonTitles:nil] retain];
+        progressView = [[UIProgressView alloc] initWithFrame:CGRectMake(30.0f, 90.0f, 225.0f, 90.0f)];
+        [alert addSubview:progressView];
+        [progressView setProgressViewStyle: UIProgressViewStyleBar];
+        progressView.progress=[progress floatValue];
+        [alert show];
+        
+    }	
+}
+-(void)updateProgress: (CGFloat)perc
+{
+    [self performSelectorOnMainThread: @selector(updateProgressBar:)
+                               withObject: [NSNumber numberWithFloat:perc] waitUntilDone:NO];
+}
+- (void) updateProgressBar:(NSNumber*)num { 
+    progressView.progress=[num floatValue]; }
+-(void)hideProgress
+{
+    if(progressView)
+       [progressView release];
+    if(alert)
+    {
+       [alert release];
+       [alert dismissWithClickedButtonIndex:0 animated:YES];
+    }
+}
 -(void)showAlertWithTitle: (NSString *)title 
                   message: (NSString*)message 
                closeLabel: (NSString*)closeLabel
               otherLabels: (NSString*)otherLabels
                   context: (FREContext *)ctx
 {
+    //clean previous windows
+    [self hideProgress];
     //Hold onto the context so we can dispatch our message later.
     context = ctx;
     

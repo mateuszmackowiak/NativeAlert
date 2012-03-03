@@ -224,7 +224,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = NO;
-				CONFIGURATION_BUILD_DIR = /Users/mmmackowiak/Documents/git/NativeDialog/build;
+				CONFIGURATION_BUILD_DIR = ../../build;
 				DSTROOT = /tmp/NativeAlert.dst;
 				GCC_LINK_WITH_DYNAMIC_LIBRARIES = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;

@@ -114,7 +114,12 @@ package pl.mateuszmackowiak.nativeANE.progress
 				_indeterminate = indeterminate;
 			
 			try{
+				if(Capabilities.os.indexOf("Linux")>-1)
 				context.call("NativeProgress","showPopup",_progress,_secondary,_style,_title,_message,cancleble,_indeterminate,_theme);
+				else if(Capabilities.os.toLowerCase().indexOf("ip")>-1)
+				{
+					context.call("showProgressPopup",_progress/_maxProgress,null,_style,title,message,false,_indeterminate);
+				}
 				return true;
 			}catch(e:Error){
 				showError("Error calling show method "+e.message,e.errorID);
@@ -131,7 +136,11 @@ package pl.mateuszmackowiak.nativeANE.progress
 				_message = message;
 			_indeterminate = true;
 			try{
-				context.call("NativeProgress","showPopup",null,null,STYLE_HORIZONTAL,_title,_message,cancleble,true,_theme);
+				if(Capabilities.os.indexOf("Linux")>-1)
+					context.call("NativeProgress","showPopup",null,null,STYLE_HORIZONTAL,_title,_message,cancleble,true,_theme);
+				else if(Capabilities.os.toLowerCase().indexOf("ip")>-1)
+					context.call("showProgressPopup",null,null,STYLE_HORIZONTAL,_title,_message,cancleble,true);	
+				
 				return true;
 			}catch(e:Error){
 				showError("Error calling show method "+e.message,e.errorID);
@@ -193,7 +202,10 @@ package pl.mateuszmackowiak.nativeANE.progress
 		public function setProgress(value:int):Boolean{
 			if(!isNaN(value) && _progress!==value  && value>=0 && value<= _maxProgress){
 				try{
-					context.call("NativeProgress","update",value);
+					if(Capabilities.os.indexOf("Linux")>-1)
+						context.call("NativeProgress","update",value);
+					else if(Capabilities.os.toLowerCase().indexOf("ip")>-1)
+						context.call("updateProgress",value/_maxProgress);
 					_progress = value;
 					return true;
 				}catch(e:Error){
@@ -234,7 +246,7 @@ package pl.mateuszmackowiak.nativeANE.progress
 		{
 			if(value!=null && value!==_message){
 				try{
-					context.call("NativeProgress","setMessage",value);
+						context.call("NativeProgress","setMessage",value);
 					_message = value;
 					return true;
 				}catch(e:Error){
@@ -253,7 +265,7 @@ package pl.mateuszmackowiak.nativeANE.progress
 		{
 			if(value!=null && value!==_title){
 				try{
-					context.call("NativeProgress","setTitle",value);
+						context.call("NativeProgress","setTitle",value);
 					_title = value;
 					return true;
 				}catch(e:Error){
@@ -287,7 +299,10 @@ package pl.mateuszmackowiak.nativeANE.progress
 		public function hide():Boolean
 		{
 			try{
-				context.call("NativeProgress","hide");
+				if(Capabilities.os.indexOf("Linux")>-1)
+					context.call("NativeProgress","hide");
+				else if(Capabilities.os.toLowerCase().indexOf("ip")>-1)
+					context.call("hideProgress");
 				return true;
 			}catch(e:Error){
 				showError("Error calling hide method "+e.message,e.errorID);
@@ -322,7 +337,13 @@ package pl.mateuszmackowiak.nativeANE.progress
 						var context:ExtensionContext = ExtensionContext.createExtensionContext(EXTENSION_ID, "ProgressContext");
 						_isSupp = context.call("isSupported")==true;
 						context.dispose();
-					}else
+					}else if(Capabilities.os.toLowerCase().indexOf("ip")>-1)
+					{
+						context = ExtensionContext.createExtensionContext(EXTENSION_ID,null);
+						_isSupp = context.call("isSupported")==true;
+						context.dispose();
+					}
+					else
 						_isSupp = false;
 				}catch(e:Error){
 					trace("NativeProcess Extension is not supported on this platform");

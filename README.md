@@ -1,5 +1,8 @@
 # Native Dialogs - Adobe air Native Extension #
+Update: NativeProgress for IOS // by [memeller](https://github.com/memeller)
+
 Checked iOS 4.3,5.1 / android 3.1 ### works with air 3.1 and beta of 3.2###
+
 See more info [here](http://mateuszmackowiak.wordpress.com)
 
 [See compiled demo APK on You're android tablet](https://github.com/mateuszmackowiak/NativeAlert/blob/master/example/NativeAlertMobile/NativeAlertMobile.apk?raw=true)
@@ -32,17 +35,17 @@ Displays a native alert dialog.
 
 
 
-# NativeProgress (Android with a function for IOS)#
-Android:
+# NativeProgress (Android / IOS)#
+Android and iOS:
   The ability to display the native dialog showing a progress bar or a spinner.
 
-iOS:
+iOS only:
   The ability to show and hide the native status-bar networki busy indicator.
 
-	if(NativeProgress.isshowIOSnetworkActivityIndicatorAvalieble())
-		NativeProgress.showIOSnetworkActivityIndicator(true);
+	if(NativeProgress.isNetworkActivityIndicatorAvalieble())
+		NativeProgress.showNetworkActivityIndicator(true);
 
-*Usage android:*
+*Usage:*
 
 	private var progressPopup:NativeProgress;
 	private var p:int = 0;
@@ -51,13 +54,13 @@ iOS:
 	{
     	progressPopup = new NativeProgress(style);
      	progressPopup.theme = NativeProgress.THEME_HOLO_DARK;
-	 	progressPopup.setSecondaryProgress(45);
+	 	progressPopup.setSecondaryProgress(45);//This only works in android 
      	progressPopup.addEventListener(NativeDialogEvent.OPENED,traceEvent);
      	progressPopup.addEventListener(NativeDialogEvent.CANCLED,closeNativeProcessHandler);
      	progressPopup.addEventListener(NativeDialogEvent.CLOSED,closeNativeProcessHandler);
      	progressPopup.addEventListener(NativeExtensionErrorEvent.ERROR,onError);
 	 	progressPopup.setMax(50);
-	 	progressPopup.setIndeterminate = true;
+	 	progressPopup.setIndeterminate = true;//This only works in android
      	progressPopup.show(0, titleInput.text , messageInput.text,true);
 
      	myTimer.addEventListener(TimerEvent.TIMER, updateProgress);

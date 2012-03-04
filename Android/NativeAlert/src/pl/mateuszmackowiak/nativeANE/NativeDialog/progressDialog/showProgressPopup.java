@@ -12,7 +12,7 @@ import com.adobe.fre.FREObject;
 
 public class showProgressPopup implements FREFunction {
 
-	public static final String KEY = "NativeProgress";
+	public static final String KEY = "showProgressPopup";
 	
 	private int MAX_PROGRESS = 100;
 	

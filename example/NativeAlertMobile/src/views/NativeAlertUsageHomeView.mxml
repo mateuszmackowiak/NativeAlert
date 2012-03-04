@@ -63,14 +63,14 @@
 					titleInput.text = "Some Title";
 					messageInput.text = "Some Message Text";
 				}
-				returnText.text += Capabilities.os+"\n";
+				returnText.appendText(Capabilities.os+"\n");
 				if(SystemProperties.isSupported()){
 					var dictionary:Dictionary = SystemProperties.getProperites(); 
 					for (var key:String in dictionary) 
 					{ 
 						var readingType:String = key; 
 						var readingValue:String = dictionary[key]; 
-						returnText.text += readingType + "=" + readingValue+"\n"; 
+						returnText.appendText(readingType + "=" + readingValue+"\n"); 
 					} 
 
 					dictionary = null;
@@ -94,25 +94,25 @@
 				if(event is UncaughtErrorEvent){
 					const e:UncaughtErrorEvent = event;
 					if(e.error is Error)
-						returnText.text += "UncaughtErrorEvent Error "+ (e.error as Error).message+"   "+(e.error as Error).toString()+"\n";
+						returnText.appendText("UncaughtErrorEvent Error "+ (e.error as Error).message+"   "+(e.error as Error).toString()+"\n");
 					else
-						returnText.text += "UncaughtErrorEvent ErrorEvent "+ (e.error as ErrorEvent).text+"   "+(e.error as ErrorEvent).toString()+"\n";
+						returnText.appendText("UncaughtErrorEvent ErrorEvent "+ (e.error as ErrorEvent).text+"   "+(e.error as ErrorEvent).toString()+"\n");
 				}else
-					returnText.text += "Error "+ event.text+"   "+event.toString()+"\n";
+					returnText.appendText("Error "+ event.text+"   "+event.toString()+"\n");
 			}
 			private function traceEvent(event:*):void
 			{
 				if(event.hasOwnProperty("text"))
-					returnText.text += event.toString()+"  "+event.text+"\n";
+					returnText.appendText(event.toString()+"  "+event.text+"\n");
 				else if(event.hasOwnProperty("index"))
-					returnText.text += event.toString()+"  "+event.index+"\n";
+					returnText.appendText(event.toString()+"  "+event.index+"\n");
 				else
-					returnText.text += event.toString()+"\n";
+					returnText.appendText(event.toString()+"\n");
 			}
 			protected function view1_backKeyPressedHandler(event:FlexEvent):void
 			{
 				event.preventDefault();
-				returnText.text +="back key pressed\n";
+				returnText.appendText("back key pressed\n");
 				
 				myTimer.removeEventListener(TimerEvent.TIMER,updateProgress);
 				myTimer.stop();
@@ -140,7 +140,7 @@
 			private function closeFun(event:NativeAlertEvent):void
 			{
 				var n:NativeAlert = event.target as NativeAlert;
-				returnText.text+= "the answer: "+event.index+"\n";
+				returnText.appendText("the answer: "+event.index+"\n");
 			}
 			
 			
@@ -167,12 +167,12 @@
 					myTimer.addEventListener(TimerEvent.TIMER, updateProgress);
 					myTimer.start();
 				}catch(e:Error){
-					returnText.text += "Error "+ e.message+"   "+e.toString()+"\n";
+					returnText.appendText("Error "+ e.message+"   "+e.toString()+"\n");
 				}
 			}
 			private function closeNativeProcessHandler(event:*):void
 			{
-				returnText.text += event.toString()+"\n";
+				returnText.appendText(event.toString()+"\n");
 				progressPopup.removeEventListener(NativeDialogEvent.CANCLED,closeNativeProcessHandler);
 				progressPopup.removeEventListener(NativeDialogEvent.CLOSED,closeNativeProcessHandler);
 				progressPopup.removeEventListener(NativeDialogEvent.OPENED,traceEvent);
@@ -191,15 +191,20 @@
 					p = 0;
 					progressPopup.hide();
 					(event.target as Timer).stop();
-				}else{
+				}
+				else{
+					if(p>=25){
+						progressPopup.setMessage("some message changed in between");
+						progressPopup.setTitle("some title changed in between");
+					}
 					try{
 						if(progressPopup.getIndeterminate()==false)
 							progressPopup.setProgress(p);
 					}catch(e:Error){
-						returnText.text += "Error "+ e.message+"   "+e.toString()+"\n";
+						returnText.appendText("Error "+ e.message+"   "+e.toString()+"\n");
 					}
 				}
-				
+				returnText.appendText(progressPopup.isShowing().toString());
 			}
 			
 			
@@ -222,9 +227,9 @@
 			{
 				for each (var n:NativeTextInput in event.list) 
 				{
-					returnText.text +=n.name+":  "+n.text+"\n";
+					returnText.appendText(n.name+":  "+n.text+"\n");
 				}
-				returnText.text +="button selected "+event.buttonIndex.toString()+"\n";
+				returnText.appendText("button selected "+event.buttonIndex.toString()+"\n");
 				
 			}
 			
@@ -264,9 +269,9 @@
 			public function closeTextInputDialogHandler(event:NativeDialogEvent):void
 			{
 				if(event.hasOwnProperty("index"))
-					returnText.text += event.toString()+"   "+event.index+"\n";
+					returnText.appendText(event.toString()+"   "+event.index+"\n");
 				else
-					returnText.text += event.toString()+"\n";
+					returnText.appendText(event.toString()+"\n");
 				textInputDialog.removeEventListener(NativeDialogEvent.CANCLED,closeTextInputDialogHandler);
 				textInputDialog.removeEventListener(NativeDialogEvent.CLOSED,closeTextInputDialogHandler);
 				textInputDialog.removeEventListener(NativeDialogEvent.OPENED,traceEvent);
@@ -333,17 +338,17 @@
 			private function onListChange(event:NativeDialogListEvent):void
 			{
 				var dialog:NativeListDialog = (event.target as NativeListDialog)
-				returnText.text += "NativeDialogListEvent "+ event.index+"   "+event.selected+"\n";
+				returnText.appendText("NativeDialogListEvent "+ event.index+"   "+event.selected+"\n");
 				if(dialog.selectedIndex>-1){
 					selectedIndex = dialog.selectedIndex;
-					returnText.text += "selectedIndex   "+selectedIndex+"\n";
+					returnText.appendText("selectedIndex   "+selectedIndex+"\n");
 				}else{
 					const a:Vector.<String> = dialog.selectedLabels;
-					returnText.text +="selectedIndexes : \n";
+					returnText.appendText("selectedIndexes : \n");
 					if(a.length>0){
 						for (var i:int = 0; i < a.length; i++) 
 						{
-							returnText.text +="   "+a[i]+"\n";
+							returnText.appendText("   "+a[i]+"\n");
 						}
 					}
 				}
@@ -351,7 +356,7 @@
 			}
 			public function closeNativeDialogHandler(event:NativeDialogEvent):void
 			{
-				returnText.text += event.toString()+"\n";
+				returnText.appendText(event.toString()+"\n");
 				var dialog:NativeListDialog = (event.target  as NativeListDialog);
 				dialog.removeEventListener(NativeDialogEvent.CANCLED,closeNativeDialogHandler);
 				dialog.removeEventListener(NativeDialogEvent.CLOSED,closeNativeDialogHandler);
@@ -364,7 +369,7 @@
 			
 			protected function togglebutton1_changeHandler(event:Event):void
 			{
-				NativeProgress.showIOSnetworkActivityIndicator(ToggleSwitch(event.target).selected);
+				NativeProgress.showNetworkActivityIndicatoror(ToggleSwitch(event.target).selected);
 			}
 			
 		]]>
@@ -398,7 +403,7 @@
 	</s:HGroup>
 	
 	
-	<s:ToggleSwitch label="SnetworkActivityIndicator" visible="{NativeProgress.isshowIOSnetworkActivityIndicatorAvalieble()}" change="togglebutton1_changeHandler(event)"/>
+	<s:ToggleSwitch label="SnetworkActivityIndicator" visible="{NativeProgress.isNetworkActivityIndicatoror()}" change="togglebutton1_changeHandler(event)"/>
 	<s:Button width="100%" click="callNativeAlret(event)" label="call native Alert" height="60"/>
 	
 	<s:VGroup width="100%" height="100%" >
@@ -419,5 +424,5 @@
 		<s:Button width="100%" click="openTextInputDialog(event)" label="open Text Input Dialog" height="60" includeInLayout="{NativeTextInputDialog.isSupported}" />
 	</s:VGroup>
 		
-	<s:TextArea id="returnText" width="100%" height="100%" selectable="false" editable="false" minHeight="500"/>
+	<s:TextArea id="returnText" width="100%" height="100%" selectable="false" editable="false" />
 </s:View>

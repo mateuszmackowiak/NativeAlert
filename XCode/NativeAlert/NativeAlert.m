@@ -11,6 +11,13 @@
 #import "UIApplication+UIID.h"
 MobileAlert *alert;
 
+
+
+//---------------------------------------------------------------------
+//
+// ALERT
+//
+//---------------------------------------------------------------------
 FREObject showAlertWithTitleAndMessage(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[] )
 {
     //Temporary values to hold our actionscript code.
@@ -43,6 +50,13 @@ FREObject showAlertWithTitleAndMessage(FREContext ctx, void* funcData, uint32_t 
                       context:ctx];
     return NULL;    
 }
+
+
+//---------------------------------------------------------------------
+//
+// PROGRESS
+//
+//---------------------------------------------------------------------
 FREObject showProgressPopup(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[] )
 {
     //Temporary values to hold our actionscript code.
@@ -51,16 +65,18 @@ FREObject showProgressPopup(FREContext ctx, void* funcData, uint32_t argc, FREOb
     uint32_t messageLength;
     const uint8_t *message;;
     double progressParam;
+    
     uint32_t showActivityValue;
     int32_t style;
     //Turn our actionscrpt code into native code.
+    FREGetObjectAsDouble(argv[0], &progressParam);
+    ///Secondary progress ignored
     FREGetObjectAsInt32(argv[2], &style);
     FREGetObjectAsUTF8(argv[3], &titleLength, &title);
     FREGetObjectAsUTF8(argv[4], &messageLength, &message);
-    //FREGetObjectAsUTF8(argv[2], &closeLength, &closeLabel);
-    // FREGetObjectAsUTF8(argv[3], &otherLength, &otherLabels);
-    FREGetObjectAsDouble(argv[0], &progressParam);
+    ///Cancleble ignored
     FREGetObjectAsBool(argv[6], &showActivityValue);
+    
     //Create our Strings for our Alert.
     NSInteger styleValue=(NSInteger)style;
     NSString *titleString = [NSString stringWithUTF8String:(char*)title];
@@ -68,6 +84,7 @@ FREObject showProgressPopup(FREContext ctx, void* funcData, uint32_t argc, FREOb
     //NSString *closeLabelString = [NSString stringWithUTF8String:(char*)closeLabel];    
     // NSString *otherLabelsString = [NSString stringWithUTF8String:(char*)otherLabels];    
     NSNumber *progressValue =[NSNumber numberWithDouble:progressParam];
+    
     alert = [[MobileAlert alloc] init];
     [alert showProgressPopup:titleString 
                        style:styleValue
@@ -79,14 +96,7 @@ FREObject showProgressPopup(FREContext ctx, void* funcData, uint32_t argc, FREOb
     return NULL;    
 }
 
-FREObject isSupported(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[] ){
-    FREObject retVal;
-    if(FRENewObjectFromBool(YES, &retVal) == FRE_OK){
-        return retVal;
-    }else{
-        return nil;
-    }
-}
+
 
 
 FREObject showHidenetworkIndicator(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[] ){
@@ -122,6 +132,64 @@ FREObject hideProgress(FREContext ctx, void* funcData, uint32_t argc, FREObject 
     //Create our Strings for our Alert.
     return NULL; 
 }
+FREObject updateMessage(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[] )
+{
+    //Temporary values to hold our actionscript code.
+    uint32_t messageLength;
+    const uint8_t *message;
+    //Turn our actionscrpt code into native code.
+    
+    FREGetObjectAsUTF8(argv[0], &messageLength, &message);
+    if(alert!=NULL){
+        NSString *nsMessage =@"";
+        if(message!=NULL){
+            nsMessage = [NSString stringWithUTF8String:(char*)message];
+        }
+        [alert updateMessage:nsMessage];
+    }
+    //Create our Strings for our Alert.
+    return NULL;    
+}
+FREObject updateTitle(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[] )
+{
+    //Temporary values to hold our actionscript code.
+    uint32_t titleLength;
+    const uint8_t *title;
+    //Turn our actionscrpt code into native code.
+    
+    FREGetObjectAsUTF8(argv[0], &titleLength, &title);
+    if(alert!=NULL){
+        NSString *nsTitle =@"";
+        if(title!=NULL){
+             [NSString stringWithUTF8String:(char*)title];
+        }
+        [alert updateTitle:nsTitle];
+    }
+    //Create our Strings for our Alert.
+    return NULL;    
+}
+
+FREObject isShowing(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[] )
+{
+    BOOL ret = NO;
+    if (alert) {
+        ret = alert.isShowing;
+    }
+    FREObject retVal;
+    if(FRENewObjectFromBool(ret, &retVal) == FRE_OK){
+        return retVal;
+    }else{
+        return nil;
+    }
+    
+}
+
+
+//---------------------------------------------------------------------
+//
+// SYSTEM PROPERTIES
+//
+//---------------------------------------------------------------------
 
 FREObject getSystemProperties(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[] ){
     
@@ -170,6 +238,20 @@ FREObject getSystemProperties(FREContext ctx, void* funcData, uint32_t argc, FRE
 //------------------------------------
 static const char * SYSTEM_PROPERTIES_KEY = "SystemProperites";
 static const char * PROGRESS_KEY = "ProgressContext";
+static const char * NETWORK_ACTIVITY_INDICATOR = "NetworkActivityIndicatoror";
+
+
+
+FREObject isSupported(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[] ){
+    FREObject retVal;
+    if(FRENewObjectFromBool(YES, &retVal) == FRE_OK){
+        return retVal;
+    }else{
+        return nil;
+    }
+}
+
+
 
 // ContextInitializer()
 //
@@ -177,18 +259,49 @@ static const char * PROGRESS_KEY = "ProgressContext";
 void ContextInitializer(void* extData, const uint8_t * ctxType, FREContext ctx, 
 						uint32_t* numFunctionsToTest, const FRENamedFunction** functionsToSet) 
 {
-	*numFunctionsToTest = 5;
+    int count=2;
+    if(strcmp((const char *)ctxType, PROGRESS_KEY)==0)
+        count = 7;
     
-	FRENamedFunction* func = (FRENamedFunction*) malloc(sizeof(FRENamedFunction) * 5);
+	*numFunctionsToTest = count;
+    
+	FRENamedFunction* func = (FRENamedFunction*) malloc(sizeof(FRENamedFunction) * count);
     
     if(strcmp((const char *)ctxType, SYSTEM_PROPERTIES_KEY)==0){
         func[0].name = (const uint8_t *) "getSystemProperty";
         func[0].functionData = NULL;
         func[0].function = &getSystemProperties;
-    }else if(strcmp((const char *)ctxType, PROGRESS_KEY)==0){
+    }else if(strcmp((const char *)ctxType, NETWORK_ACTIVITY_INDICATOR)==0){
+        
         func[0].name = (const uint8_t *) "showHidenetworkIndicator";
         func[0].functionData = NULL;
         func[0].function = &showHidenetworkIndicator;
+        
+    }else if(strcmp((const char *)ctxType, PROGRESS_KEY)==0){
+        func[0].name = (const uint8_t*) "isShowing";
+        func[0].functionData = NULL;
+        func[0].function = &isShowing;
+        
+        func[2].name = (const uint8_t *) "showProgressPopup";
+        func[2].functionData = NULL;
+        func[2].function = &showProgressPopup;
+        
+        func[3].name = (const uint8_t*) "updateProgress";
+        func[3].functionData = NULL;
+        func[3].function = &updateProgress;
+        
+        func[4].name = (const uint8_t*) "hideProgress";
+        func[4].functionData = NULL;
+        func[4].function = &hideProgress;
+        
+        func[5].name = (const uint8_t*) "updateMessage";
+        func[5].functionData = NULL;
+        func[5].function = &updateMessage;
+
+        func[6].name = (const uint8_t*) "updateTitle";
+        func[6].functionData = NULL;
+        func[6].function = &updateTitle;
+        
     }else{
         func[0].name = (const uint8_t *) "showAlertWithTitleAndMessage";
         func[0].functionData = NULL;
@@ -197,15 +310,7 @@ void ContextInitializer(void* extData, const uint8_t * ctxType, FREContext ctx,
     func[1].name = (const uint8_t *) "isSupported";
     func[1].functionData = NULL;
     func[1].function = &isSupported;
-    func[2].name = (const uint8_t *) "showProgressPopup";
-    func[2].functionData = NULL;
-    func[2].function = &showProgressPopup;
-    func[3].name = (const uint8_t*) "updateProgress";
-	func[3].functionData = NULL;
-    func[3].function = &updateProgress;
-    func[4].name = (const uint8_t*) "hideProgress";
-	func[4].functionData = NULL;
-    func[4].function = &hideProgress;
+    
 	*functionsToSet = func;
 }
 
@@ -221,10 +326,10 @@ void ContextInitializer(void* extData, const uint8_t * ctxType, FREContext ctx,
 void ContextFinalizer(FREContext ctx) {
     
     NSLog(@"Entering ContextFinalizer()");
-    
-    // Nothing to clean up.
-    [alert hideProgress];
-    [alert release];
+    if(alert!=NULL){
+        [alert hideProgress];
+        [alert release];
+    }
     NSLog(@"Exiting ContextFinalizer()");
     
 	return;

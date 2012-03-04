@@ -38,6 +38,10 @@ package pl.mateuszmackowiak.nativeANE.progress
 		private static var _defaultTheme:int = THEME_HOLO_LIGHT;
 		private static var _set:Boolean = false;
 		private static var _isSupp:Boolean = false;
+		
+		
+		private static var isAndroid:Boolean=false;
+		private static var isIOS:Boolean=false;
 		//---------------------------------------------------------------------
 		//
 		// Private Properties.
@@ -65,6 +69,11 @@ package pl.mateuszmackowiak.nativeANE.progress
 		 */
 		public function NativeProgress(style:int = 0x00000001,title:String ="",message:String = "")
 		{
+			if(Capabilities.os.toLowerCase().indexOf("linux")>-1)
+				isAndroid = true;
+			else if(Capabilities.os.toLowerCase().indexOf("iph")>-1)
+				isIOS = true;
+				
 			if(title!= null && title!=="")
 				_title = title;
 			if(style == STYLE_HORIZONTAL || style==STYLE_SPINNER)
@@ -79,16 +88,24 @@ package pl.mateuszmackowiak.nativeANE.progress
 			}
 		}
 		
-		public static function isshowIOSnetworkActivityIndicatorAvalieble():Boolean{
+		
+		
+		/**
+		 * AVAILEBLE ONLY ON IOS
+		 */
+		public static function isNetworkActivityIndicatoror():Boolean{
 			if(Capabilities.os.toLowerCase().indexOf("ip")>-1){
 				return true;
 			}else
 				return false;
 		}
-		public static function showIOSnetworkActivityIndicator(show:Boolean):Boolean{
+		/**
+		 * AVAILEBLE ONLY ON IOS
+		 */
+		public static function showNetworkActivityIndicatoror(show:Boolean):Boolean{
 			if(Capabilities.os.toLowerCase().indexOf("ip")>-1){
 				try{
-					var context:ExtensionContext = ExtensionContext.createExtensionContext(EXTENSION_ID, "ProgressContext");
+					var context:ExtensionContext = ExtensionContext.createExtensionContext(EXTENSION_ID, "NetworkActivityIndicatoror");
 					var ret:Boolean = context.call("showHidenetworkIndicator",show)as Boolean;
 					context.dispose();
 					return ret;
@@ -114,12 +131,10 @@ package pl.mateuszmackowiak.nativeANE.progress
 				_indeterminate = indeterminate;
 			
 			try{
-				if(Capabilities.os.indexOf("Linux")>-1)
-				context.call("NativeProgress","showPopup",_progress,_secondary,_style,_title,_message,cancleble,_indeterminate,_theme);
-				else if(Capabilities.os.toLowerCase().indexOf("ip")>-1)
-				{
-					context.call("showProgressPopup",_progress/_maxProgress,null,_style,title,message,false,_indeterminate);
-				}
+				if(isAndroid)
+					context.call("showProgressPopup","showPopup",_progress,_secondary,_style,_title,_message,cancleble,_indeterminate,_theme);
+				else if(isIOS)
+					context.call("showProgressPopup",_progress/_maxProgress,null,_style,title,message,cancleble,_indeterminate);
 				return true;
 			}catch(e:Error){
 				showError("Error calling show method "+e.message,e.errorID);
@@ -136,11 +151,10 @@ package pl.mateuszmackowiak.nativeANE.progress
 				_message = message;
 			_indeterminate = true;
 			try{
-				if(Capabilities.os.indexOf("Linux")>-1)
-					context.call("NativeProgress","showPopup",null,null,STYLE_HORIZONTAL,_title,_message,cancleble,true,_theme);
-				else if(Capabilities.os.toLowerCase().indexOf("ip")>-1)
+				if(isAndroid)
+					context.call("showProgressPopup","showPopup",null,null,STYLE_HORIZONTAL,_title,_message,cancleble,true,_theme);
+				else if(isIOS)
 					context.call("showProgressPopup",null,null,STYLE_HORIZONTAL,_title,_message,cancleble,true);	
-				
 				return true;
 			}catch(e:Error){
 				showError("Error calling show method "+e.message,e.errorID);
@@ -156,7 +170,10 @@ package pl.mateuszmackowiak.nativeANE.progress
 			if(message!=null && message!=="")
 				_message = message;
 			try{
-				context.call("NativeProgress","showPopup",null,null,STYLE_SPINNER,_title,_message,cancleble,false,_theme);
+				if(isAndroid)
+					context.call("showProgressPopup","showPopup",null,null,STYLE_SPINNER,_title,_message,cancleble,false,_theme);
+				else if(isIOS)
+					context.call("showProgressPopup",null,null,STYLE_SPINNER,_title,_message,cancleble,true);
 				return true;
 			}catch(e:Error){
 				showError("Error calling show method "+e.message,e.errorID);
@@ -164,32 +181,39 @@ package pl.mateuszmackowiak.nativeANE.progress
 			return false;
 		}
 		
+		
+		
+		/**
+		 * availeble only on Andorid
+		 */
 		public function setIndeterminate(value:Boolean):Boolean{
-			if(_indeterminate!==value  && value>=0 && value<= _maxProgress){
+			if(isAndroid && _indeterminate!==value  && value>=0 && value<= _maxProgress){
 				try{
 					context.call("NativeProgress","setIndeterminate",value);
 					_indeterminate = value;
 					return true;
 				}catch(e:Error){
-					showError("Error setting progress "+e.message,e.errorID);
+					showError("Error setting setIndeterminate "+e.message,e.errorID);
 				}
 			}
 			return false;
 		}
-		
 		public function getIndeterminate():Boolean{
 			return _indeterminate;
 		}
 		
 		
+		/**
+		 * availeble only on Andorid
+		 */
 		public function setSecondaryProgress(value:int):Boolean{
-			if(_secondary!==value  && value>=0 && value<= _maxProgress){
+			if(isAndroid && _secondary!==value  && value>=0 && value<= _maxProgress){
 				try{
-					context.call("NativeProgress","setSecondary",value);
+					context.call("showProgressPopup","setSecondary",value);
 					_secondary = value;
 					return true;
 				}catch(e:Error){
-					showError("Error setting progress "+e.message,e.errorID);
+					showError("Error setting secondary progress "+e.message,e.errorID);
 				}
 			}
 			return false;
@@ -199,12 +223,15 @@ package pl.mateuszmackowiak.nativeANE.progress
 			return _secondary;
 		}
 		
+		
+		
+		
 		public function setProgress(value:int):Boolean{
 			if(!isNaN(value) && _progress!==value  && value>=0 && value<= _maxProgress){
 				try{
-					if(Capabilities.os.indexOf("Linux")>-1)
-						context.call("NativeProgress","update",value);
-					else if(Capabilities.os.toLowerCase().indexOf("ip")>-1)
+					if(isAndroid)
+						context.call("showProgressPopup","update",value);
+					else
 						context.call("updateProgress",value/_maxProgress);
 					_progress = value;
 					return true;
@@ -219,11 +246,19 @@ package pl.mateuszmackowiak.nativeANE.progress
 			return _progress;
 		}
 		
+		
+		
+		/**
+		 * availeble only on Andorid
+		 */
 		public function setMax(value:int):Boolean{
 			if(!isNaN(value) && _maxProgress!==value){
 				try{
-					context.call("NativeProgress","max",value);
-					_progress = value;
+					if(isAndroid)
+						context.call("showProgressPopup","max",value);
+					if(_progress>value)
+						_progress = value;
+					_maxProgress= value;
 					return true;
 				}catch(e:Error){
 					showError("Error setting MAX "+e.message,e.errorID);
@@ -237,16 +272,17 @@ package pl.mateuszmackowiak.nativeANE.progress
 		}
 		
 		
-		public function getMessage():String
-		{
-			return _message;
-		}
 		
+		
+
 		public function setMessage(value:String):Boolean
 		{
 			if(value!=null && value!==_message){
 				try{
-						context.call("NativeProgress","setMessage",value);
+					if(isAndroid)
+						context.call("showProgressPopup","setMessage",value);
+					else
+						context.call("updateMessage",value);
 					_message = value;
 					return true;
 				}catch(e:Error){
@@ -255,17 +291,25 @@ package pl.mateuszmackowiak.nativeANE.progress
 			}
 			return false;
 		}
-		
-		public function getTitle():String
+		public function getMessage():String
 		{
-			return _title;
+			return _message;
 		}
 		
+		
+		
+		
+		
+		
+
 		public function setTitle(value:String):Boolean
 		{
 			if(value!=null && value!==_title){
 				try{
-						context.call("NativeProgress","setTitle",value);
+					if(isAndroid)
+						context.call("showProgressPopup","setTitle",value);
+					else
+						context.call("updateTitle",value);
 					_title = value;
 					return true;
 				}catch(e:Error){
@@ -274,10 +318,23 @@ package pl.mateuszmackowiak.nativeANE.progress
 			}
 			return false;
 		}
+		public function getTitle():String
+		{
+			return _title;
+		}
 		
+		
+		
+		
+		/**
+		 * availeble only on Andorid
+		 */
 		public function isShowing():Boolean{
 			if(context){
-				return context.call("NativeProgress","isShowing");
+				if(isAndroid)
+					return context.call("showProgressPopup","isShowing");
+				else
+					return context.call("isShowing");
 			}else
 				return false;
 				
@@ -288,7 +345,6 @@ package pl.mateuszmackowiak.nativeANE.progress
 		{
 			return _theme;
 		}
-		
 		public function set theme(value:int):void
 		{
 			_theme = value;
@@ -299,9 +355,9 @@ package pl.mateuszmackowiak.nativeANE.progress
 		public function hide():Boolean
 		{
 			try{
-				if(Capabilities.os.indexOf("Linux")>-1)
-					context.call("NativeProgress","hide");
-				else if(Capabilities.os.toLowerCase().indexOf("ip")>-1)
+				if(isAndroid)
+					context.call("showProgressPopup","hide");
+				else
 					context.call("hideProgress");
 				return true;
 			}catch(e:Error){
@@ -334,6 +390,7 @@ package pl.mateuszmackowiak.nativeANE.progress
 				try{
 					_set = true;
 					if(Capabilities.os.indexOf("Linux")>-1){
+						isAndroid = true;
 						var context:ExtensionContext = ExtensionContext.createExtensionContext(EXTENSION_ID, "ProgressContext");
 						_isSupp = context.call("isSupported")==true;
 						context.dispose();

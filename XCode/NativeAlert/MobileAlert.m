@@ -24,7 +24,7 @@ FREContext *context;
     context = ctx;
     [self hideProgress];
     //Create our alert.
-    if (showActivity) {
+    if (style== 0 || showActivity) {
         self.alert = [[[UIAlertView alloc] initWithTitle:title 
                                                  message:message
                                                 delegate:self 
@@ -45,6 +45,7 @@ FREContext *context;
                                                 delegate:self 
                                        cancelButtonTitle:nil
                                        otherButtonTitles:nil] retain];
+        
         progressView = [[UIProgressView alloc] initWithFrame:CGRectMake(30.0f, 90.0f, 225.0f, 90.0f)];
         [alert addSubview:progressView];
         [progressView setProgressViewStyle: UIProgressViewStyleBar];
@@ -53,13 +54,44 @@ FREContext *context;
         
     }	
 }
+
+
+-(BOOL)isShowing{
+    if(alert && alert.isHidden==NO)
+        return YES;
+    else
+        return NO;
+}
+
+
+-(void)updateMessage: (NSString*)message
+{
+    [self performSelectorOnMainThread: @selector(updateMessageWithSt:)
+                           withObject: message waitUntilDone:NO];
+}
+- (void) updateMessageWithSt:(NSString*)message { 
+   alert.message = message; }
+
+-(void)updateTitle: (NSString*)title
+{
+    [self performSelectorOnMainThread: @selector(updateTitleWithSt:)
+                           withObject: title waitUntilDone:NO];
+}
+- (void) updateTitleWithSt:(NSString*)title { 
+    alert.title = title; }
+
+
+
 -(void)updateProgress: (CGFloat)perc
 {
     [self performSelectorOnMainThread: @selector(updateProgressBar:)
-                               withObject: [NSNumber numberWithFloat:perc] waitUntilDone:NO];
+                           withObject: [NSNumber numberWithFloat:perc] waitUntilDone:NO];
 }
 - (void) updateProgressBar:(NSNumber*)num { 
     progressView.progress=[num floatValue]; }
+
+
+
 -(void)hideProgress
 {
     if(progressView)
@@ -70,6 +102,9 @@ FREContext *context;
        [alert dismissWithClickedButtonIndex:0 animated:YES];
     }
 }
+
+
+
 -(void)showAlertWithTitle: (NSString *)title 
                   message: (NSString*)message 
                closeLabel: (NSString*)closeLabel
@@ -97,6 +132,10 @@ FREContext *context;
     }
     [alert show];
 }
+
+
+
+
 
 - (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
 {

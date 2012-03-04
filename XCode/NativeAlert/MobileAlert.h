@@ -25,6 +25,14 @@
                 progress: (NSNumber*)progress
             showActivity:(Boolean)showActivity
                  context: (FREContext *)ctx;
+
 -(void)updateProgress: (CGFloat)perc;
+
+-(void)updateMessage: (NSString *)message;
+
+-(void)updateTitle: (NSString*)title;
+
+-(BOOL)isShowing;
+
 -(void)hideProgress;
 @end

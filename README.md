@@ -1,7 +1,7 @@
 # Native Dialogs - Adobe air Native Extension #
 Update: NativeProgress for IOS // by [memeller](https://github.com/memeller)
 
-Checked iOS 4.3,5.1 / android 3.1 ### works with air 3.1 and beta of 3.2###
+Checked iOS 4.3,5.1 / android 3.1
 
 See more info [here](http://mateuszmackowiak.wordpress.com)
 
@@ -25,7 +25,7 @@ Displays a native alert dialog.
 *Usage:*
 
 	NativeAlert.defaultAndroidTheme = NativeAlert.THEME_DEVICE_DEFAULT_DARK;
-	if(NativeAlert.isSuported())
+	if(NativeAlert.isSuported)
 	NativeAlert.show( "some message" , "title" , "first button label" , "otherButtons,LabelsSeperated,WithAComma" , someAnswerFunction);
 	NativeAlert.dispose();`
 

@@ -47,7 +47,7 @@
           <anePathEntry path="/Users/mmmackowiak/Documents/git/NativeDialog/build/release/NativeAlert.ane"/>
         </anePaths>
       </airSettings>
-      <multiPlatformSettings enabled="true" includePlatformLibs="false" nativeSDKPathString="/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS5.0.sdk" platformID="com.adobe.flexide.multiplatform.ios.platform" version="2"/>
+      <multiPlatformSettings enabled="true" includePlatformLibs="false" platformID="com.adobe.flexide.multiplatform.ios.platform" version="2"/>
       <actionScriptSettings version="1"/>
     </buildTarget>
     <buildTarget buildTargetName="default">

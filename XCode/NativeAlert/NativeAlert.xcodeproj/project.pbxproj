@@ -123,7 +123,7 @@
 		009AC4C91453648D001C38F5 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0420;
+				LastUpgradeCheck = 0430;
 			};
 			buildConfigurationList = 009AC4CC1453648D001C38F5 /* Build configuration list for PBXProject "NativeAlert" */;
 			compatibilityVersion = "Xcode 3.2";

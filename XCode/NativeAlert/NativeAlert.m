@@ -343,6 +343,23 @@ static const char * NETWORK_ACTIVITY_INDICATOR = "NetworkActivityIndicatoror";
 
 
 
+FREObject setBadge(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[] ){
+    int32_t value;
+    FREGetObjectAsInt32(argv[0], &value);
+    NSLog(@"setting badege to %i",value);
+    [UIApplication sharedApplication].applicationIconBadgeNumber = value;
+    return NULL;
+}
+FREObject getBadge(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[] ){
+    
+    uint32_t ret = [UIApplication sharedApplication].applicationIconBadgeNumber;
+    
+    FREObject retObj = nil;
+    FRENewObjectFromUint32(ret, &retObj);
+    
+    return retObj;
+}
+
 FREObject isSupported(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[] ){
     FREObject retVal;
     if(FRENewObjectFromBool(YES, &retVal) == FRE_OK){
@@ -353,35 +370,42 @@ FREObject isSupported(FREContext ctx, void* funcData, uint32_t argc, FREObject a
 }
 
 
-
-// ContextInitializer()
+// NativeDialogContextInitializer()
 //
 // The context initializer is called when the runtime creates the extension context instance.
-void ContextInitializer(void* extData, const uint8_t * ctxType, FREContext ctx, 
+void NativeDialogContextInitializer(void* extData, const uint8_t * ctxType, FREContext ctx, 
 						uint32_t* numFunctionsToTest, const FRENamedFunction** functionsToSet) 
 {
     int count=2;
     if(strcmp((const char *)ctxType, PROGRESS_KEY)==0)
         count = 7;
+    else if (strcmp((const char *)ctxType, "")==0){
+        count = 4;
+    }
     
 	*numFunctionsToTest = count;
     
 	FRENamedFunction* func = (FRENamedFunction*) malloc(sizeof(FRENamedFunction) * count);
     
+    
+    func[0].name = (const uint8_t *) "isSupported";
+    func[0].functionData = NULL;
+    func[0].function = &isSupported;
+    
     if(strcmp((const char *)ctxType, SYSTEM_PROPERTIES_KEY)==0){
-        func[0].name = (const uint8_t *) "getSystemProperty";
-        func[0].functionData = NULL;
-        func[0].function = &getSystemProperties;
+        func[1].name = (const uint8_t *) "getSystemProperty";
+        func[1].functionData = NULL;
+        func[1].function = &getSystemProperties;
     }else if(strcmp((const char *)ctxType, NETWORK_ACTIVITY_INDICATOR)==0){
         
-        func[0].name = (const uint8_t *) "showHidenetworkIndicator";
-        func[0].functionData = NULL;
-        func[0].function = &showHidenetworkIndicator;
+        func[1].name = (const uint8_t *) "showHidenetworkIndicator";
+        func[1].functionData = NULL;
+        func[1].function = &showHidenetworkIndicator;
         
     }else if(strcmp((const char *)ctxType, PROGRESS_KEY)==0){
-        func[0].name = (const uint8_t*) "isShowing";
-        func[0].functionData = NULL;
-        func[0].function = &isShowing;
+        func[1].name = (const uint8_t*) "isShowing";
+        func[1].functionData = NULL;
+        func[1].function = &isShowing;
         
         func[2].name = (const uint8_t *) "showProgressPopup";
         func[2].functionData = NULL;
@@ -404,27 +428,34 @@ void ContextInitializer(void* extData, const uint8_t * ctxType, FREContext ctx,
         func[6].function = &updateTitle;
         
     }else{
-        func[0].name = (const uint8_t *) "showAlertWithTitleAndMessage";
-        func[0].functionData = NULL;
-        func[0].function = &showAlertWithTitleAndMessage;
+        func[1].name = (const uint8_t *) "showAlertWithTitleAndMessage";
+        func[1].functionData = NULL;
+        func[1].function = &showAlertWithTitleAndMessage;
+        
+        func[2].name = (const uint8_t *) "setBadge";
+        func[2].functionData = NULL;
+        func[2].function = &setBadge;
+        
+        func[3].name = (const uint8_t *) "getBadge";
+        func[3].functionData = NULL;
+        func[3].function = &getBadge;
     }
-    func[1].name = (const uint8_t *) "isSupported";
-    func[1].functionData = NULL;
-    func[1].function = &isSupported;
+    
+    
     
 	*functionsToSet = func;
 }
 
 
 
-// ContextFinalizer()
+// NativeDialogContextFinalizer()
 //
 // The context finalizer is called when the extension's ActionScript code
 // calls the ExtensionContext instance's dispose() method.
 // If the AIR runtime garbage collector disposes of the ExtensionContext instance, the runtime also calls
 // ContextFinalizer().
 
-void ContextFinalizer(FREContext ctx) {
+void NativeDialogContextFinalizer(FREContext ctx) {
     
     NSLog(@"Entering ContextFinalizer()");
     if(alert!=NULL){
@@ -436,28 +467,28 @@ void ContextFinalizer(FREContext ctx) {
 	return;
 }
 
-// ExtInitializer()
+// NativeDialogExtInitializer()
 //
 // The extension initializer is called the first time the ActionScript side of the extension
 // calls ExtensionContext.createExtensionContext() for any context.
 
-void ExtInitializer(void** extDataToSet, FREContextInitializer* ctxInitializerToSet, 
+void NativeDialogExtInitializer(void** extDataToSet, FREContextInitializer* ctxInitializerToSet, 
                     FREContextFinalizer* ctxFinalizerToSet) {
     
     NSLog(@"Entering ExtInitializer()");
     
     *extDataToSet = NULL;
-    *ctxInitializerToSet = &ContextInitializer;
-    *ctxFinalizerToSet = &ContextFinalizer;
+    *ctxInitializerToSet = &NativeDialogContextInitializer;
+    *ctxFinalizerToSet = &NativeDialogContextFinalizer;
     
     NSLog(@"Exiting ExtInitializer()");
 }
 
-// ExtFinalizer()
+// NativeDialogExtFinalizer()
 //
 // The extension finalizer is called when the runtime unloads the extension. However, it is not always called.
 
-void ExtFinalizer(void* extData) {
+void NativeDialogExtFinalizer(void* extData) {
     
     NSLog(@"Entering ExtFinalizer()");
     

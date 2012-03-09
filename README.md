@@ -1,5 +1,5 @@
 # Native Dialogs - Adobe air Native Extension #
-Update: NativeProgress for IOS // by [memeller](https://github.com/memeller)
+Update: NativeAlert badge/ System Properites -IOS
 
 Checked iOS 4.3,5.1 / android 3.1
 
@@ -20,7 +20,17 @@ Available themes for android:
 
 
 ## NativeAlert (IOS/Android/Windows) ##
-Displays a native alert dialog.
+Android and iOS:
+	Displays a native alert dialog.
+
+iOS only:
+	setting the badge of the app
+
+*Usage (badge):*
+
+	if(NativeAlert.isBadgeSupported())
+		NativeAlert.badge = 4;
+
 
 *Usage:*
 
@@ -35,9 +45,11 @@ Displays a native alert dialog.
 
 
 
-# NativeProgress (Android / IOS)#
+# NativeProgress (Android / IOS) #
 Android and iOS:
   The ability to display the native dialog showing a progress bar or a spinner.
+
+NativeProgress for IOS by [memeller](https://github.com/memeller)
 
 iOS only:
   The ability to show and hide the native status-bar networki busy indicator.
@@ -235,20 +247,25 @@ Show a dialog with defined by user input text fields.
 
 
 
-# System Properties (Android) #
+# System Properties (Android / IOS) #
 SystemProperties class can provide some of the missing properties that You can’t get in adobe air
 
 Available parameters: 
 
 * os - like in Capabilities (IOS/Androdi)
+
 * language - the set language in the system (Android)
 * architecture of the cpu (Android)
 * package name (Android)
 * source directory (Android)
 * application uid -always when a application is installed on device the system creates a unique id for setting up the space for it (Android)
-* UID - created a unique ID for the device based on some of the device properties (Android) - The UDID of the device (IOS)
-* name - the name of the device (IOS)
+* UID - created a unique ID for the device based on some of the device properties (Android)
 
+* UDID - The UDID of the device (IOS)
+* name - the name of the device (IOS)
+* MACAdress - MAC Adress (IOS)
+* localizedModel (IOS)
+* model (IOS)
 
 **requires **
 

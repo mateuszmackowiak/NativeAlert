@@ -159,7 +159,7 @@ package pl.mateuszmackowiak.nativeANE.alert
 		 * Whether a Notification system is available on the device (true);<br>otherwise false
 		 */
 		public static function get isSupported():Boolean{
-			if(!_set){// checks if a value was set before
+			/*if(!_set){// checks if a value was set before
 				try{
 					_set = true;
 					if(context==null)
@@ -170,11 +170,43 @@ package pl.mateuszmackowiak.nativeANE.alert
 					return _isSupp;
 				}
 			}	
-			return _isSupp;
+			return _isSupp;*/
+			if(Capabilities.os.toLowerCase().indexOf("ip")>-1 || Capabilities.os.toLowerCase().indexOf("win")>-1 || Capabilities.os.toLowerCase().indexOf("linux")>-1)
+				return true;
+			else 
+				return false;
 		}
 		
-		
-		
+		public static function isBadgeSupported():Boolean
+		{
+			if(Capabilities.os.toLowerCase().indexOf("ip")>-1)
+				return true;
+			else 
+				return false;
+		}
+		public static  function set badge(value:uint):void
+		{
+			if(isNaN(value))
+				return;
+			try{
+				if(context==null)
+					context = ExtensionContext.createExtensionContext(EXTENSION_ID, null);
+				context.call("setBadge",value);
+			}catch(e:Error){
+				showError(e.message,e.errorID);
+			}
+		}
+		public static function get badge():uint
+		{
+			try{
+				if(context==null)
+					context = ExtensionContext.createExtensionContext(EXTENSION_ID, null);
+				return context.call("getBadge") as uint;
+			}catch(e:Error){
+				showError(e.message,e.errorID);
+			}
+			return NaN;
+		}
 		//---------------------------------------------------------------------
 		//
 		// Private Methods.

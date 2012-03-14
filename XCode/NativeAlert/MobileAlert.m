@@ -122,13 +122,16 @@ FREContext *context;
                                                    delegate:self 
                                           cancelButtonTitle:closeLabel
                                           otherButtonTitles:nil] retain];
-    //Split our labels into an array
-    NSArray *labels = [otherLabels componentsSeparatedByString:@","];
+
+    if (otherLabels != nil && ![otherLabels isEqualToString:@""]) { 
+        //Split our labels into an array
+        NSArray *labels = [otherLabels componentsSeparatedByString:@","];
     
-    //Add each label to our array.
-    for (NSString *label in labels) 
-    {
-        [alert addButtonWithTitle:label];
+        //Add each label to our array.
+        for (NSString *label in labels) 
+        {
+            [alert addButtonWithTitle:label];
+        }
     }
     [alert show];
 }

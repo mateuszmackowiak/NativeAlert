@@ -5,7 +5,9 @@ package pl.mateuszmackowiak.nativeANE
 	public class LogEvent extends Event
 	{
 		public static const LOG_EVENT:String = "logEvent";
-		
+		/**
+		 * @private
+		 */
 		private var _text:String ="";
 		
 		public function LogEvent(type:String, text:String="", bubbles:Boolean=false, cancelable:Boolean=false)

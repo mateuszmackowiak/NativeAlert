@@ -17,7 +17,7 @@ public class ProgressContext extends FREContext {
 	
 	@Override
 	public void dispose() {
-		if(map!=null){
+		/*if(map!=null){
 			FREObject args[] = new FREObject [1];
 	    	try {
 				args[0] = FREObject.newObject("kill");
@@ -26,7 +26,7 @@ public class ProgressContext extends FREContext {
 				dispatchStatusEventAsync(NativeExtension.ERROR_EVENT,"while disposeing   "+e.toString());
 				e.printStackTrace();
 			}
-		}
+		}*/
 	}
 
 	@Override

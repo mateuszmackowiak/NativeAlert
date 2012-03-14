@@ -34,7 +34,8 @@ package pl.mateuszmackowiak.nativeANE.progress
 		
 		public static const EXTENSION_ID : String = "pl.mateuszmackowiak.nativeANE.NativeAlert";
 		
-			
+		
+		
 		private static var _defaultTheme:int = THEME_HOLO_LIGHT;
 		private static var _set:Boolean = false;
 		private static var _isSupp:Boolean = false;
@@ -42,6 +43,7 @@ package pl.mateuszmackowiak.nativeANE.progress
 		
 		private static var isAndroid:Boolean=false;
 		private static var isIOS:Boolean=false;
+		private static var showProgressPopup:String = "showProgressPopup";
 		//---------------------------------------------------------------------
 		//
 		// Private Properties.
@@ -132,9 +134,9 @@ package pl.mateuszmackowiak.nativeANE.progress
 			
 			try{
 				if(isAndroid)
-					context.call("showProgressPopup","showPopup",_progress,_secondary,_style,_title,_message,cancleble,_indeterminate,_theme);
+					context.call(showProgressPopup,"showPopup",_progress,_secondary,_style,_title,_message,cancleble,_indeterminate,_theme);
 				else if(isIOS)
-					context.call("showProgressPopup",_progress/_maxProgress,null,_style,title,message,cancleble,_indeterminate);
+					context.call(showProgressPopup,_progress/_maxProgress,null,_style,title,message,cancleble,_indeterminate);
 				return true;
 			}catch(e:Error){
 				showError("Error calling show method "+e.message,e.errorID);
@@ -152,9 +154,9 @@ package pl.mateuszmackowiak.nativeANE.progress
 			_indeterminate = true;
 			try{
 				if(isAndroid)
-					context.call("showProgressPopup","showPopup",null,null,STYLE_HORIZONTAL,_title,_message,cancleble,true,_theme);
+					context.call(showProgressPopup,"showPopup",null,null,STYLE_HORIZONTAL,_title,_message,cancleble,true,_theme);
 				else if(isIOS)
-					context.call("showProgressPopup",null,null,STYLE_HORIZONTAL,_title,_message,cancleble,true);	
+					context.call(showProgressPopup,null,null,STYLE_HORIZONTAL,_title,_message,cancleble,true);	
 				return true;
 			}catch(e:Error){
 				showError("Error calling show method "+e.message,e.errorID);
@@ -171,9 +173,9 @@ package pl.mateuszmackowiak.nativeANE.progress
 				_message = message;
 			try{
 				if(isAndroid)
-					context.call("showProgressPopup","showPopup",null,null,STYLE_SPINNER,_title,_message,cancleble,false,_theme);
+					context.call(showProgressPopup,"showPopup",null,null,STYLE_SPINNER,_title,_message,cancleble,false,_theme);
 				else if(isIOS)
-					context.call("showProgressPopup",null,null,STYLE_SPINNER,_title,_message,cancleble,true);
+					context.call(showProgressPopup,null,null,STYLE_SPINNER,_title,_message,cancleble,true);
 				return true;
 			}catch(e:Error){
 				showError("Error calling show method "+e.message,e.errorID);
@@ -189,7 +191,7 @@ package pl.mateuszmackowiak.nativeANE.progress
 		public function setIndeterminate(value:Boolean):Boolean{
 			if(isAndroid && _indeterminate!==value  && value>=0 && value<= _maxProgress){
 				try{
-					context.call("NativeProgress","setIndeterminate",value);
+					context.call(showProgressPopup,"setIndeterminate",value);
 					_indeterminate = value;
 					return true;
 				}catch(e:Error){
@@ -209,7 +211,7 @@ package pl.mateuszmackowiak.nativeANE.progress
 		public function setSecondaryProgress(value:int):Boolean{
 			if(isAndroid && _secondary!==value  && value>=0 && value<= _maxProgress){
 				try{
-					context.call("showProgressPopup","setSecondary",value);
+					context.call(showProgressPopup,"setSecondary",value);
 					_secondary = value;
 					return true;
 				}catch(e:Error){
@@ -230,7 +232,7 @@ package pl.mateuszmackowiak.nativeANE.progress
 			if(!isNaN(value) && _progress!==value  && value>=0 && value<= _maxProgress){
 				try{
 					if(isAndroid)
-						context.call("showProgressPopup","update",value);
+						context.call(showProgressPopup,"update",value);
 					else
 						context.call("updateProgress",value/_maxProgress);
 					_progress = value;
@@ -255,7 +257,7 @@ package pl.mateuszmackowiak.nativeANE.progress
 			if(!isNaN(value) && _maxProgress!==value){
 				try{
 					if(isAndroid)
-						context.call("showProgressPopup","max",value);
+						context.call(showProgressPopup,"max",value);
 					if(_progress>value)
 						_progress = value;
 					_maxProgress= value;
@@ -280,7 +282,7 @@ package pl.mateuszmackowiak.nativeANE.progress
 			if(value!=null && value!==_message){
 				try{
 					if(isAndroid)
-						context.call("showProgressPopup","setMessage",value);
+						context.call(showProgressPopup,"setMessage",value);
 					else
 						context.call("updateMessage",value);
 					_message = value;
@@ -307,7 +309,7 @@ package pl.mateuszmackowiak.nativeANE.progress
 			if(value!=null && value!==_title){
 				try{
 					if(isAndroid)
-						context.call("showProgressPopup","setTitle",value);
+						context.call(showProgressPopup,"setTitle",value);
 					else
 						context.call("updateTitle",value);
 					_title = value;
@@ -332,7 +334,7 @@ package pl.mateuszmackowiak.nativeANE.progress
 		public function isShowing():Boolean{
 			if(context){
 				if(isAndroid)
-					return context.call("showProgressPopup","isShowing");
+					return context.call(showProgressPopup,"isShowing");
 				else
 					return context.call("isShowing");
 			}else
@@ -356,7 +358,7 @@ package pl.mateuszmackowiak.nativeANE.progress
 		{
 			try{
 				if(isAndroid)
-					context.call("showProgressPopup","hide");
+					context.call(showProgressPopup,"hide");
 				else
 					context.call("hideProgress");
 				return true;
@@ -426,9 +428,9 @@ package pl.mateuszmackowiak.nativeANE.progress
 		//---------------------------------------------------------------------
 		private function showError(message:String,id:int=0):void
 		{
-			if(hasEventListener(NativeExtensionErrorEvent.ERROR))
+			/*if(hasEventListener(NativeExtensionErrorEvent.ERROR))
 				dispatchEvent(new NativeExtensionErrorEvent(NativeExtensionErrorEvent.ERROR,false,false,message,id));
-			else
+			else*/
 				throw new Error(message,id);
 		}
 		private function onStatus(event:StatusEvent):void

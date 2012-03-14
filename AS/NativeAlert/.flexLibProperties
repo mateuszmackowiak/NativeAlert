@@ -3,7 +3,6 @@
   <includeClasses>
     <classEntry path="uk.co.betadesigns.extension.nativealert.NativeAlert"/>
     <classEntry path="uk.co.betadesigns.extension.nativealert.INativeAlert"/>
-    <classEntry path="uk.co.betadesigns.extension.nativealert.NativeAlertEvent"/>
     <classEntry path="pl.mateuszmackowiak.nativeANE.NativeExtensionErrorEvent"/>
     <classEntry path="pl.mateuszmackowiak.nativeANE.progress.NativeProgress"/>
     <classEntry path="pl.mateuszmackowiak.nativeANE.NativeDialogEvent"/>
@@ -15,6 +14,7 @@
     <classEntry path="pl.mateuszmackowiak.nativeANE.properties.SystemProperties"/>
     <classEntry path="pl.mateuszmackowiak.nativeANE.dialogs.NativeTextInput"/>
     <classEntry path="pl.mateuszmackowiak.nativeANE.dialogs.NativeTextInputDialogEvent"/>
+    <classEntry path="pl.mateuszmackowiak.nativeANE.notification.NativeNotifiction"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests/>

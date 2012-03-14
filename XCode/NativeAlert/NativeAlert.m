@@ -189,6 +189,72 @@ FREObject isShowing(FREContext ctx, void* funcData, uint32_t argc, FREObject arg
     }
     
 }
+//
+
+
+FREObject showNotification(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[] )
+{
+    
+    uint32_t messageLength;
+    uint32_t soundUrlLength;
+    uint32_t buttonLabelLength;
+    double timeStamp;
+    
+    const uint8_t *message;
+    const uint8_t *buttonLabel;
+    const uint8_t *soundUrl;
+    
+    FREGetObjectAsUTF8(argv[0], &messageLength, &message);
+    FREGetObjectAsUTF8(argv[1], &buttonLabelLength, &buttonLabel);
+    
+    NSString *buttonLabelString = [NSString stringWithUTF8String:(char*)buttonLabel];
+    NSString *messageString = [NSString stringWithUTF8String:(char*)message];
+    
+    
+    // NSDictionary *userInfo = [NSDictionary dictionaryWithObject: @"ID" forKey: @"Test"];;
+   
+    
+    UILocalNotification *localNotification = [[UILocalNotification alloc] init]; //Create the localNotification object
+     //Set the date when the alert will be launched using the date adding the time the user selected on the timer
+    [localNotification setAlertAction:buttonLabelString]; //The button's text that launches the application and is shown in the alert
+    [localNotification setAlertBody:messageString]; //Set the message in the notification from the textField's text
+    [localNotification setHasAction: YES]; //Set that pushing the button will launch the application
+    [localNotification setApplicationIconBadgeNumber:[[UIApplication sharedApplication] applicationIconBadgeNumber]+1]; //Set the Application Icon Badge Number of the application's icon to the current Application Icon Badge Number plus 1
+    // localNotification.userInfo = userInfo;
+    if(argc>2){
+        FREGetObjectAsDouble(argv[2], &timeStamp);
+        NSLog(@"timeStamp %f",timeStamp);
+        if(timeStamp>-1){
+            
+            NSDate *date = [NSDate dateWithTimeIntervalSince1970:timeStamp];
+            NSLog(@"converted date: %@",date);
+            
+            NSLog(@"current date: %@",[NSDate date]);
+            [localNotification setFireDate:date];
+        }
+    }
+
+    if(argc>3 && argv[3]!=nil){
+        FREGetObjectAsUTF8(argv[3], &soundUrlLength, &soundUrl);
+        NSString *soundUrlString = [NSString stringWithUTF8String:(char*)soundUrl];
+        
+        if (soundUrlString != nil && ![soundUrlString isEqualToString:@""]){
+           if([soundUrlString isEqualToString:@"defaultSound"]) { 
+               localNotification.soundName = @"UILocalNotificationDefaultSoundName";
+           }else
+               localNotification.soundName =soundUrlString;
+        }
+    }
+
+  
+    
+    
+    [[UIApplication sharedApplication] scheduleLocalNotification:localNotification]; //Schedule the notification with the system
+    [localNotification release];
+    
+    return nil;
+}
+
 
 
 //---------------------------------------------------------------------
@@ -288,8 +354,6 @@ FREObject getSystemProperties(FREContext ctx, void* funcData, uint32_t argc, FRE
         // float batLevel = [device batteryLevel];
         
        
-        
-       
         FREObject uidObj;
         FREObject udidObj;
         FREObject osObj;
@@ -340,7 +404,7 @@ FREObject getSystemProperties(FREContext ctx, void* funcData, uint32_t argc, FRE
 static const char * SYSTEM_PROPERTIES_KEY = "SystemProperites";
 static const char * PROGRESS_KEY = "ProgressContext";
 static const char * NETWORK_ACTIVITY_INDICATOR = "NetworkActivityIndicatoror";
-
+static const char * LOCAL_NOTIFICATION = "LocalNotification";
 
 
 FREObject setBadge(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[] ){
@@ -377,11 +441,16 @@ void NativeDialogContextInitializer(void* extData, const uint8_t * ctxType, FREC
 						uint32_t* numFunctionsToTest, const FRENamedFunction** functionsToSet) 
 {
     int count=2;
-    if(strcmp((const char *)ctxType, PROGRESS_KEY)==0)
+    if(strcmp((const char *)ctxType, PROGRESS_KEY)==0){
         count = 7;
-    else if (strcmp((const char *)ctxType, "")==0){
+        NSLog(@"ctxType %s",ctxType);
+    }else if (strcmp((const char *)ctxType, "")==0){
         count = 4;
+        NSLog(@"ctxType is empty");
+    }else{
+        NSLog(@"ctxType %s",ctxType);
     }
+    
     
 	*numFunctionsToTest = count;
     
@@ -401,6 +470,12 @@ void NativeDialogContextInitializer(void* extData, const uint8_t * ctxType, FREC
         func[1].name = (const uint8_t *) "showHidenetworkIndicator";
         func[1].functionData = NULL;
         func[1].function = &showHidenetworkIndicator;
+        
+    }else if(strcmp((const char *)ctxType, LOCAL_NOTIFICATION)==0){
+        
+        func[1].name = (const uint8_t *) "showNotification";
+        func[1].functionData = NULL;
+        func[1].function = &showNotification;
         
     }else if(strcmp((const char *)ctxType, PROGRESS_KEY)==0){
         func[1].name = (const uint8_t*) "isShowing";

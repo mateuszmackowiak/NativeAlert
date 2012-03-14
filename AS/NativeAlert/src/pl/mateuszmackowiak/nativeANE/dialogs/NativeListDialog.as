@@ -1,6 +1,6 @@
 /** 
  * @author Mateusz Maćkowiak
- * @see http://www.mateuszmackowiak.art.pl/blog
+ * @see http://mateuszmackowiak.wordpress.com/
  * @since 2011
  */
 package pl.mateuszmackowiak.nativeANE.dialogs
@@ -16,6 +16,12 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 	import pl.mateuszmackowiak.nativeANE.NativeDialogListEvent;
 	import pl.mateuszmackowiak.nativeANE.NativeExtensionErrorEvent;
 	
+	
+	/** 
+	 * @author Mateusz Maćkowiak
+	 * @see http://mateuszmackowiak.wordpress.com/
+	 * @since 2011
+	 */
 	public class NativeListDialog extends EventDispatcher
 	{
 		//---------------------------------------------------------------------
@@ -23,33 +29,84 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 		// Constants
 		//
 		//---------------------------------------------------------------------
+		/**
+		 * the id of the extension that has to be added in the descriptor file
+		 */
 		public static const EXTENSION_ID : String = "pl.mateuszmackowiak.nativeANE.NativeAlert";
 		
 		public static const STYLE_HORIZONTAL:int = 0x00000001;
 		public static const STYLE_SPINNER:int = 0x00000000;
 		
+		/**
+		 * use the device's default alert theme with a dark background
+		 * <br>Constant Value: 4 (0x00000004)
+		 */
 		public static const THEME_DEVICE_DEFAULT_DARK:int = 0x00000004;
+		/**
+		 *  use the device's default alert theme with a dark background.
+		 * <br>Constant Value: 5 (0x00000005)
+		 */
 		public static const THEME_DEVICE_DEFAULT_LIGHT:int = 0x00000005;
+		/**
+		 * use the holographic alert theme with a dark background
+		 * <br>Constant Value: 2 (0x00000002)
+		 */
 		public static const THEME_HOLO_DARK:int = 0x00000002;
+		/**
+		 * use the holographic alert theme with a light background
+		 * <br>Constant Value: 3 (0x00000003)
+		 */
 		public static const THEME_HOLO_LIGHT:int = 0x00000003;
+		/**
+		 * use the traditional (pre-Holo) alert dialog theme
+		 * <br>Constant Value: 1 (0x00000001)
+		 */
 		public static const THEME_TRADITIONAL:int = 0x00000001;
 		
+		/**
+		 * @private
+		 */
 		private static var _defaultTheme:int = THEME_HOLO_LIGHT;
-		private static var _set:Boolean = false;
-		private static var _isSupp:Boolean = false;
+
 		
 		//---------------------------------------------------------------------
 		//
 		// Private Properties.
 		//
 		//---------------------------------------------------------------------
+		/**
+		 * @private
+		 */
 		private var context:ExtensionContext;
+		/**
+		 * @private
+		 */
 		private var _title:String="";
+		/**
+		 * @private
+		 */
 		private var _buttons:Vector.<String>=null;
+		/**
+		 * @private
+		 */
 		private var _theme:int = -1;
+		/**
+		 * @private
+		 */
 		private var _cancleble:Boolean = false;
+		/**
+		 * @private
+		 */
 		private var _list:Vector.<Object> = null;
+		/**
+		 * @private
+		 */
 		private var _selectedIndex:int = -1;
+		
+		
+		/**
+		 * 
+		 */
 		public function NativeListDialog()
 		{
 			try{
@@ -62,7 +119,9 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 		
 		
 		
-
+		/**
+		 * 
+		 */
 		public function showSingleChoice(labels:Vector.<String>,checkedLabel:int=-1,buttons:Vector.<String>=null,title:String="",cancleble:Object=null):Boolean
 		{
 			if(title!= null && title!=="")
@@ -93,6 +152,10 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 			return false;
 		}
 
+		
+		/**
+		 * 
+		 */
 		public function showMultiChoice(labels:Vector.<String>,checkedLabels:Vector.<Boolean>,buttons:Vector.<String>=null,title:String="",cancleble:Object=null):Boolean
 		{
 			if(title!= null && title!=="")
@@ -128,6 +191,11 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 			return false;
 		}
 		
+		
+		
+		/**
+		 * 
+		 */
 		public function get labels():Vector.<String>{
 			var lab:Vector.<String> = new Vector.<String>();
 			if(_list!==null){
@@ -138,6 +206,11 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 			}
 			return lab;
 		}
+		
+		
+		/**
+		 * 
+		 */
 		public function get selectedLabels():Vector.<String>{
 			var lab:Vector.<String> = new Vector.<String>();
 			if(_list!==null && _list.length>0){
@@ -151,6 +224,10 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 			}
 			return lab;
 		}
+		
+		/**
+		 * 
+		 */
 		public function get selectedIndexes():Vector.<int>{
 			var indexes:Vector.<int> = new Vector.<int>();
 			if(_list!==null && _list.length>0){
@@ -165,10 +242,18 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 			return indexes;
 		}
 		
+		
+		/**
+		 * 
+		 */
 		public function get selectedIndex():int{
 			return _selectedIndex;
 		}
 		
+		
+		/**
+		 * 
+		 */
 		public function get selectedLabel():String{
 			if(_selectedIndex>-1 && _list!=null && _list.length>0)
 				return _list[_selectedIndex].label;
@@ -178,7 +263,9 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 		
 		
 		
-		
+		/**
+		 * 
+		 */
 		public function isShowing():Boolean{
 			if(context){
 				return context.call("showListDialog","isShowing");
@@ -188,48 +275,69 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 		}
 
 		
-		
+		/**
+		 * 
+		 */
 		public function get title():String
 		{
 			return _title;
 		}
-		
+		/**
+		 * 
+		 */
 		public function set title(value:String):void
 		{
 			if(value!=null && value!==_title){
 				_title = value;
 			}
 		}
+		/**
+		 * 
+		 */
 		public function get cancleble():Boolean
 		{
 			return _cancleble;
 		}
+		/**
+		 * 
+		 */
 		public function set cancleble(value:Boolean):void
 		{
 			_cancleble = value;
 		}
-		
+		/**
+		 * 
+		 */
 		public function get theme():int
 		{
 			return _theme;
 		}
+		/**
+		 * 
+		 */
 		public function get buttons():Vector.<String>
 		{
 			return _buttons;
 		}
-		
+		/**
+		 * 
+		 */
 		public function set buttons(value:Vector.<String>):void
 		{
 			_buttons = value;
 		}
-		
+		/**
+		 * 
+		 */
 		public function set theme(value:int):void
 		{
 			_theme = value;
 		}
 		
 		
-		
+		/**
+		 * hides 
+		 */
 		public function hide():Boolean
 		{
 			try{
@@ -240,6 +348,9 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 			}
 			return false;
 		}
+		/**
+		 * 
+		 */
 		public function kill():Boolean
 		{
 			try{
@@ -259,25 +370,23 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 		//
 		//---------------------------------------------------------------------
 		/**
-		 * Whether the extension is available on the device (true);<br>otherwise false
+		 * Whether the extension class is available on the device (true);<br>otherwise false
 		 */
 		public static function get isSupported():Boolean{
-			if(!_set){// checks if a value was set before
-				try{
-					_set = true;
-					if(Capabilities.os.indexOf("Linux")>-1){
-						var context:ExtensionContext = ExtensionContext.createExtensionContext(EXTENSION_ID, "ListDialogContext");
-						_isSupp = context.call("isSupported");
-						context.dispose();
-					}else
-						_isSupp = false;
-				}catch(e:Error){
-					return _isSupp;
-				}
-			}	
-			return _isSupp;
+			if(Capabilities.os.toLowerCase().indexOf("linux")>-1)
+				return true;
+			else 
+				return false;
 		}
 		
+		/**
+		 * the theme from which to get the dialog's style (one of the constants THEME_DEVICE_DEFAULT_DARK, THEME_DEVICE_DEFAULT_LIGHT, or THEME_HOLO_LIGHT.
+		 * @see pl.mateuszmackowiak.nativeANE.alert.NativeListDialog.THEME_DEVICE_DEFAULT_DARK
+		 * @see pl.mateuszmackowiak.nativeANE.alert.NativeListDialog.THEME_DEVICE_DEFAULT_LIGHT
+		 * @see pl.mateuszmackowiak.nativeANE.alert.NativeListDialog.THEME_HOLO_LIGHT
+		 * @see pl.mateuszmackowiak.nativeANE.alert.NativeListDialog.THEME_HOLO_DARK
+		 * @see pl.mateuszmackowiak.nativeANE.alert.NativeListDialog.THEME_TRADITIONAL
+		 */
 		public static function set defaultTheme(value:int):void
 		{
 			if(value==THEME_DEVICE_DEFAULT_DARK || value==THEME_DEVICE_DEFAULT_LIGHT || value==THEME_HOLO_DARK || value==THEME_HOLO_LIGHT || value==THEME_TRADITIONAL)
@@ -292,6 +401,9 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 		// Private Methods.
 		//
 		//---------------------------------------------------------------------
+		/**
+		 * @private
+		 */
 		private function showError(message:String,id:int=0):void
 		{
 			if(hasEventListener(NativeExtensionErrorEvent.ERROR))
@@ -299,6 +411,9 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 			else
 				throw new Error(message,id);
 		}
+		/**
+		 * @private
+		 */
 		private function onStatus(event:StatusEvent):void
 		{
 			try{

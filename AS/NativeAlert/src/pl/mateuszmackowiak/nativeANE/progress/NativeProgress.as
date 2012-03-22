@@ -439,8 +439,8 @@ package pl.mateuszmackowiak.nativeANE.progress
 				if(event.code == NativeDialogEvent.CLOSED)
 				{
 					dispatchEvent(new NativeDialogEvent(NativeDialogEvent.CLOSED,event.level));
-				}else if(event.code == NativeDialogEvent.CANCLED){
-					dispatchEvent(new NativeDialogEvent(NativeDialogEvent.CANCLED,event.level));
+				}else if(event.code == NativeDialogEvent.CANCELED){
+					dispatchEvent(new NativeDialogEvent(NativeDialogEvent.CANCELED,event.level));
 				}else if(event.code == NativeDialogEvent.OPENED){
 					dispatchEvent(new NativeDialogEvent(NativeDialogEvent.OPENED,event.level));
 				}else if(event.code == LogEvent.LOG_EVENT){

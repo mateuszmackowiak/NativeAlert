@@ -7,7 +7,7 @@ package pl.mateuszmackowiak.nativeANE
 		/**
 		 * Defines the value of the type property of a NativeDialogEvent object.
 		 */
-		public static const CANCLED:String = "nativeDialog_cancled";
+		public static const CANCELED:String = "nativeDialog_canceled";
 		/**
 		 * Defines the value of the type property of a NativeDialogEvent object.
 		 */

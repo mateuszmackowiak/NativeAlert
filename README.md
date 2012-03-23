@@ -120,7 +120,7 @@ iOS only:
 	}
 
 
-# NativeListDialog(Android) #
+# NativeListDialog(Android / IOS) #
 
 NativeListDialog has the ability to show a native android popup dialog with a multi-choice or single-choice inside a Adobe Air project.
 

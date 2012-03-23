@@ -157,7 +157,7 @@ public class showProgressPopup implements FREFunction {
  
         public void onCancel(DialogInterface dialog) 
         {
-     	    context.dispatchStatusEventAsync(NativeExtension.CANCLED,String.valueOf(-1));
+     	    context.dispatchStatusEventAsync(NativeExtension.CANCELED,String.valueOf(-1));
             dialog.dismiss();
         }
     }

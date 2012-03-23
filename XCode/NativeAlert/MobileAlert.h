@@ -24,7 +24,14 @@
                  message: (NSString*)message 
                 progress: (NSNumber*)progress
             showActivity:(Boolean)showActivity
+               cancleble:(Boolean)cancleble
                  context: (FREContext *)ctx;
+
+-(void)showTextInputDialog: (NSString *)title
+                   message: (NSString*)message
+                textInputs: (FREObject*)textInputs
+                   buttons: (FREObject*)buttons
+                   context: (FREContext *)ctx;
 
 -(void)updateProgress: (CGFloat)perc;
 
@@ -34,5 +41,5 @@
 
 -(BOOL)isShowing;
 
--(void)hideProgress;
+-(void)hide;
 @end

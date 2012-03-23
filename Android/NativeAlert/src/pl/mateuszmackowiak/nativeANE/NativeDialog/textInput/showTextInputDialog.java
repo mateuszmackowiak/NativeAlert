@@ -6,6 +6,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.text.Html;
+import android.text.InputType;
 
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
@@ -60,7 +61,8 @@ public class showTextInputDialog implements FREFunction {
 						}
 					}
 					
-					AlertDialog.Builder textInputDialog = (Integer.parseInt(android.os.Build.VERSION.SDK)<11)?new TextInputDialogWithoutTheme(freContext.getActivity(),textInputs):new TextInputDialog(freContext.getActivity(),theme,textInputs);
+					TextInputDialog textInputDialog = (Integer.parseInt(android.os.Build.VERSION.SDK)<11)?new TextInputDialog(freContext.getActivity(),textInputs):new TextInputDialog(freContext.getActivity(),textInputs,theme);
+
 					if(title!=null)
 						textInputDialog.setTitle(Html.fromHtml(title));
 					
@@ -69,13 +71,13 @@ public class showTextInputDialog implements FREFunction {
 				    	textInputDialog.setOnCancelListener(new CancelListener(freContext));
 
 				    if(buttons!=null && buttons.length>0){
-				    	textInputDialog.setPositiveButton(buttons[0], new ClickListener(freContext,(ITextInput)textInputDialog));
+				    	textInputDialog.setPositiveButton(buttons[0], new ClickListener(freContext,textInputDialog));
 						if(buttons.length>1)
-							textInputDialog.setNeutralButton(buttons[1], new ClickListener(freContext,(ITextInput)textInputDialog));
+							textInputDialog.setNeutralButton(buttons[1], new ClickListener(freContext,textInputDialog));
 						if(buttons.length>2)
-							textInputDialog.setNeutralButton(buttons[2], new ClickListener(freContext,(ITextInput)textInputDialog));
+							textInputDialog.setNeutralButton(buttons[2], new ClickListener(freContext,textInputDialog));
 					}else
-						textInputDialog.setPositiveButton("OK",new ClickListener(freContext,(ITextInput)textInputDialog));
+						textInputDialog.setPositiveButton("OK",new ClickListener(freContext,textInputDialog));
 				    
 				    mDialog = textInputDialog.create();
 				    textInputDialog.show();
@@ -95,7 +97,7 @@ public class showTextInputDialog implements FREFunction {
 			        
 			    }else if(function.equals("hide") && mDialog!=null && mDialog.isShowing()){
 					mDialog.dismiss();
-					freContext.dispatchStatusEventAsync(NativeExtension.CANCLED,String.valueOf(-1));
+					freContext.dispatchStatusEventAsync(NativeExtension.CANCELED,String.valueOf(-1));
 				}
 			}
 		}catch (Exception e){
@@ -116,119 +118,165 @@ public class showTextInputDialog implements FREFunction {
  
         public void onCancel(DialogInterface dialog) 
         {
-        	try{
-	     	    context.dispatchStatusEventAsync(NativeExtension.CLOSED,String.valueOf(-1));        
-	            dialog.cancel();
-        	}catch(Exception e){
-        		context.dispatchStatusEventAsync(NativeExtension.ERROR_EVENT,e.toString());   
-                e.printStackTrace();
-        	}
+	     	 context.dispatchStatusEventAsync(NativeExtension.CLOSED,String.valueOf(-1));        
+	         dialog.dismiss();
         }
     }
 	
 	
 
 /////////////////////////////////////////
-	private interface ITextInput{
-		TextInput textInputs[] = new TextInput[0];
-	}
-	private class TextInputDialog extends AlertDialog.Builder implements ITextInput
-	{
-
-		TextInput textInputs[];
-		public TextInputDialog(Context context, int theme, FREArray fretextInputs) throws IllegalArgumentException, FREInvalidObjectException, FREWrongThreadException, IllegalStateException, FRETypeMismatchException, FREASErrorException, FRENoSuchNameException 
-		{
-			super(context,theme);
-			/*input = new EditText(arg0);
-			setView(input);*/
-			int length = (int)fretextInputs.getLength();
-			textInputs = new TextInput[length];
-			TextInput textInput = null;
-			String name ="";
-			ScrollView sv = new ScrollView(context);
-			LinearLayout ll = new LinearLayout(context);
-			ll.setOrientation(LinearLayout.VERTICAL);
-			sv.addView(ll);
-			int type=0;
-			for (int i = 0; i < length; i++) {
-				FREObject fretextInput = fretextInputs.getObjectAt(i);
-				name = (fretextInput.getProperty("name")!=null)?fretextInput.getProperty("name").getAsString():"";
-				if(name!=null && name.length()>0){
-					if(fretextInput.getProperty("messageBefore")!=null){
-						TextView tv = new TextView(context);
-						tv.setText(fretextInput.getProperty("messageBefore").getAsString());
-						ll.addView(tv);
-					}
-					textInput = new TextInput(context,name);
-					
-					if(fretextInput.getProperty("text")!=null)
-						textInput.setText(fretextInput.getProperty("text").getAsString());
-					if(fretextInput.getProperty("inputType")!=null){
-						type = fretextInput.getProperty("inputType").getAsInt();
-						textInput.setInputType(type);
-					}
-					ll.addView(textInput);
-					
-					textInputs[i] = textInput;
-				}
-			}
-			setView(sv);
-			
-		}		
-	}
 	
+	private class TextInputDialog extends AlertDialog.Builder{
 
-	private class TextInputDialogWithoutTheme extends AlertDialog.Builder implements ITextInput
-	{
+		private TextInput textInputs[];
 
-		TextInput textInputs[];
-		public TextInputDialogWithoutTheme(Context context, FREArray fretextInputs) throws IllegalArgumentException, FREInvalidObjectException, FREWrongThreadException, IllegalStateException, FRETypeMismatchException, FREASErrorException, FRENoSuchNameException 
+		
+		public TextInputDialog(Context context,FREArray fretextFields) throws IllegalArgumentException, FREInvalidObjectException, FREWrongThreadException, IllegalStateException, FRETypeMismatchException, FREASErrorException, FRENoSuchNameException 
 		{
 			super(context);
+			createContent(context,fretextFields);
+		}
+		public TextInputDialog(Context context,FREArray fretextFields, int theme) throws IllegalArgumentException, FREInvalidObjectException, FREWrongThreadException, IllegalStateException, FRETypeMismatchException, FREASErrorException, FRENoSuchNameException 
+		{
+			super(context,theme);
+			createContent(context,fretextFields);
+		}
+
+		
+		public void createContent(Context context,FREArray fretextFields) throws IllegalArgumentException, FREInvalidObjectException, FREWrongThreadException, IllegalStateException, FRETypeMismatchException, FREASErrorException, FRENoSuchNameException 
+		{
+			if(fretextFields==null)
+				return;
 			
-			int length = (int)fretextInputs.getLength();
-			textInputs = new TextInput[length];
-			TextInput textInput = null;
-			String name ="";
 			ScrollView sv = new ScrollView(context);
 			LinearLayout ll = new LinearLayout(context);
 			ll.setOrientation(LinearLayout.VERTICAL);
 			sv.addView(ll);
-			int type=0;
+			
+			
+			TextInput textInput = null;
+			String name ="";
+			boolean editable = false;
+			
+			int length = (int)fretextFields.getLength();
+			
+			textInputs = new TextInput[length];
+			
+			
 			for (int i = 0; i < length; i++) {
-				FREObject fretextInput = fretextInputs.getObjectAt(i);
-				name = (fretextInput.getProperty("name")!=null)?fretextInput.getProperty("name").getAsString():"";
-				if(name!=null && name.length()>0){
-					if(fretextInput.getProperty("messageBefore")!=null){
-						TextView tv = new TextView(context);
-						tv.setText(fretextInput.getProperty("messageBefore").getAsString());
-						ll.addView(tv);
+				FREObject fretextField = fretextFields.getObjectAt(i);
+
+				if(fretextField.getProperty("editable")!=null)
+					editable = fretextField.getProperty("editable").getAsBool();
+				
+				if(editable){
+					name = (fretextField.getProperty("name")!=null)?fretextField.getProperty("name").getAsString():"";
+					if(name.length()>0){
+						
+						textInput =  new TextInput(context,name);
+						
+						if(fretextField.getProperty("text")!=null)
+							textInput.setText(fretextField.getProperty("text").getAsString());
+						
+						if(fretextField.getProperty("prompText")!=null)
+							textInput.setHint(fretextField.getProperty("prompText").getAsString());	
+						
+						textInput.setInputType(getInputType(fretextField));
+						
+						ll.addView(textInput);
+						
+						textInputs[i] = textInput;
 					}
-					textInput = new TextInput(context,name);
-					
-					if(fretextInput.getProperty("text")!=null)
-						textInput.setText(fretextInput.getProperty("text").getAsString());
-					if(fretextInput.getProperty("inputType")!=null){
-						type = fretextInput.getProperty("inputType").getAsInt();
-						textInput.setInputType(type);
-					}
-					ll.addView(textInput);
-					
-					textInputs[i] = textInput;
+				}else if(fretextField.getProperty("text")!=null){
+					TextView tv = new TextView(context);
+					tv.setText(fretextField.getProperty("text").getAsString());
+					ll.addView(tv);
 				}
 			}
 			setView(sv);
+		}
+		/**
+		 * @return the textInputs
+		 */
+		public TextInput[] getTextInputs() {
+			return textInputs;
+		}
+	
+		
+		
+		public int  getInputType(FREObject textField) throws IllegalStateException, FRETypeMismatchException, FREInvalidObjectException, FREASErrorException, FRENoSuchNameException, FREWrongThreadException{
+			int type = 0x00000001;
+			String softKeyboardType="default",autoCapitalize="none";
+			boolean displayAsPassword=false,autoCorrect=false;
 			
-		}		
+			if(textField.getProperty("softKeyboardType")!=null){
+				softKeyboardType = textField.getProperty("softKeyboardType").getAsString();
+				if(textField.getProperty("autoCapitalize")!=null)
+					autoCapitalize = textField.getProperty("autoCapitalize").getAsString();
+				if(textField.getProperty("displayAsPassword")!=null)
+					displayAsPassword = textField.getProperty("displayAsPassword").getAsBool();
+				if(textField.getProperty("autoCorrect")!=null)
+					autoCorrect = textField.getProperty("autoCorrect").getAsBool();
+				
+				if("url".equals(softKeyboardType)){
+					type = InputType.TYPE_TEXT_VARIATION_WEB_EDIT_TEXT;
+					if(displayAsPassword)
+						type = type | InputType.TYPE_TEXT_VARIATION_PASSWORD;
+					if(autoCorrect)
+						type = type | InputType.TYPE_TEXT_FLAG_AUTO_CORRECT;
+					
+					if("word".equals(autoCapitalize))
+						type = type | InputType.TYPE_TEXT_FLAG_CAP_WORDS;
+					else if("sentence".equals(autoCapitalize))
+						type = type | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES;
+					else if("all".equals(autoCapitalize))
+						type = type | InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS;
+					
+				}else if("number".equals(softKeyboardType)){
+					type = InputType.TYPE_CLASS_NUMBER;
+					if(displayAsPassword)
+						type = type | InputType.TYPE_NUMBER_VARIATION_PASSWORD;
+				}else if("contact".equals(softKeyboardType)){
+					type = InputType.TYPE_CLASS_PHONE;
+					if(displayAsPassword)
+						type = type | InputType.TYPE_NUMBER_VARIATION_PASSWORD;
+					
+				}else if("email".equals(softKeyboardType)){
+					type = InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS;
+					if(displayAsPassword)
+						type = type | InputType.TYPE_TEXT_VARIATION_PASSWORD;
+					if(autoCorrect)
+						type = type | InputType.TYPE_TEXT_FLAG_AUTO_CORRECT;
+					
+					if("word".equals(autoCapitalize))
+						type = type | InputType.TYPE_TEXT_FLAG_CAP_WORDS;
+					else if("sentence".equals(autoCapitalize))
+						type = type | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES;
+					else if("all".equals(autoCapitalize))
+						type = type | InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS;
+				}else{
+					type = InputType.TYPE_CLASS_TEXT;
+					if(displayAsPassword)
+						type = type | InputType.TYPE_TEXT_VARIATION_PASSWORD;
+					if(autoCorrect)
+						type = type | InputType.TYPE_TEXT_FLAG_AUTO_CORRECT;
+					
+					
+					if("word".equals(autoCapitalize))
+						type = type | InputType.TYPE_TEXT_FLAG_CAP_WORDS;
+					else if("sentence".equals(autoCapitalize))
+						type = type | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES;
+					else if("all".equals(autoCapitalize))
+						type = type | InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS;
+				}
+			}
+			return type;
+		}
 	}
 	
 	
-	
-	
-	
-	
-	
-	
+
 	
 	
 	private class TextInput extends EditText{
@@ -244,9 +292,9 @@ public class showTextInputDialog implements FREFunction {
 	private class ClickListener implements DialogInterface.OnClickListener
 	{
     	private FREContext context;
-    	private ITextInput dlg;
+    	private TextInputDialog dlg;
     	
-    	ClickListener(FREContext context,ITextInput dlg)
+    	ClickListener(FREContext context,TextInputDialog dlg)
     	{
     		this.dlg = dlg;
     		this.context=context;
@@ -259,18 +307,20 @@ public class showTextInputDialog implements FREFunction {
         		if(obj!=null && obj instanceof InputMethodManager){
 		        	InputMethodManager imm = (InputMethodManager)obj;
 		        	if(imm.isActive()){
-		        		for (TextInput textinput : dlg.textInputs) {
-		        			imm.hideSoftInputFromWindow(textinput.getWindowToken(), 0);
+		        		for (TextInput textinput : dlg.getTextInputs()) {
+		        			if(textinput!=null)
+		        				imm.hideSoftInputFromWindow(textinput.getWindowToken(), 0);
 						}
 		        	}
 		        	
 		        	String returnString="";
-		        	for (TextInput textinput : dlg.textInputs) {
-	        			returnString+="#_#"+textinput.name+"#_#"+textinput.getText().toString();
+		        	for (TextInput textinput : dlg.getTextInputs()) {
+		        		if(textinput!=null)
+		        			returnString+="#_#"+textinput.name+"#_#"+textinput.getText().toString();
 					}
 		        	String ret=String.valueOf(id)+returnString;
 		     	    context.dispatchStatusEventAsync(NativeExtension.CLOSED,ret);        
-		            dialog.cancel();
+		            dialog.dismiss();
         		}
         	}catch(Exception e){
         		context.dispatchStatusEventAsync(NativeExtension.ERROR_EVENT,e.toString());   

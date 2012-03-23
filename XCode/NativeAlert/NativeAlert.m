@@ -72,7 +72,7 @@ FREObject showProgressPopup(FREContext ctx, void* funcData, uint32_t argc, FREOb
     const uint8_t *message;;
     double progressParam;
     
-    uint32_t showActivityValue;
+    uint32_t showActivityValue, cancleble;
     int32_t style;
     //Turn our actionscrpt code into native code.
     FREGetObjectAsDouble(argv[0], &progressParam);
@@ -80,15 +80,13 @@ FREObject showProgressPopup(FREContext ctx, void* funcData, uint32_t argc, FREOb
     FREGetObjectAsInt32(argv[2], &style);
     FREGetObjectAsUTF8(argv[3], &titleLength, &title);
     FREGetObjectAsUTF8(argv[4], &messageLength, &message);
-    ///Cancleble ignored
+    FREGetObjectAsBool(argv[5], &cancleble);
     FREGetObjectAsBool(argv[6], &showActivityValue);
     
     //Create our Strings for our Alert.
     NSInteger styleValue=(NSInteger)style;
     NSString *titleString = [NSString stringWithUTF8String:(char*)title];
     NSString *messageString = [NSString stringWithUTF8String:(char*)message];
-    //NSString *closeLabelString = [NSString stringWithUTF8String:(char*)closeLabel];    
-    // NSString *otherLabelsString = [NSString stringWithUTF8String:(char*)otherLabels];    
     NSNumber *progressValue =[NSNumber numberWithDouble:progressParam];
     
     alert = [[MobileAlert alloc] init];
@@ -97,11 +95,39 @@ FREObject showProgressPopup(FREContext ctx, void* funcData, uint32_t argc, FREOb
                      message:messageString 
                     progress:progressValue
                 showActivity:showActivityValue
+                   cancleble:cancleble
                      context:ctx];
     
     return NULL;    
 }
 
+//---------------------------------------------------------------------
+//
+// TEXT INPUT DIALOG
+//
+//---------------------------------------------------------------------
+FREObject showTextInputDialog(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[] )
+{
+    //Temporary values to hold our actionscript code.
+    uint32_t titleLength;
+    const uint8_t *title;
+    uint32_t messageLength;
+    const uint8_t *message;
+    
+    //Turn our actionscrpt code into native code.
+    FREGetObjectAsUTF8(argv[0], &titleLength, &title);
+    FREGetObjectAsUTF8(argv[1], &messageLength, &message);
+
+    
+    //Create our Strings for our Alert.
+    NSString *titleString = [NSString stringWithUTF8String:(char*)title];
+    NSString *messageString = [NSString stringWithUTF8String:(char*)message];  
+    
+    alert = [[MobileAlert alloc] init];
+    [alert showTextInputDialog:titleString message:messageString textInputs:argv[2] buttons:argv[3] context:ctx];
+    
+    return NULL;    
+}
 
 
 
@@ -132,9 +158,9 @@ FREObject updateProgress(FREContext ctx, void* funcData, uint32_t argc, FREObjec
     //Create our Strings for our Alert.
     return NULL;    
 }	
-FREObject hideProgress(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[] )
+FREObject hide(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[] )
 {
-    [alert hideProgress];
+    [alert hide];
     //Create our Strings for our Alert.
     return NULL; 
 }
@@ -405,6 +431,7 @@ static const char * SYSTEM_PROPERTIES_KEY = "SystemProperites";
 static const char * PROGRESS_KEY = "ProgressContext";
 static const char * NETWORK_ACTIVITY_INDICATOR = "NetworkActivityIndicatoror";
 static const char * LOCAL_NOTIFICATION = "LocalNotification";
+static const char * TEXT_INPUT_DIALOG = "TextInputDialogContext";
 
 
 FREObject setBadge(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[] ){
@@ -444,6 +471,9 @@ void NativeDialogContextInitializer(void* extData, const uint8_t * ctxType, FREC
     if(strcmp((const char *)ctxType, PROGRESS_KEY)==0){
         count = 7;
         NSLog(@"ctxType %s",ctxType);
+    }else if(strcmp((const char *)ctxType, TEXT_INPUT_DIALOG)==0){
+        count = 5;
+        NSLog(@"ctxType %s",ctxType);
     }else if (strcmp((const char *)ctxType, "")==0){
         count = 4;
         NSLog(@"ctxType is empty");
@@ -477,6 +507,24 @@ void NativeDialogContextInitializer(void* extData, const uint8_t * ctxType, FREC
         func[1].functionData = NULL;
         func[1].function = &showNotification;
         
+    }else if(strcmp((const char *)ctxType, TEXT_INPUT_DIALOG)==0){
+    
+        func[1].name = (const uint8_t*) "isShowing";
+        func[1].functionData = NULL;
+        func[1].function = &isShowing;
+        
+        func[2].name = (const uint8_t *) "show";
+        func[2].functionData = NULL;
+        func[2].function = &showTextInputDialog;
+        
+        func[3].name = (const uint8_t*) "updateTitle";
+        func[3].functionData = NULL;
+        func[3].function = &updateTitle;
+        
+        func[4].name = (const uint8_t*) "hide";
+        func[4].functionData = NULL;
+        func[4].function = &hide;
+        
     }else if(strcmp((const char *)ctxType, PROGRESS_KEY)==0){
         func[1].name = (const uint8_t*) "isShowing";
         func[1].functionData = NULL;
@@ -492,7 +540,7 @@ void NativeDialogContextInitializer(void* extData, const uint8_t * ctxType, FREC
         
         func[4].name = (const uint8_t*) "hideProgress";
         func[4].functionData = NULL;
-        func[4].function = &hideProgress;
+        func[4].function = &hide;
         
         func[5].name = (const uint8_t*) "updateMessage";
         func[5].functionData = NULL;
@@ -534,7 +582,7 @@ void NativeDialogContextFinalizer(FREContext ctx) {
     
     NSLog(@"Entering ContextFinalizer()");
     if(alert!=NULL){
-        [alert hideProgress];
+        [alert hide];
         [alert release];
     }
     NSLog(@"Exiting ContextFinalizer()");

@@ -129,7 +129,7 @@ public class showListDialog implements FREFunction {
  
         public void onCancel(DialogInterface dialog) 
         {
-     	    context.dispatchStatusEventAsync(NativeExtension.CANCLED,String.valueOf(-1));        
+     	    context.dispatchStatusEventAsync(NativeExtension.CANCELED,String.valueOf(-1));        
             dialog.cancel();
         }
     }

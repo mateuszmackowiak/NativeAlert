@@ -16,7 +16,7 @@
 			import pl.mateuszmackowiak.nativeANE.alert.NativeAlert;
 			import pl.mateuszmackowiak.nativeANE.alert.NativeAlertEvent;
 			import pl.mateuszmackowiak.nativeANE.dialogs.NativeListDialog;
-			import pl.mateuszmackowiak.nativeANE.dialogs.NativeTextInput;
+			import pl.mateuszmackowiak.nativeANE.dialogs.NativeTextField;
 			import pl.mateuszmackowiak.nativeANE.dialogs.NativeTextInputDialog;
 			import pl.mateuszmackowiak.nativeANE.dialogs.NativeTextInputDialogEvent;
 			import pl.mateuszmackowiak.nativeANE.notification.NativeNotifiction;
@@ -172,7 +172,7 @@
 				try{
 					progressPopup = new NativeProgress(style);
 					progressPopup.setSecondaryProgress(45);
-					progressPopup.addEventListener(NativeDialogEvent.CANCLED,closeNativeProcessHandler);
+					progressPopup.addEventListener(NativeDialogEvent.CANCELED,closeNativeProcessHandler);
 					progressPopup.addEventListener(NativeDialogEvent.OPENED,traceEvent);
 					progressPopup.addEventListener(NativeDialogEvent.CLOSED,closeNativeProcessHandler);
 					progressPopup.addEventListener(NativeExtensionErrorEvent.ERROR,onError);
@@ -190,7 +190,7 @@
 			private function closeNativeProcessHandler(event:*):void
 			{
 				returnText.appendText(event.toString()+"\n");
-				progressPopup.removeEventListener(NativeDialogEvent.CANCLED,closeNativeProcessHandler);
+				progressPopup.removeEventListener(NativeDialogEvent.CANCELED,closeNativeProcessHandler);
 				progressPopup.removeEventListener(NativeDialogEvent.CLOSED,closeNativeProcessHandler);
 				progressPopup.removeEventListener(NativeDialogEvent.OPENED,traceEvent);
 				progressPopup.removeEventListener(NativeExtensionErrorEvent.ERROR,onError);
@@ -242,7 +242,7 @@
 			
 			private function onTextInputDialogClosedHandler(event:NativeTextInputDialogEvent):void
 			{
-				for each (var n:NativeTextInput in event.list) 
+				for each (var n:NativeTextField in event.list) 
 				{
 					returnText.appendText(n.name+":  "+n.text+"\n");
 				}
@@ -253,7 +253,7 @@
 			public function openTextInputDialog(event:MouseEvent):void{
 				textInputDialog = new NativeTextInputDialog();
 				textInputDialog.theme = ThemeSelector.selectedItem.data;
-				textInputDialog.addEventListener(NativeDialogEvent.CANCLED,closeTextInputDialogHandler);
+				textInputDialog.addEventListener(NativeDialogEvent.CANCELED,closeTextInputDialogHandler);
 				textInputDialog.addEventListener(NativeDialogEvent.OPENED,traceEvent);
 				textInputDialog.addEventListener(NativeExtensionErrorEvent.ERROR,onError);
 				textInputDialog.addEventListener(LogEvent.LOG_EVENT,traceEvent);
@@ -270,17 +270,25 @@
 					}
 				}
 
-				var v:Vector.<NativeTextInput> = new Vector.<NativeTextInput>();
-				var ti1:NativeTextInput = new NativeTextInput("name");
-				ti1.inputType = NativeTextInput.text;
-				ti1.messageBefore ="name:";
-				ti1.text = "jacek";
+				var v:Vector.<NativeTextField> = new Vector.<NativeTextField>();
+				
+				var ti1:NativeTextField = new NativeTextField(null);
+				ti1.text ="enter name and password:";
+				ti1.editable = false;
 				v.push(ti1);
-				var ti2:NativeTextInput = new NativeTextInput("password");
-				ti2.inputType = NativeTextInput.textPassword;
-				ti2.messageBefore ="password:";
-				ti2.text = "dddd";
+				
+				var ti:NativeTextField = new NativeTextField("name");
+				ti.prompText = "name";
+				ti.text = "John Doe";
+				v.push(ti);
+				
+				var ti2:NativeTextField = new NativeTextField("password");
+				ti2.displayAsPassword = true;
+				ti2.prompText = "password";
+				ti2.softKeyboardType = SoftKeyboardType.NUMBER;
+				ti2.text = "77799";
 				v.push(ti2);
+				
 				textInputDialog.show(titleInput.text,v,buttons);
 			}
 			public function closeTextInputDialogHandler(event:NativeDialogEvent):void
@@ -289,7 +297,7 @@
 					returnText.appendText(event.toString()+"   "+event.index+"\n");
 				else
 					returnText.appendText(event.toString()+"\n");
-				textInputDialog.removeEventListener(NativeDialogEvent.CANCLED,closeTextInputDialogHandler);
+				textInputDialog.removeEventListener(NativeDialogEvent.CANCELED,closeTextInputDialogHandler);
 				textInputDialog.removeEventListener(NativeDialogEvent.CLOSED,closeTextInputDialogHandler);
 				textInputDialog.removeEventListener(NativeDialogEvent.OPENED,traceEvent);
 				textInputDialog.removeEventListener(NativeExtensionErrorEvent.ERROR,onError);
@@ -305,7 +313,7 @@
 				singleChDialog = new NativeListDialog();
 				singleChDialog.theme = ThemeSelector.selectedItem.data;
 				
-				singleChDialog.addEventListener(NativeDialogEvent.CANCLED,closeNativeDialogHandler);
+				singleChDialog.addEventListener(NativeDialogEvent.CANCELED,closeNativeDialogHandler);
 				singleChDialog.addEventListener(NativeDialogEvent.OPENED,traceEvent);
 				singleChDialog.addEventListener(NativeDialogEvent.CLOSED,closeNativeDialogHandler);
 				singleChDialog.addEventListener(LogEvent.LOG_EVENT,traceEvent);
@@ -332,7 +340,7 @@
 				multChDialog = new NativeListDialog();
 				multChDialog.theme = ThemeSelector.selectedItem.data;
 				
-				multChDialog.addEventListener(NativeDialogEvent.CANCLED,closeNativeDialogHandler);
+				multChDialog.addEventListener(NativeDialogEvent.CANCELED,closeNativeDialogHandler);
 				multChDialog.addEventListener(NativeDialogEvent.OPENED,traceEvent);
 				multChDialog.addEventListener(NativeDialogEvent.CLOSED,closeNativeDialogHandler);
 				multChDialog.addEventListener(NativeExtensionErrorEvent.ERROR,onError);
@@ -375,7 +383,7 @@
 			{
 				returnText.appendText(event.toString()+"\n");
 				var dialog:NativeListDialog = (event.target  as NativeListDialog);
-				dialog.removeEventListener(NativeDialogEvent.CANCLED,closeNativeDialogHandler);
+				dialog.removeEventListener(NativeDialogEvent.CANCELED,closeNativeDialogHandler);
 				dialog.removeEventListener(NativeDialogEvent.CLOSED,closeNativeDialogHandler);
 				dialog.removeEventListener(NativeDialogEvent.OPENED,traceEvent);
 				dialog.removeEventListener(NativeExtensionErrorEvent.ERROR,onError);

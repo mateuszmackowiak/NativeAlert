@@ -6,15 +6,15 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 	{
 		public static const CLOSED:String = "nativeTextInputDialog_closed";
 		private var _buttonIndex:int = -1;
-		private var _list:Vector.<NativeTextInput>;
-		public function NativeTextInputDialogEvent(type:String,buttonIndex:String,list:Vector.<NativeTextInput>, bubbles:Boolean=false, cancelable:Boolean=false)
+		private var _list:Vector.<NativeTextField>;
+		public function NativeTextInputDialogEvent(type:String,buttonIndex:String,list:Vector.<NativeTextField>, bubbles:Boolean=false, cancelable:Boolean=false)
 		{
 			_list = list;
 			_buttonIndex = int(buttonIndex);
 			super(type, bubbles, cancelable);
 		}
 
-		public function get list():Vector.<NativeTextInput>
+		public function get list():Vector.<NativeTextField>
 		{
 			return _list;
 		}

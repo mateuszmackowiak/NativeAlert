@@ -1,5 +1,5 @@
 # Native Dialogs - Adobe air Native Extension #
-Update: NativeAlert badge/ System Properites -IOS
+Update: NativeTextInputDialog , NativeTextInput changed to NativeTextField
 
 Checked iOS 4.3,5.1 / android 3.1
 
@@ -68,7 +68,7 @@ iOS only:
      	progressPopup.theme = NativeProgress.THEME_HOLO_DARK;
 	 	progressPopup.setSecondaryProgress(45);//This only works in android 
      	progressPopup.addEventListener(NativeDialogEvent.OPENED,traceEvent);
-     	progressPopup.addEventListener(NativeDialogEvent.CANCLED,closeNativeProcessHandler);
+     	progressPopup.addEventListener(NativeDialogEvent.CANCELED,closeNativeProcessHandler);
      	progressPopup.addEventListener(NativeDialogEvent.CLOSED,closeNativeProcessHandler);
      	progressPopup.addEventListener(NativeExtensionErrorEvent.ERROR,onError);
 	 	progressPopup.setMax(50);
@@ -81,7 +81,7 @@ iOS only:
 
 	private function closeNativeProcessHandler(event:Event):void
 	{
-     	progressPopup.removeEventListener(NativeDialogEvent.CANCLED,closeNativeProcessHandler);
+     	progressPopup.removeEventListener(NativeDialogEvent.CANCELED,closeNativeProcessHandler);
      	progressPopup.removeEventListener(NativeDialogEvent.CLOSED,closeNativeProcessHandler);
      	progressPopup.removeEventListener(NativeExtensionErrorEvent.ERROR,onError);
      	progressPopup.removeEventListener(NativeDialogEvent.OPENED,traceEvent);
@@ -148,7 +148,7 @@ NativeListDialog has the ability to show a native android popup dialog with a mu
 	{
 		multChDialog = new NativeListDialog();
     	multChDialog.theme = NativeListDialog.THEME_HOLO_DARK;
-      	multChDialog.addEventListener(NativeDialogEvent.CANCLED,closeNativeDialogHandler);
+      	multChDialog.addEventListener(NativeDialogEvent.CANCELED,closeNativeDialogHandler);
       	multChDialog.addEventListener(NativeDialogEvent.OPENED,traceEvent);
       	multChDialog.addEventListener(NativeDialogEvent.CLOSED,closeNativeDialogHandler);
       	multChDialog.addEventListener(NativeExtensionErrorEvent.ERROR,onError);
@@ -161,7 +161,7 @@ NativeListDialog has the ability to show a native android popup dialog with a mu
 	{
 		singleChDialog = new NativeListDialog();
 		singleChDialog.theme = ThemeSelector.selectedItem.data;
-		singleChDialog.addEventListener(NativeDialogEvent.CANCLED,closeNativeDialogHandler);
+		singleChDialog.addEventListener(NativeDialogEvent.CANCELED,closeNativeDialogHandler);
 		singleChDialog.addEventListener(NativeDialogEvent.OPENED,traceEvent);
 		singleChDialog.addEventListener(NativeDialogEvent.CLOSED,closeNativeDialogHandler);
 		singleChDialog.addEventListener(LogEvent.LOG_EVENT,traceEvent);
@@ -173,7 +173,7 @@ NativeListDialog has the ability to show a native android popup dialog with a mu
 	public function closeNativeDialogHandler(event:NativeDialogEvent):void
 	{
 		var dialog:NativeListDialog = (event.target  as NativeListDialog);
-		dialog.removeEventListener(NativeDialogEvent.CANCLED,closeNativeDialogHandler);
+		dialog.removeEventListener(NativeDialogEvent.CANCELED,closeNativeDialogHandler);
 		dialog.removeEventListener(NativeDialogEvent.CLOSED,closeNativeDialogHandler);
 		dialog.removeEventListener(NativeDialogEvent.OPENED,traceEvent);
 		dialog.removeEventListener(NativeExtensionErrorEvent.ERROR,onError);
@@ -198,35 +198,44 @@ NativeListDialog has the ability to show a native android popup dialog with a mu
 # Text input Dialog (Android) #
 Show a dialog with defined by user input text fields.
 
+###Important: IOS limitations###
+There can be only 2 buttons and 2 text inputs. To display message specyfie for the first NativeTextField editable == false
 *Usage:*
 
 	public function openTextInputDialog(event:MouseEvent):void{
 		if(NativeTextInputDialog.isSupported()){
 			textInputDialog = new NativeTextInputDialog();
 			textInputDialog.theme = NativeTextInputDialog.THEME_HOLO_LIGHT;
-			textInputDialog.addEventListener(NativeDialogEvent.CANCLED,trace);
+			textInputDialog.addEventListener(NativeDialogEvent.CANCELED,trace);
 			textInputDialog.addEventListener(NativeDialogEvent.OPENED,trace);
 			textInputDialog.addEventListener(NativeExtensionErrorEvent.ERROR,trace);
 			textInputDialog.addEventListener(NativeTextInputDialogEvent.CLOSED, onTextInputDialogClosedHandler);
-			var buttons:Vector.<String> = new Vector.<String>();
-			buttons.push("OK","Cancle");
-			var v:Vector.<NativeTextInput> = new Vector.<NativeTextInput>();
-			var ti1:NativeTextInput = new NativeTextInput("name");
-			ti1.inputType = NativeTextInput.text;
-			ti1.messageBefore ="name:";
-			ti1.text = "jacek";
+
+			var v:Vector.<NativeTextField> = new Vector.<NativeTextField>();
+				
+			var ti1:NativeTextField = new NativeTextField(null);
+			ti1.text ="enter name and password:";
+			ti1.editable = false;
 			v.push(ti1);
-			var ti2:NativeTextInput = new NativeTextInput("password");
-			ti2.inputType = NativeTextInput.textPassword;
-			ti2.messageBefore ="password:";
-			ti2.text = "dddd";
+				
+			var ti:NativeTextField = new NativeTextField("name");
+			ti.prompText = "name";
+			ti.text = "John Doe";
+			v.push(ti);
+				
+			var ti2:NativeTextField = new NativeTextField("password");
+			ti2.displayAsPassword = true;
+			ti2.prompText = "password";
+			ti2.softKeyboardType = SoftKeyboardType.NUMBER;
+			ti2.text = "77799";
 			v.push(ti2);
+				
 			textInputDialog.show(titleInput.text,v,buttons);
 		}
 	}
 	private function onTextInputDialogClosedHandler(event:NativeTextInputDialogEvent):void
 	{
-		for each (var n:NativeTextInput in event.list) 
+		for each (var n:NativeTextField in event.list) 
 		{
 			trace(n.name+":  "+n.text);
 		}

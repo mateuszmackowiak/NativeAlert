@@ -33,6 +33,8 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 		private static var _set:Boolean = false;
 		private static var _isSupp:Boolean = false;
 		
+		private static var isAndroid:Boolean=false;
+		private static var isIOS:Boolean=false;
 		//---------------------------------------------------------------------
 		//
 		// Private Properties.
@@ -42,6 +44,7 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 		private var _title:String="";
 		private var _theme:int = -1;
 		private var _buttons:Vector.<String>=null;
+		private var _textInputs:Vector.<NativeTextField>=null;
 		//---------------------------------------------------------------------
 		//
 		// Public Methods.
@@ -52,10 +55,15 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 		 * @see http://www.mateuszmackowiak.art.pl/blog
 		 * @since 2011
 		 */
-		public function NativeTextInputDialog(title:String ="")
+		public function NativeTextInputDialog()
 		{
-			if(title!= null && title!=="")
-				_title = title;
+			if(Capabilities.os.toLowerCase().indexOf("linux")>-1)
+				isAndroid = true;
+			else if(Capabilities.os.toLowerCase().indexOf("iph")>-1)
+				isIOS = true;
+			else
+				trace("NativeTextInputDialog is not supported on this platform");
+			
 			try{
 				context = ExtensionContext.createExtensionContext(EXTENSION_ID, "TextInputDialogContext");
 				context.addEventListener(StatusEvent.STATUS, onStatus);
@@ -65,7 +73,7 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 		}
 		
 		
-		public function show(title:String,textInputs:Vector.<NativeTextInput>,buttons:Vector.<String>=null):Boolean{
+		public function show(title:String,textInputs:Vector.<NativeTextField>,buttons:Vector.<String>=null):Boolean{
 			if(title!= null && title!=="")
 				_title = title;
 			
@@ -77,8 +85,23 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 				return false;
 			}
 			try{
-				context.call(FRE_FUNCTIONL,"show",_title,textInputs,buttons,_theme);
-				return true;
+				_textInputs = textInputs;
+				if(isAndroid){
+					context.call(FRE_FUNCTIONL,"show",_title,textInputs,buttons,_theme);
+					return true;
+				}
+				if(isIOS){
+					var message:String = null;
+					if(textInputs[0].editable==false)
+						message = textInputs[0].text;
+					if(buttons.length>1)
+						trace("Warning: There can be only 2 buttons on IOS NativeTextInputDialog");
+					if(textInputs.length>2)
+						trace("Warning: There can be max only 3 NativeTextFields (first with editable==false to display aditional message) on IOS NativeTextInputDialog ");
+					context.call("show",_title,message,textInputs,buttons);
+					return true;
+				}
+				return false;
 			}catch(e:Error){
 				showError("Error calling show method "+e.message,e.errorID);
 			}
@@ -94,9 +117,18 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 		{
 			if(value!=null && value!==_title){
 				try{
-					context.call(FRE_FUNCTIONL,"setTitle",value);
-					_title = value;
-					return true;
+					if(isAndroid){
+						context.call(FRE_FUNCTIONL,"setTitle",value);
+						_title = value;
+						return true;
+					}
+					if(isIOS){
+						context.call("setTitle",value);
+						_title = value;
+						return true;
+					}
+					
+					return false;
 				}catch(e:Error){
 					showError("Error setting title "+e.message,e.errorID);
 				}
@@ -106,10 +138,13 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 		
 		public function isShowing():Boolean{
 			if(context){
-				return context.call(FRE_FUNCTIONL,"isShowing");
+				if(isAndroid)
+					return context.call(FRE_FUNCTIONL,"isShowing");
+				if(isIOS)
+					return context.call("isShowing");
+				return false;
 			}else
 				return false;
-			
 		}
 		
 		public function get buttons():Vector.<String>
@@ -136,9 +171,17 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 		public function hide():Boolean
 		{
 			try{
-				if(context!=null)
-					context.call(FRE_FUNCTIONL,"hide");
-				return true;
+				if(context!=null){
+					if(isAndroid){
+						context.call(FRE_FUNCTIONL,"hide");
+						return true;
+					}
+					if(isIOS){
+						context.call("hide");
+						return true;
+					}
+				}
+				return false;
 			}catch(e:Error){
 				showError("Error calling hide method "+e.message,e.errorID);
 			}
@@ -171,13 +214,12 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 			if(!_set){// checks if a value was set before
 				try{
 					_set = true;
-					if(Capabilities.os.indexOf("Linux")>-1){
-						var context:ExtensionContext = ExtensionContext.createExtensionContext(EXTENSION_ID, "TextInputDialogContext");
-						_isSupp = context.call("isSupported");
-						context.dispose();
+					if(Capabilities.os.indexOf("Linux")>-1 || Capabilities.os.toLowerCase().indexOf("ip")>-1){
+						_isSupp = true;
 					}else
 						_isSupp = false;
 				}catch(e:Error){
+					trace("NativeTextInputDialog extension is not supported on this platform");
 					return _isSupp;
 				}
 			}	
@@ -209,16 +251,37 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 		{
 			try{
 				if(event.code == NativeDialogEvent.CLOSED){
-					var v:Vector.<NativeTextInput> = new Vector.<NativeTextInput>();
 					const a:Array = event.level.split("#_#");
-					var nt:NativeTextInput=null;
-					for (var i:int = 1; i < a.length; i+=2) 
-					{
-						nt=new NativeTextInput(a[i]);
-						nt.text = a[i+1];
-						v.push(nt);
+					
+					if(isAndroid){
+						var v:Vector.<NativeTextField> = new Vector.<NativeTextField>();
+						var nt:NativeTextField=null;
+						for (var i:int = 1; i < a.length; i+=2) 
+						{
+							nt=new NativeTextField(a[i]);
+							nt.text = a[i+1];
+							v.push(nt);
+						}
+						for each (var n:NativeTextField in _textInputs) 
+						{
+							for each (var n2:NativeTextField in v) 
+							{
+								if(n.name == n2.name)
+									n.text = n2.text;
+							}
+						}	
+					}else if(isIOS){
+						if(_textInputs[0].editable==false){
+							_textInputs[1].text = a[1];
+							if(_textInputs.length>1)
+								_textInputs[2].text = a[2];
+						}else{
+							_textInputs[0].text = a[0];
+							if(_textInputs.length>0)
+								_textInputs[1].text = a[1];
+						}
 					}
-					dispatchEvent(new NativeTextInputDialogEvent(NativeTextInputDialogEvent.CLOSED,a[0],v));
+					dispatchEvent(new NativeTextInputDialogEvent(NativeTextInputDialogEvent.CLOSED,a[0],_textInputs));
 				}else if(event.code == NativeDialogEvent.CANCELED)
 					dispatchEvent(new NativeDialogEvent(NativeDialogEvent.CANCELED,event.level));
 				else if(event.code == NativeDialogEvent.OPENED)

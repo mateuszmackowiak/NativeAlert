@@ -23,7 +23,7 @@ public class NativeExtension implements FREExtension{
 	
 	public static final String CLOSED="nativeDialog_closed";
 	public static final String OPENED="nativeDialog_opened";
-	public static final String CANCLED="nativeDialog_cancled";
+	public static final String CANCELED="nativeDialog_cancled";
 	
 	public static final String LIST_CHANGE = "nativeListDialog_change";
 	

@@ -77,8 +77,14 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 			if(title!= null && title!=="")
 				_title = title;
 			
-			if(buttons!=null)
-				_buttons = buttons;
+			if (!buttons || buttons.length == 0){
+				//no buttons exist, lets make the default buttons
+				trace("Buttons not configured, assigning default CANCEL,OK buttons");
+				buttons = new Vector.<String>();
+				buttons.push("Cancel","OK");
+			}
+			_buttons = buttons;
+
 			
 			if(textInputs==null || textInputs.length==0){
 				throw new Error("textInputs cannot be null");

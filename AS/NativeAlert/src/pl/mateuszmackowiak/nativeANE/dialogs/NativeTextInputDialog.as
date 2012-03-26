@@ -94,10 +94,14 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 					var message:String = null;
 					if(textInputs[0].editable==false)
 						message = textInputs[0].text;
-					if(buttons.length>1)
+					if(buttons.length>2){
 						trace("Warning: There can be only 2 buttons on IOS NativeTextInputDialog");
-					if(textInputs.length>2)
+						return false;
+					}
+					if(textInputs.length>3){
 						trace("Warning: There can be max only 3 NativeTextFields (first with editable==false to display aditional message) on IOS NativeTextInputDialog ");
+						return false;
+					}
 					context.call("show",_title,message,textInputs,buttons);
 					return true;
 				}

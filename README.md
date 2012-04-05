@@ -245,6 +245,7 @@ IOS limitations - There can be only 2 buttons and 2 text inputs. To display mess
 	
 # Toast (Android / IOS) #
 
+For IOS uses : [SlideNotification](https://github.com/mateuszmackowiak/SlideNotification)
 ###Important:###
 IOS limitations - Toast will always be on the bottom of the screen (both functions work)
 

@@ -1,5 +1,6 @@
 package pl.mateuszmackowiak.nativeANE.dialogs
 {
+	import flash.events.Event;
 	import flash.events.EventDispatcher;
 	import flash.events.IEventDispatcher;
 	import flash.events.StatusEvent;
@@ -73,9 +74,20 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 		}
 		
 		
+		public function get textInputs():Vector.<NativeTextField>
+		{
+			return _textInputs;
+		}
+
+		public function get buttons():Vector.<String>
+		{
+			return _buttons;
+		}
+
 		public function show(title:String,textInputs:Vector.<NativeTextField>,buttons:Vector.<String>=null):Boolean{
-			if(title!= null && title!=="")
-				_title = title;
+			_title = title;
+			_buttons = buttons;
+			_textInputs = textInputs;
 			
 			if (!buttons || buttons.length == 0){
 				//no buttons exist, lets make the default buttons
@@ -83,15 +95,13 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 				buttons = new Vector.<String>();
 				buttons.push("Cancel","OK");
 			}
-			_buttons = buttons;
-
-			
 			if(textInputs==null || textInputs.length==0){
 				throw new Error("textInputs cannot be null");
 				return false;
 			}
+			
+			
 			try{
-				_textInputs = textInputs;
 				if(isAndroid){
 					context.call(FRE_FUNCTIONL,"show",_title,textInputs,buttons,_theme);
 					return true;
@@ -102,11 +112,11 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 						message = textInputs[0].text;
 					if(buttons.length>2){
 						trace("Warning: There can be only 2 buttons on IOS NativeTextInputDialog");
-						return false;
+						//return false;
 					}
 					if(textInputs.length>3){
 						trace("Warning: There can be max only 3 NativeTextFields (first with editable==false to display aditional message) on IOS NativeTextInputDialog ");
-						return false;
+						//return false;
 					}
 					context.call("show",_title,message,textInputs,buttons);
 					return true;
@@ -157,15 +167,7 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 				return false;
 		}
 		
-		public function get buttons():Vector.<String>
-		{
-			return _buttons;
-		}
 		
-		public function set buttons(value:Vector.<String>):void
-		{
-			_buttons = value;
-		}
 		public function get theme():int
 		{
 			return _theme;
@@ -212,6 +214,21 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 		}
 		
 		
+		/**
+		 * 
+		 */
+		public function shake():void
+		{
+			try{
+				if(context!=null && isIOS)
+					context.call(FRE_FUNCTIONL,"shake");
+				
+			}catch(e:Error){
+				showError("Error calling shake method "+e.message,e.errorID);
+			}
+		}
+		
+		
 		//---------------------------------------------------------------------
 		//
 		// Public Static Methods.
@@ -250,6 +267,9 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 		// Private Methods.
 		//
 		//---------------------------------------------------------------------
+		/**
+		 * @private
+		 */
 		private function showError(message:String,id:int=0):void
 		{
 			if(hasEventListener(NativeExtensionErrorEvent.ERROR))
@@ -257,10 +277,28 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 			else
 				throw new Error(message,id);
 		}
+		/**
+		 * @private
+		 */
 		private function onStatus(event:StatusEvent):void
 		{
 			try{
-				if(event.code == NativeDialogEvent.CLOSED){
+				if(event.code == Event.CHANGE){
+					if(isIOS){
+						const a2:Array = event.level.split("#_#");
+						var t:NativeTextField = null;
+						if(_textInputs[0].editable==false){
+							t = _textInputs[int(a2[0])+1];
+							t.text = a2[1];
+						}else{
+							t = _textInputs[int(a2[0])];
+							t.text = a2[1];
+						}
+						
+						t.dispatchEvent(new Event(Event.CHANGE));
+					}
+				}else if(event.code == NativeDialogEvent.CLOSED){
+					
 					const a:Array = event.level.split("#_#");
 					
 					if(isAndroid){
@@ -281,14 +319,15 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 							}
 						}	
 					}else if(isIOS){
-						if(_textInputs[0].editable==false){
+						if(_textInputs[0].editable==false && _textInputs.length>0){
+							
 							_textInputs[1].text = a[1];
 							if(_textInputs.length>1)
 								_textInputs[2].text = a[2];
-						}else{
-							_textInputs[0].text = a[0];
-							if(_textInputs.length>0)
-								_textInputs[1].text = a[1];
+						}else if(_textInputs.length>0){
+							_textInputs[0].text = a[1];
+							if(_textInputs.length>1)
+								_textInputs[1].text = a[2];
 						}
 					}
 					dispatchEvent(new NativeTextInputDialogEvent(NativeTextInputDialogEvent.CLOSED,a[0],_textInputs));

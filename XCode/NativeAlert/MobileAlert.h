@@ -6,9 +6,11 @@
 //  Copyright (c) 2011 __MyCompanyName__. All rights reserved.
 //
 
+#ifdef __OBJC__
+    #import <UIKit/UIKit.h>
+    #import "FlashRuntimeExtensions.h"
+#endif
 
-#import <UIKit/UIKit.h>
-#import "FlashRuntimeExtensions.h"
 
 @interface MobileAlert : NSObject <UIAlertViewDelegate>
 @property( nonatomic, retain ) UIProgressView *progressView;
@@ -32,6 +34,8 @@
                 textInputs: (FREObject*)textInputs
                    buttons: (FREObject*)buttons
                    context: (FREContext *)ctx;
+
+- (void)shake;
 
 -(void)updateProgress: (CGFloat)perc;
 

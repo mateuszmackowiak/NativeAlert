@@ -8,12 +8,15 @@
 
 #include "FlashRuntimeExtensions.h"
 #import "MobileAlert.h"
-#import "UIApplication+UIID.h"
 
-#include <sys/socket.h>
-#include <sys/sysctl.h>
-#include <net/if.h>
-#include <net/if_dl.h>
+
+#import <sys/socket.h>
+#import <sys/sysctl.h>
+#import <net/if.h>
+#import <net/if_dl.h>
+
+
+#import "SlideNotification.h"
 
 MobileAlert *alert;
 
@@ -114,22 +117,35 @@ FREObject showTextInputDialog(FREContext ctx, void* funcData, uint32_t argc, FRE
     uint32_t messageLength;
     const uint8_t *message;
     
-    //Turn our actionscrpt code into native code.
-    FREGetObjectAsUTF8(argv[0], &titleLength, &title);
-    FREGetObjectAsUTF8(argv[1], &messageLength, &message);
+    
+    
 
     
     //Create our Strings for our Alert.
-    NSString *titleString = [NSString stringWithUTF8String:(char*)title];
-    NSString *messageString = [NSString stringWithUTF8String:(char*)message];  
+   
+   
+    NSString *titleString = nil;
+    NSString *messageString =nil;
     
+    if(argv[0]!=NULL){
+        FREGetObjectAsUTF8(argv[0], &titleLength, &title);
+        titleString = [NSString stringWithUTF8String:(char*)title];
+    }
+    if(argv[1]!=NULL){
+        FREGetObjectAsUTF8(argv[1], &messageLength, &message);
+        messageString = [NSString stringWithUTF8String:(char*)message]; 
+    }
     alert = [[MobileAlert alloc] init];
     [alert showTextInputDialog:titleString message:messageString textInputs:argv[2] buttons:argv[3] context:ctx];
     
     return NULL;    
 }
-
-
+FREObject shake(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[] )
+{
+    if(alert!=NULL)
+        [alert shake];
+    return NULL;
+}
 
 FREObject showHidenetworkIndicator(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[] ){
     
@@ -218,6 +234,33 @@ FREObject isShowing(FREContext ctx, void* funcData, uint32_t argc, FREObject arg
 //
 
 
+FREObject showToast(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[] )
+{
+    if(argv==NULL)
+        return NULL;
+    
+    uint32_t messageLength;
+    const uint8_t *message;
+    double dur;
+    FREGetObjectAsDouble(argv[1], &dur);
+    FREGetObjectAsUTF8(argv[0], &messageLength, &message);
+    
+    NSString* messageString=[NSString stringWithUTF8String:(char*)message];
+
+    float duration = [SlideNotification SHORT];
+    if(dur==1)
+        duration = [SlideNotification LONG];
+    //NSLog(@"%f",dur);
+    if(messageString!=nil && ![messageString isEqualToString:@""]){
+        [SlideNotification showMessage2:messageString duration:duration];
+    }
+    
+    
+    return NULL;
+}
+
+
+
 FREObject showNotification(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[] )
 {
     
@@ -267,6 +310,7 @@ FREObject showNotification(FREContext ctx, void* funcData, uint32_t argc, FREObj
         if (soundUrlString != nil && ![soundUrlString isEqualToString:@""]){
            if([soundUrlString isEqualToString:@"defaultSound"]) { 
                localNotification.soundName = @"UILocalNotificationDefaultSoundName";
+              
            }else
                localNotification.soundName =soundUrlString;
         }
@@ -432,7 +476,7 @@ static const char * PROGRESS_KEY = "ProgressContext";
 static const char * NETWORK_ACTIVITY_INDICATOR = "NetworkActivityIndicatoror";
 static const char * LOCAL_NOTIFICATION = "LocalNotification";
 static const char * TEXT_INPUT_DIALOG = "TextInputDialogContext";
-
+static const char * TOAST = "ToastContext";
 
 FREObject setBadge(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[] ){
     int32_t value;
@@ -472,7 +516,7 @@ void NativeDialogContextInitializer(void* extData, const uint8_t * ctxType, FREC
         count = 7;
         NSLog(@"ctxType %s",ctxType);
     }else if(strcmp((const char *)ctxType, TEXT_INPUT_DIALOG)==0){
-        count = 5;
+        count = 6;
         NSLog(@"ctxType %s",ctxType);
     }else if (strcmp((const char *)ctxType, "")==0){
         count = 4;
@@ -495,6 +539,12 @@ void NativeDialogContextInitializer(void* extData, const uint8_t * ctxType, FREC
         func[1].name = (const uint8_t *) "getSystemProperty";
         func[1].functionData = NULL;
         func[1].function = &getSystemProperties;
+    }else if(strcmp((const char *)ctxType, TOAST)==0){
+        
+        func[1].name = (const uint8_t *) "Toast";
+        func[1].functionData = NULL;
+        func[1].function = &showToast;
+        
     }else if(strcmp((const char *)ctxType, NETWORK_ACTIVITY_INDICATOR)==0){
         
         func[1].name = (const uint8_t *) "showHidenetworkIndicator";
@@ -524,6 +574,10 @@ void NativeDialogContextInitializer(void* extData, const uint8_t * ctxType, FREC
         func[4].name = (const uint8_t*) "hide";
         func[4].functionData = NULL;
         func[4].function = &hide;
+        
+        func[5].name = (const uint8_t*) "shake";
+        func[5].functionData = NULL;
+        func[5].function = &shake;
         
     }else if(strcmp((const char *)ctxType, PROGRESS_KEY)==0){
         func[1].name = (const uint8_t*) "isShowing";

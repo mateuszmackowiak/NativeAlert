@@ -108,7 +108,7 @@ package pl.mateuszmackowiak.nativeANE.toast
 		 */
 		public static function show(message:String , durration:int):void
 		{
-			if(Capabilities.os.indexOf("Linux")>-1){
+			if(Capabilities.os.indexOf("Linux")>-1 || Capabilities.os.toLowerCase().indexOf("ip")>-1){
 				if(message==null)
 					message="";
 				if(isNaN(durration))
@@ -140,7 +140,7 @@ package pl.mateuszmackowiak.nativeANE.toast
 		 */
 		public static function showWithDifferentGravit(message:String , durration:int , gravity:int=NaN , xOffset:int=0 , yOffset:int=0 ):void
 		{
-			if(Capabilities.os.indexOf("Linux")>-1){
+			if(Capabilities.os.indexOf("Linux")>-1 || Capabilities.os.toLowerCase().indexOf("ip")>-1){
 				if(message==null)
 					message="";
 				if(isNaN(durration))
@@ -170,7 +170,7 @@ package pl.mateuszmackowiak.nativeANE.toast
 			if(!_set){// checks if a value was set before
 				try{
 					_set = true;
-					if(Capabilities.os.indexOf("Linux")>-1){
+					if(Capabilities.os.indexOf("Linux")>-1 || Capabilities.os.toLowerCase().indexOf("ip")>-1){
 						if(context==null)
 							var context:ExtensionContext = ExtensionContext.createExtensionContext(EXTENSION_ID, "ToastContext");
 						_isSupp = context.call("isSupported")==true;
@@ -202,4 +202,6 @@ package pl.mateuszmackowiak.nativeANE.toast
 			//FlexGlobals.topLevelApplication.dispatchEvent(new NativeAlertErrorEvent(NativeAlertErrorEvent.ERROR,false,false,message,id));
 		}
 	}
+	
+
 }

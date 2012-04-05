@@ -93,9 +93,9 @@ FREContext *context;
     [self hide];
     //Hold onto the context so we can dispatch our message later.
     context = ctx;
+    NSLog(@"message %@",message);
     
     NSString* closeLabel=nil;
-    
     
     uint32_t buttons_len;
     FREGetArrayLength(buttons, &buttons_len);
@@ -109,6 +109,8 @@ FREContext *context;
         FREGetObjectAsUTF8(button0, &button0LabelLength, &button0Label);
         
         closeLabel = [NSString stringWithUTF8String:(char*)button0Label];
+    }else{
+        closeLabel = NSLocalizedString(@"OK", nil);
     }
     
     //Create our alert.
@@ -137,34 +139,69 @@ FREContext *context;
     if(message!=nil && ![message isEqualToString:@""])
         index++;
     
-    if (textInputs_len>index) {
+    if (textInputs_len > index) {
         UITextField *textField=nil;
         FREObject textObj;
-        if(textInputs_len==1){
+        if(textInputs_len==(index+1)){
             [alert setAlertViewStyle:UIAlertViewStylePlainTextInput];
             
             textField = [alert textFieldAtIndex:0];
+            [textField addTarget:self action:@selector(textFieldDidChange:) forControlEvents:UIControlEventEditingChanged];
             FREGetArrayElementAt(textInputs, index, &textObj);
             setupTextInputParamsFormFREOBJ(textField,textObj);
-        }else if(textInputs_len>1){
+        }else if(textInputs_len > (index+1)){
             [alert setAlertViewStyle:UIAlertViewStyleLoginAndPasswordInput];
             
             textField = [alert textFieldAtIndex:0];
+            [textField addTarget:self action:@selector(textFieldDidChange:) forControlEvents:UIControlEventEditingChanged];
             FREGetArrayElementAt(textInputs, index, &textObj);
             setupTextInputParamsFormFREOBJ(textField,textObj);
             
             textField = [alert textFieldAtIndex:1];
+            [textField addTarget:self action:@selector(textFieldDidChange:) forControlEvents: UIControlEventEditingChanged];
             FREGetArrayElementAt(textInputs, index+1, &textObj);
             setupTextInputParamsFormFREOBJ(textField,textObj);
         }
         
     }
     FREDispatchStatusEventAsync(context, (uint8_t*)"nativeDialog_opened", NULL);
+    
     [alert show];
 }
 
 
 
+
+
+
+-(void)textFieldDidChange:(id)sender {
+    // whatever you wanted to do
+    int8_t index = 0;
+    if(sender != [alert textFieldAtIndex:0])
+        index =1;
+    NSString* returnString = [NSString stringWithFormat:@"%i#_#%@",index,((UITextField *)sender).text];
+    NSLog(@"text changed: %@",((UITextField *)sender).text);
+    FREDispatchStatusEventAsync(context, (uint8_t*)"change", (uint8_t*)[returnString UTF8String]);
+}
+
+
+- (void)shake
+{
+    if(alert && alert.isHidden==NO){
+        CGRect r = alert.frame;
+        r.origin.x = r.origin.x - r.origin.x * 0.1;
+	
+        CGContextRef context = UIGraphicsGetCurrentContext();
+        [UIView beginAnimations:nil context:context];
+        [UIView setAnimationCurve:UIViewAnimationCurveEaseInOut];
+        [UIView setAnimationDuration:.1f];
+        [UIView setAnimationRepeatCount:5];
+        [UIView setAnimationRepeatAutoreverses:NO];
+        [alert setFrame:r];
+	
+        [UIView commitAnimations];
+    }
+}
 
 
 
@@ -219,10 +256,6 @@ FREContext *context;
 
 
 
-
-
-
-
 - (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
 {
     
@@ -234,9 +267,12 @@ FREContext *context;
         FREDispatchStatusEventAsync(context, (uint8_t*)"ALERT_CLOSED", (uint8_t*)[buttonID UTF8String]);
     }else{
         NSString* returnString=nil;
+        [[alertView textFieldAtIndex:0] removeTarget:self action:@selector(textFieldDidChange:) forControlEvents:UIControlEventEditingChanged];
         if([alertView alertViewStyle]==UIAlertViewStyleLoginAndPasswordInput){
+            [[alertView textFieldAtIndex:1] removeTarget:self action:@selector(textFieldDidChange:) forControlEvents:UIControlEventEditingChanged];
             returnString = [NSString stringWithFormat:@"%@#_#%@#_#%@",buttonID,[[alertView textFieldAtIndex:0] text],[[alertView textFieldAtIndex:1] text]];
         }else{
+            
             returnString = [NSString stringWithFormat:@"%@#_#%@",buttonID,[[alertView textFieldAtIndex:0] text]];
         }
         FREDispatchStatusEventAsync(context, (uint8_t*)"nativeDialog_closed", (uint8_t*)[returnString UTF8String]);

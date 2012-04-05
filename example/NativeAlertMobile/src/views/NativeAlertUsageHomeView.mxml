@@ -258,7 +258,33 @@
 				textInputDialog.addEventListener(NativeExtensionErrorEvent.ERROR,onError);
 				textInputDialog.addEventListener(LogEvent.LOG_EVENT,traceEvent);
 				textInputDialog.addEventListener(NativeTextInputDialogEvent.CLOSED,onTextInputDialogClosedHandler);
-				var a:Array = otherLabels.text.split(",");
+				
+				
+				
+
+				//textInputDialog.theme = NativeTextInputDialog.THEME_HOLO_LIGHT;
+				
+				
+				
+				var v:Vector.<NativeTextField> = new Vector.<NativeTextField>();
+				
+				/*var message:NativeTextField = new NativeTextField(null);
+				message.text =r.getString(LangProperties.MBIMAS,'ENTER_SERVER_ADRESS');
+				message.editable = false;
+				v.push(message);*/
+				
+				var serverAdressTextInput:NativeTextField = new NativeTextField("serverAdress");
+				serverAdressTextInput.displayAsPassword = true;
+				serverAdressTextInput.prompText = "192.168.0.1:8080";
+				serverAdressTextInput.softKeyboardType = SoftKeyboardType.URL;
+				serverAdressTextInput.addEventListener(Event.CHANGE,traceEvent);
+				v.push(serverAdressTextInput);
+				
+				var b:Vector.<String> = new Vector.<String>();
+				b.push("OK");
+				var t:String = "ENTER_SERVER_ADRESS";
+				textInputDialog.show(t,v,b);
+				/*var a:Array = otherLabels.text.split(",");
 				var buttons:Vector.<String> = new Vector.<String>();
 				if(a==null || a.length==0)
 					buttons.push(closeLabelInput.text);
@@ -289,7 +315,7 @@
 				ti2.text = "77799";
 				v.push(ti2);
 				
-				textInputDialog.show(titleInput.text,v,buttons);
+				textInputDialog.show(titleInput.text,v,buttons);*/
 			}
 			public function closeTextInputDialogHandler(event:NativeDialogEvent):void
 			{

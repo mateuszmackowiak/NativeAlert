@@ -7,23 +7,25 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		003CDF01145395CE00364F3C /* FlashRuntimeExtensions.h in Headers */ = {isa = PBXBuildFile; fileRef = 003CDF00145395CE00364F3C /* FlashRuntimeExtensions.h */; };
-		00968C18145497AC00924321 /* NativeAlert.h in Headers */ = {isa = PBXBuildFile; fileRef = 00968C17145497AC00924321 /* NativeAlert.h */; };
 		009AC4D61453648D001C38F5 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 009AC4D51453648D001C38F5 /* Foundation.framework */; };
 		009AC4F3145369A8001C38F5 /* NativeAlert.m in Sources */ = {isa = PBXBuildFile; fileRef = 009AC4F1145369A8001C38F5 /* NativeAlert.m */; };
 		00C6A1C4145390C400AD3496 /* MobileAlert.h in Headers */ = {isa = PBXBuildFile; fileRef = 00C6A1BE145370D200AD3496 /* MobileAlert.h */; };
 		00C6A1C5145390C900AD3496 /* MobileAlert.m in Sources */ = {isa = PBXBuildFile; fileRef = 00C6A1BF145370D200AD3496 /* MobileAlert.m */; };
+		9A5DFBCB15253109001C08B5 /* SlideNotification.h in Headers */ = {isa = PBXBuildFile; fileRef = 9A5DFBC915253109001C08B5 /* SlideNotification.h */; };
+		9A5DFBCC15253109001C08B5 /* SlideNotification.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A5DFBCA15253109001C08B5 /* SlideNotification.m */; };
+		9A6B76B415225D19004B17CA /* FlashRuntimeExtensions.h in Headers */ = {isa = PBXBuildFile; fileRef = 9A6B76B315225D19004B17CA /* FlashRuntimeExtensions.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		003CDF00145395CE00364F3C /* FlashRuntimeExtensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FlashRuntimeExtensions.h; path = "../../../../../../../../../Applications/installs/Adobe Flash Builder 4.6/sdks/4.6.0/include/FlashRuntimeExtensions.h"; sourceTree = "<group>"; };
-		00968C17145497AC00924321 /* NativeAlert.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NativeAlert.h; sourceTree = "<group>"; };
 		009AC4D21453648D001C38F5 /* libNativeAlert.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libNativeAlert.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		009AC4D51453648D001C38F5 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		009AC4D91453648D001C38F5 /* NativeAlert-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NativeAlert-Prefix.pch"; sourceTree = "<group>"; };
 		009AC4F1145369A8001C38F5 /* NativeAlert.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NativeAlert.m; sourceTree = "<group>"; };
 		00C6A1BE145370D200AD3496 /* MobileAlert.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MobileAlert.h; sourceTree = "<group>"; };
 		00C6A1BF145370D200AD3496 /* MobileAlert.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MobileAlert.m; sourceTree = "<group>"; };
+		9A5DFBC915253109001C08B5 /* SlideNotification.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SlideNotification.h; path = ../../../../../Projekty/XCode/test/test/SlideToastNotification/SlideNotification.h; sourceTree = "<group>"; };
+		9A5DFBCA15253109001C08B5 /* SlideNotification.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SlideNotification.m; path = ../../../../../Projekty/XCode/test/test/SlideToastNotification/SlideNotification.m; sourceTree = "<group>"; };
+		9A6B76B315225D19004B17CA /* FlashRuntimeExtensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FlashRuntimeExtensions.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -41,10 +43,11 @@
 		009AC4C71453648D001C38F5 = {
 			isa = PBXGroup;
 			children = (
-				003CDF00145395CE00364F3C /* FlashRuntimeExtensions.h */,
+				9A5DFBC915253109001C08B5 /* SlideNotification.h */,
+				9A5DFBCA15253109001C08B5 /* SlideNotification.m */,
+				9A6B76B315225D19004B17CA /* FlashRuntimeExtensions.h */,
 				00C6A1BE145370D200AD3496 /* MobileAlert.h */,
 				00C6A1BF145370D200AD3496 /* MobileAlert.m */,
-				00968C17145497AC00924321 /* NativeAlert.h */,
 				009AC4F1145369A8001C38F5 /* NativeAlert.m */,
 				009AC4D71453648D001C38F5 /* NativeAlert */,
 				009AC4D41453648D001C38F5 /* Frameworks */,
@@ -92,8 +95,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				00C6A1C4145390C400AD3496 /* MobileAlert.h in Headers */,
-				003CDF01145395CE00364F3C /* FlashRuntimeExtensions.h in Headers */,
-				00968C18145497AC00924321 /* NativeAlert.h in Headers */,
+				9A6B76B415225D19004B17CA /* FlashRuntimeExtensions.h in Headers */,
+				9A5DFBCB15253109001C08B5 /* SlideNotification.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -149,6 +152,7 @@
 			files = (
 				00C6A1C5145390C900AD3496 /* MobileAlert.m in Sources */,
 				009AC4F3145369A8001C38F5 /* NativeAlert.m in Sources */,
+				9A5DFBCC15253109001C08B5 /* SlideNotification.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -201,8 +205,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = NO;
-				CONFIGURATION_BUILD_DIR = /Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/debug;
+				CONFIGURATION_BUILD_DIR = ../../build;
 				DSTROOT = /tmp/NativeAlert.dst;
+				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_LINK_WITH_DYNAMIC_LIBRARIES = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "NativeAlert/NativeAlert-Prefix.pch";
@@ -213,6 +218,7 @@
 					"$(inherited)",
 					"\"$(SDKROOT)/usr/lib/system\"",
 				);
+				MACH_O_TYPE = staticlib;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -226,6 +232,7 @@
 				CLANG_ENABLE_OBJC_ARC = NO;
 				CONFIGURATION_BUILD_DIR = ../../build;
 				DSTROOT = /tmp/NativeAlert.dst;
+				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_LINK_WITH_DYNAMIC_LIBRARIES = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "NativeAlert/NativeAlert-Prefix.pch";
@@ -236,6 +243,7 @@
 					"$(inherited)",
 					"\"$(SDKROOT)/usr/lib/system\"",
 				);
+				MACH_O_TYPE = staticlib;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;

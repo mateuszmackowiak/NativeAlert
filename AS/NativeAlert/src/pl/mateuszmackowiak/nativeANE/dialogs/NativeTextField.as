@@ -1,9 +1,11 @@
 package pl.mateuszmackowiak.nativeANE.dialogs
 {
+	import flash.events.EventDispatcher;
+
 	/**
 	 * @playerversion 3.0
 	 */
-	public class NativeTextField
+	public class NativeTextField extends EventDispatcher
 	{
 		
 
@@ -18,13 +20,13 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 		 * @default null
 		 * @playerversion 3.0
 		 */
-		public var text:String;
+		public var text:String="";
 		/**
 		 * The promp text in the text field.
 		 * @default null
 		 * @playerversion 3.0
 		 */
-		public var prompText:String;
+		public var prompText:String="";
 		
 		/**
 		 * Controls how a device applies auto capitalization to user input. Valid values are defined as constants in the AutoCapitalize class:

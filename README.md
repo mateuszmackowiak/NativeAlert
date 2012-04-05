@@ -1,5 +1,5 @@
 # Native Dialogs - Adobe air Native Extension #
-Update: NativeTextInputDialog , NativeTextInput changed to NativeTextField
+Update: Toast for iOS
 
 Checked iOS 4.3,5.1 / android 3.1
 
@@ -198,8 +198,9 @@ NativeListDialog has the ability to show a native android popup dialog with a mu
 # Text input Dialog (Android /IOS) #
 Show a dialog with defined by user input text fields.
 
-###Important: IOS limitations###
-There can be only 2 buttons and 2 text inputs. To display message specyfie for the first NativeTextField editable == false
+###Important:###
+IOS limitations - There can be only 2 buttons and 2 text inputs. To display message specyfie for the first NativeTextField editable == false
+
 *Usage:*
 
 	public function openTextInputDialog(event:MouseEvent):void{
@@ -241,8 +242,11 @@ There can be only 2 buttons and 2 text inputs. To display message specyfie for t
 		}
 		trace(event.buttonIndex);
 	}
-# Toast (Android) #
+	
+# Toast (Android / IOS) #
 
+###Important:###
+IOS limitations - Toast will always be on the bottom of the screen (both functions work)
 
 *Usage:*
 

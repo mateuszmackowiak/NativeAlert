@@ -102,17 +102,17 @@ package pl.mateuszmackowiak.nativeANE.toast
 		/**
 		 * Make a standard toast that just contains a text with the text from a resource.
 		 * @param message- the text displayed on the Toast 
-		 * @param durration - How long to display the message. Either LENGTH_SHORT or LENGTH_LONG
+		 * @param duration - How long to display the message. Either LENGTH_SHORT or LENGTH_LONG
 		 * @see pl.mateuszmackowiak.nativeANE.toast.Toast.LENGTH_SHORT
 		 * @see pl.mateuszmackowiak.nativeANE.toast.Toast.LENGTH_LONG
 		 */
-		public static function show(message:String , durration:int):void
+		public static function show(message:String , duration:int=0x00000001):void
 		{
 			if(Capabilities.os.indexOf("Linux")>-1 || Capabilities.os.toLowerCase().indexOf("ip")>-1){
 				if(message==null)
 					message="";
-				if(isNaN(durration))
-					durration = 0;
+				if(isNaN(duration))
+					duration = 0;
 				
 				if(context==null){
 					try{
@@ -122,14 +122,14 @@ package pl.mateuszmackowiak.nativeANE.toast
 					}
 				}
 				
-				context.call("Toast",message,durration);
+				context.call("Toast",message,duration);
 			}else
 				trace("Toast extension is not supported on this platform");
 		}
 		/**
 		 * Make a standard toast that just contains a text with the text from a resource.
 		 * @param message- the text displayed on the Toast 
-		 * @param durration - How long to display the message. Either LENGTH_SHORT or LENGTH_LONG
+		 * @param duration - How long to display the message. Either LENGTH_SHORT or LENGTH_LONG
 		 * 
 		 * @param gravity - Set the location at which the notification should appear on the screen.(GRAVITY_BOTTOM , GRAVITY_CENTER,...)
 		 * @see pl.mateuszmackowiak.nativeANE.toast.Toast.show()
@@ -138,13 +138,13 @@ package pl.mateuszmackowiak.nativeANE.toast
 		 * 
 		 * @see http://developer.android.com/reference/android/view/Gravity.html
 		 */
-		public static function showWithDifferentGravit(message:String , durration:int , gravity:int=NaN , xOffset:int=0 , yOffset:int=0 ):void
+		public static function showWithDifferentGravit(message:String , duration:int=0x00000001, gravity:int=NaN , xOffset:int=0 , yOffset:int=0 ):void
 		{
 			if(Capabilities.os.indexOf("Linux")>-1 || Capabilities.os.toLowerCase().indexOf("ip")>-1){
 				if(message==null)
 					message="";
-				if(isNaN(durration))
-					durration = 0;
+				if(isNaN(duration))
+					duration = 0;
 				if(isNaN(gravity) || isNaN(xOffset) || isNaN(yOffset))
 					return;
 				
@@ -156,7 +156,7 @@ package pl.mateuszmackowiak.nativeANE.toast
 					}
 				}
 				
-				context.call("Toast", message, durration, gravity, xOffset, yOffset);
+				context.call("Toast", message, duration, gravity, xOffset, yOffset);
 			}else
 				trace("Toast extension is not supported on this platform");
 		}

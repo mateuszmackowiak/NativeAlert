@@ -5,8 +5,10 @@ import pl.mateuszmackowiak.nativeANE.NativeDialog.NativeExtension;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.text.Editable;
 import android.text.Html;
 import android.text.InputType;
+import android.text.TextWatcher;
 
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
@@ -32,12 +34,14 @@ public class showTextInputDialog implements FREFunction {
 	
 	public AlertDialog mDialog=null;
 	
+	private static FREContext _freContext;
 	
 	@Override
 	public FREObject call(FREContext freContext, FREObject[] args) {
 		String title="",function="";
 		boolean cancelable=true;
 		int theme = 1;
+		_freContext = freContext;
 		try{
 			function = args[0].getAsString();
 			
@@ -196,114 +200,139 @@ public class showTextInputDialog implements FREFunction {
 			}
 			setView(sv);
 		}
+		
 		/**
 		 * @return the textInputs
 		 */
 		public TextInput[] getTextInputs() {
 			return textInputs;
 		}
-	
 		
-		
-		public int  getInputType(FREObject textField) throws IllegalStateException, FRETypeMismatchException, FREInvalidObjectException, FREASErrorException, FRENoSuchNameException, FREWrongThreadException{
-			int type = 0x00000001;
-			String softKeyboardType="default",autoCapitalize="none";
-			boolean displayAsPassword=false,autoCorrect=false;
-			
-			if(textField.getProperty("softKeyboardType")!=null){
-				softKeyboardType = textField.getProperty("softKeyboardType").getAsString();
-				if(textField.getProperty("autoCapitalize")!=null)
-					autoCapitalize = textField.getProperty("autoCapitalize").getAsString();
-				if(textField.getProperty("displayAsPassword")!=null)
-					displayAsPassword = textField.getProperty("displayAsPassword").getAsBool();
-				if(textField.getProperty("autoCorrect")!=null)
-					autoCorrect = textField.getProperty("autoCorrect").getAsBool();
-				
-				if("url".equals(softKeyboardType)){
-					type = InputType.TYPE_TEXT_VARIATION_WEB_EDIT_TEXT;
-					if(displayAsPassword)
-						type = type | InputType.TYPE_TEXT_VARIATION_PASSWORD;
-					if(autoCorrect)
-						type = type | InputType.TYPE_TEXT_FLAG_AUTO_CORRECT;
-					
-					if("word".equals(autoCapitalize))
-						type = type | InputType.TYPE_TEXT_FLAG_CAP_WORDS;
-					else if("sentence".equals(autoCapitalize))
-						type = type | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES;
-					else if("all".equals(autoCapitalize))
-						type = type | InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS;
-					
-				}else if("number".equals(softKeyboardType)){
-					type = InputType.TYPE_CLASS_NUMBER;
-					if(displayAsPassword)
-						type = type | InputType.TYPE_NUMBER_VARIATION_PASSWORD;
-				}else if("contact".equals(softKeyboardType)){
-					type = InputType.TYPE_CLASS_PHONE;
-					if(displayAsPassword)
-						type = type | InputType.TYPE_NUMBER_VARIATION_PASSWORD;
-					
-				}else if("email".equals(softKeyboardType)){
-					type = InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS;
-					if(displayAsPassword)
-						type = type | InputType.TYPE_TEXT_VARIATION_PASSWORD;
-					if(autoCorrect)
-						type = type | InputType.TYPE_TEXT_FLAG_AUTO_CORRECT;
-					
-					if("word".equals(autoCapitalize))
-						type = type | InputType.TYPE_TEXT_FLAG_CAP_WORDS;
-					else if("sentence".equals(autoCapitalize))
-						type = type | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES;
-					else if("all".equals(autoCapitalize))
-						type = type | InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS;
-				}else{
-					type = InputType.TYPE_CLASS_TEXT;
-					if(displayAsPassword)
-						type = type | InputType.TYPE_TEXT_VARIATION_PASSWORD;
-					if(autoCorrect)
-						type = type | InputType.TYPE_TEXT_FLAG_AUTO_CORRECT;
-					
-					
-					if("word".equals(autoCapitalize))
-						type = type | InputType.TYPE_TEXT_FLAG_CAP_WORDS;
-					else if("sentence".equals(autoCapitalize))
-						type = type | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES;
-					else if("all".equals(autoCapitalize))
-						type = type | InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS;
-				}
-			}
-			return type;
-		}
 	}
 	
-	
+	public static int  getInputType(FREObject textField) throws IllegalStateException, FRETypeMismatchException, FREInvalidObjectException, FREASErrorException, FRENoSuchNameException, FREWrongThreadException{
+		int type = 0x00000001;
+		String softKeyboardType="default",autoCapitalize="none";
+		boolean displayAsPassword=false,autoCorrect=false;
+		
+		if(textField.getProperty("softKeyboardType")!=null){
+			softKeyboardType = textField.getProperty("softKeyboardType").getAsString();
+			if(textField.getProperty("autoCapitalize")!=null)
+				autoCapitalize = textField.getProperty("autoCapitalize").getAsString();
+			if(textField.getProperty("displayAsPassword")!=null)
+				displayAsPassword = textField.getProperty("displayAsPassword").getAsBool();
+			if(textField.getProperty("autoCorrect")!=null)
+				autoCorrect = textField.getProperty("autoCorrect").getAsBool();
+			
+			if("url".equals(softKeyboardType)){
+				type = InputType.TYPE_TEXT_VARIATION_WEB_EDIT_TEXT;
+				if(displayAsPassword)
+					type = type | InputType.TYPE_TEXT_VARIATION_PASSWORD;
+				if(autoCorrect)
+					type = type | InputType.TYPE_TEXT_FLAG_AUTO_CORRECT;
+				
+				if("word".equals(autoCapitalize))
+					type = type | InputType.TYPE_TEXT_FLAG_CAP_WORDS;
+				else if("sentence".equals(autoCapitalize))
+					type = type | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES;
+				else if("all".equals(autoCapitalize))
+					type = type | InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS;
+				
+			}else if("number".equals(softKeyboardType)){
+				type = InputType.TYPE_CLASS_NUMBER;
+				if(displayAsPassword)
+					type = type | InputType.TYPE_NUMBER_VARIATION_PASSWORD;
+			}else if("contact".equals(softKeyboardType)){
+				type = InputType.TYPE_CLASS_PHONE;
+				if(displayAsPassword)
+					type = type | InputType.TYPE_NUMBER_VARIATION_PASSWORD;
+				
+			}else if("email".equals(softKeyboardType)){
+				type = InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS;
+				if(displayAsPassword)
+					type = type | InputType.TYPE_TEXT_VARIATION_PASSWORD;
+				if(autoCorrect)
+					type = type | InputType.TYPE_TEXT_FLAG_AUTO_CORRECT;
+				
+				if("word".equals(autoCapitalize))
+					type = type | InputType.TYPE_TEXT_FLAG_CAP_WORDS;
+				else if("sentence".equals(autoCapitalize))
+					type = type | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES;
+				else if("all".equals(autoCapitalize))
+					type = type | InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS;
+			}else{
+				type = InputType.TYPE_CLASS_TEXT;
+				if(displayAsPassword)
+					type = type | InputType.TYPE_TEXT_VARIATION_PASSWORD;
+				if(autoCorrect)
+					type = type | InputType.TYPE_TEXT_FLAG_AUTO_CORRECT;
+				
+				
+				if("word".equals(autoCapitalize))
+					type = type | InputType.TYPE_TEXT_FLAG_CAP_WORDS;
+				else if("sentence".equals(autoCapitalize))
+					type = type | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES;
+				else if("all".equals(autoCapitalize))
+					type = type | InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS;
+			}
+		}
+		return type;
+	}
 
 	
 	
 	private class TextInput extends EditText{
 		
 		String name="";
+		CustomTextWatcher watcher;
 		TextInput(Context activity,String _name)
 		{
 			super(activity);
 			name = _name; 
+			watcher = new CustomTextWatcher(this);
+			addTextChangedListener(watcher);
+		}
+		public void removeWacher(){
+			removeTextChangedListener(watcher);
 		}
 	}
 	
+	private class CustomTextWatcher implements TextWatcher {
+	    private TextInput mEditText;
+	    
+	    public CustomTextWatcher(TextInput e) {
+	        mEditText = e;
+	    }
+
+	    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+	    }
+
+	    public void onTextChanged(CharSequence s, int start, int before, int count) {
+	    	String ret=String.valueOf(mEditText.name+"#_#"+mEditText.getText().toString());
+	    	_freContext.dispatchStatusEventAsync("change",ret);  
+	    }
+
+	    public void afterTextChanged(Editable s) {
+	    }
+	}
+	
+	
+	
+	
+	
 	private class ClickListener implements DialogInterface.OnClickListener
 	{
-    	private FREContext context;
     	private TextInputDialog dlg;
     	
     	ClickListener(FREContext context,TextInputDialog dlg)
     	{
     		this.dlg = dlg;
-    		this.context=context;
     	}
  
         public void onClick(DialogInterface dialog,int id) 
         {
         	try{
-        		Object obj  = context.getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+        		Object obj  = _freContext.getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
         		if(obj!=null && obj instanceof InputMethodManager){
 		        	InputMethodManager imm = (InputMethodManager)obj;
 		        	if(imm.isActive()){
@@ -315,17 +344,20 @@ public class showTextInputDialog implements FREFunction {
 		        	
 		        	String returnString="";
 		        	for (TextInput textinput : dlg.getTextInputs()) {
-		        		if(textinput!=null)
+		        		if(textinput!=null){
 		        			returnString+="#_#"+textinput.name+"#_#"+textinput.getText().toString();
+		        			textinput.removeWacher();
+		        		}
 					}
 		        	String ret=String.valueOf(id)+returnString;
-		     	    context.dispatchStatusEventAsync(NativeExtension.CLOSED,ret);        
+		        	_freContext.dispatchStatusEventAsync(NativeExtension.CLOSED,ret);
 		            dialog.dismiss();
         		}
         	}catch(Exception e){
-        		context.dispatchStatusEventAsync(NativeExtension.ERROR_EVENT,e.toString());   
+        		_freContext.dispatchStatusEventAsync(NativeExtension.ERROR_EVENT,e.toString());
                 e.printStackTrace();
         	}
+        	_freContext = null;
         }
     }
 }

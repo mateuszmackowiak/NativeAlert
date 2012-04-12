@@ -297,6 +297,18 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 						
 						t.dispatchEvent(new Event(Event.CHANGE));
 					}
+					if(isAndroid){
+						const a3:Array = event.level.split("#_#");
+						
+						for each (var n1:NativeTextField in _textInputs)
+						{
+							if(n1.name==a3[0]){
+								n1.text = a3[1];
+								n1.dispatchEvent(new Event(Event.CHANGE));
+							}
+						}
+						
+					}
 				}else if(event.code == NativeDialogEvent.CLOSED){
 					
 					const a:Array = event.level.split("#_#");

@@ -11,6 +11,8 @@
 		009AC4F3145369A8001C38F5 /* NativeAlert.m in Sources */ = {isa = PBXBuildFile; fileRef = 009AC4F1145369A8001C38F5 /* NativeAlert.m */; };
 		00C6A1C4145390C400AD3496 /* MobileAlert.h in Headers */ = {isa = PBXBuildFile; fileRef = 00C6A1BE145370D200AD3496 /* MobileAlert.h */; };
 		00C6A1C5145390C900AD3496 /* MobileAlert.m in Sources */ = {isa = PBXBuildFile; fileRef = 00C6A1BF145370D200AD3496 /* MobileAlert.m */; };
+		8C058D321538B5A300498079 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8C058D311538B5A300498079 /* UIKit.framework */; };
+		8C058D351538B5AB00498079 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8C058D341538B5AB00498079 /* QuartzCore.framework */; };
 		9A5DFBCB15253109001C08B5 /* SlideNotification.h in Headers */ = {isa = PBXBuildFile; fileRef = 9A5DFBC915253109001C08B5 /* SlideNotification.h */; };
 		9A5DFBCC15253109001C08B5 /* SlideNotification.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A5DFBCA15253109001C08B5 /* SlideNotification.m */; };
 		9A6B76B415225D19004B17CA /* FlashRuntimeExtensions.h in Headers */ = {isa = PBXBuildFile; fileRef = 9A6B76B315225D19004B17CA /* FlashRuntimeExtensions.h */; };
@@ -23,6 +25,8 @@
 		009AC4F1145369A8001C38F5 /* NativeAlert.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NativeAlert.m; sourceTree = "<group>"; };
 		00C6A1BE145370D200AD3496 /* MobileAlert.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MobileAlert.h; sourceTree = "<group>"; };
 		00C6A1BF145370D200AD3496 /* MobileAlert.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MobileAlert.m; sourceTree = "<group>"; };
+		8C058D311538B5A300498079 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		8C058D341538B5AB00498079 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		9A5DFBC915253109001C08B5 /* SlideNotification.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SlideNotification.h; path = ../../../../../Projekty/XCode/test/test/SlideToastNotification/SlideNotification.h; sourceTree = "<group>"; };
 		9A5DFBCA15253109001C08B5 /* SlideNotification.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SlideNotification.m; path = ../../../../../Projekty/XCode/test/test/SlideToastNotification/SlideNotification.m; sourceTree = "<group>"; };
 		9A6B76B315225D19004B17CA /* FlashRuntimeExtensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FlashRuntimeExtensions.h; sourceTree = "<group>"; };
@@ -33,6 +37,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8C058D351538B5AB00498079 /* QuartzCore.framework in Frameworks */,
+				8C058D321538B5A300498079 /* UIKit.framework in Frameworks */,
 				009AC4D61453648D001C38F5 /* Foundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -43,6 +49,8 @@
 		009AC4C71453648D001C38F5 = {
 			isa = PBXGroup;
 			children = (
+				8C058D341538B5AB00498079 /* QuartzCore.framework */,
+				8C058D311538B5A300498079 /* UIKit.framework */,
 				9A5DFBC915253109001C08B5 /* SlideNotification.h */,
 				9A5DFBCA15253109001C08B5 /* SlideNotification.m */,
 				9A6B76B315225D19004B17CA /* FlashRuntimeExtensions.h */,

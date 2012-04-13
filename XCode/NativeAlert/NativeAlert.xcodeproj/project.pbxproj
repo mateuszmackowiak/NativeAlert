@@ -209,19 +209,21 @@
 				DSTROOT = /tmp/NativeAlert.dst;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_LINK_WITH_DYNAMIC_LIBRARIES = NO;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = NO;
 				GCC_PREFIX_HEADER = "NativeAlert/NativeAlert-Prefix.pch";
-				GCC_VERSION = "";
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = NO;
-				IPHONEOS_DEPLOYMENT_TARGET = 4.2;
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SDKROOT)/usr/lib/system\"",
-				);
-				MACH_O_TYPE = staticlib;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.0;
+				LIBRARY_SEARCH_PATHS = "";
+				MACH_O_TYPE = mh_dylib;
 				OTHER_LDFLAGS = "-ObjC";
+				PRIVATE_HEADERS_FOLDER_PATH = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SKIP_INSTALL = YES;
+				PUBLIC_HEADERS_FOLDER_PATH = "";
+				SEPARATE_STRIP = NO;
+				SKIP_INSTALL = NO;
+				STRIP_INSTALLED_PRODUCT = YES;
+				STRIP_STYLE = all;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -234,19 +236,21 @@
 				DSTROOT = /tmp/NativeAlert.dst;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_LINK_WITH_DYNAMIC_LIBRARIES = NO;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = NO;
 				GCC_PREFIX_HEADER = "NativeAlert/NativeAlert-Prefix.pch";
-				GCC_VERSION = "";
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = NO;
-				IPHONEOS_DEPLOYMENT_TARGET = 4.2;
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SDKROOT)/usr/lib/system\"",
-				);
-				MACH_O_TYPE = staticlib;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.0;
+				LIBRARY_SEARCH_PATHS = "";
+				MACH_O_TYPE = mh_dylib;
 				OTHER_LDFLAGS = "-ObjC";
+				PRIVATE_HEADERS_FOLDER_PATH = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SKIP_INSTALL = YES;
+				PUBLIC_HEADERS_FOLDER_PATH = "";
+				SEPARATE_STRIP = NO;
+				SKIP_INSTALL = NO;
+				STRIP_INSTALLED_PRODUCT = YES;
+				STRIP_STYLE = all;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;

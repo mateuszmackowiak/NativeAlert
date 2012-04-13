@@ -166,8 +166,8 @@ public class showAlertFunction implements FREFunction{
         public void onCancel(DialogInterface dialog) 
         {
      	    context.dispatchStatusEventAsync("ALERT_CLOSED",String.valueOf(-1));        
-            dialog.cancel();
-           
+            dialog.dismiss();
+            context =null;
         }
     }
     private class AlertListener implements DialogInterface.OnClickListener
@@ -187,7 +187,8 @@ public class showAlertFunction implements FREFunction{
         	else if(id==-3)
         		id=0;
      	    context.dispatchStatusEventAsync("ALERT_CLOSED",String.valueOf(id));        
-            dialog.cancel();
+            dialog.dismiss();
+            context =null;
         }
     	
     }

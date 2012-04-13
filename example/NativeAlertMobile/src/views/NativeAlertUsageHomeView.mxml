@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
-		xmlns:s="library://ns.adobe.com/flex/spark" title="Native Alerts" initialize="init(event)" creationComplete="view_creationComplete()" backKeyPressed="view1_backKeyPressedHandler(event)" 
+		xmlns:s="library://ns.adobe.com/flex/spark" title="Native Alerts" creationComplete="view_creationComplete()" backKeyPressed="view1_backKeyPressedHandler(event)" 
 		>
 	<fx:Script>
 		<![CDATA[
@@ -26,6 +26,8 @@
 			
 			import spark.events.IndexChangeEvent;
 			import spark.events.ViewNavigatorEvent;
+			import spark.layouts.HorizontalLayout;
+			import spark.layouts.VerticalLayout;
 			
 			
 			
@@ -41,21 +43,20 @@
 			private var selectedIndex:int = -1;
 			
 			
-			protected function init(event:FlexEvent):void
-			{
-				NativeApplication.nativeApplication.addEventListener(
-					InvokeEvent.INVOKE, onInvoke);
-			}
-			
-			private function onInvoke(event:InvokeEvent):void
-			{
-				returnText.text+= "INVOKED\n";
-				if(event.arguments!=null && event.arguments.length>0)
-					returnText.text+= String(event.arguments[0])+"\n";
-			}
+
+
 			
 			protected function view_creationComplete():void
 			{
+				var isTablet:Boolean = height > 960 || width > 960;
+				if(isTablet){
+					currentState = "tablet";
+					content.layout = new HorizontalLayout();
+				}else{
+					currentState = "phone";
+					content.layout = new VerticalLayout();
+				}
+				
 				FlexGlobals.topLevelApplication.addEventListener(UncaughtErrorEvent.UNCAUGHT_ERROR,onError);
 				FlexGlobals.topLevelApplication.addEventListener(NativeExtensionErrorEvent.ERROR,onError);
 				
@@ -74,9 +75,15 @@
 				if(Capabilities.os.indexOf("Linux")>-1){
 					titleInput.text = "Some <b>simple HTML</b> Title";
 					messageInput.text = "Some <i>simple HTML</i> Message Text";
+
+					ThemeSelector.dataProvider = themesAndroid;
+					ThemeSelector.selectedItem = themesAndroid.getItemAt(0);
 				}else{
 					titleInput.text = "Some Title";
 					messageInput.text = "Some Message Text";
+					
+					ThemeSelector.dataProvider = themesIOS;
+					ThemeSelector.selectedItem = themesIOS.getItemAt(0);
 				}
 				
 				if(SystemProperties.isSupported()){
@@ -90,13 +97,13 @@
 
 					dictionary = null;
 				}
-				NativeApplication.nativeApplication.addEventListener(Event.DEACTIVATE,handleDeactivate, false, 0, true);
+
 				
 			}
 			protected function exiting(event:Event):void
 			{
 				if(progressPopup)
-					progressPopup.kill();
+					progressPopup.dispose();
 				if(multChDialog)
 					multChDialog.kill();
 				if(textInputDialog)
@@ -179,8 +186,9 @@
 					progressPopup.addEventListener(LogEvent.LOG_EVENT,traceEvent);
 					progressPopup.theme = ThemeSelector.selectedItem.data;
 					progressPopup.setMax(50);
-					
-					progressPopup.show(0, titleInput.text , messageInput.text,canclebleCheckbox.selected,indeterminateInput.selected);
+					progressPopup.setTitle(titleInput.text);
+					progressPopup.setMessage(messageInput.text);
+					progressPopup.show(canclebleCheckbox.selected,indeterminateInput.selected);
 					myTimer.addEventListener(TimerEvent.TIMER, updateProgress);
 					myTimer.start();
 				}catch(e:Error){
@@ -195,7 +203,7 @@
 				progressPopup.removeEventListener(NativeDialogEvent.OPENED,traceEvent);
 				progressPopup.removeEventListener(NativeExtensionErrorEvent.ERROR,onError);
 				progressPopup.removeEventListener(LogEvent.LOG_EVENT,traceEvent);
-				progressPopup.kill();
+				progressPopup.dispose();
 				
 				myTimer.removeEventListener(TimerEvent.TIMER,updateProgress);
 				myTimer.stop();
@@ -221,7 +229,6 @@
 						returnText.appendText("Error "+ e.message+"   "+e.toString()+"\n");
 					}
 				}
-				returnText.appendText(progressPopup.isShowing().toString());
 			}
 			
 			
@@ -433,78 +440,84 @@
 			{
 				NativeNotifiction.notifi(messageInput.text,new Date(),closeLabelInput.text);
 			}
-			
-			protected function handleDeactivate(event:Event):void
-			{
-				//if(NativeNotifiction.isSupported)
-				//	NativeNotifiction.notifi(messageInput.text,null,closeLabelInput.text);
-			}
+
 			
 			
 			
 		]]>
 	</fx:Script>
 	<fx:Declarations>
-		<s:ArrayList id="themes">
+		<s:ArrayList id="themesAndroid">
 			<fx:Object name="THEME_DEVICE_DEFAULT_DARK" data="0x00000004"/>
 			<fx:Object name="THEME_DEVICE_DEFAULT_LIGHT" data="0x00000005"/>
 			<fx:Object name="THEME_HOLO_DARK" data="0x00000002"/>
 			<fx:Object name="THEME_HOLO_LIGHT" data="0x00000003"/>
 			<fx:Object name="THEME_TRADITIONAL" data="0x00000001"/>
 		</s:ArrayList>
+		<s:ArrayList id="themesIOS">
+			<fx:Object name="IOS_SVHUD_BLACK_BACKGROUND_THEME" data="0x00000002"/>
+			<fx:Object name="IOS_SVHUD_NON_BACKGROUND_THEME" data="0x00000003"/>
+			<fx:Object name="DEFAULT_THEME" data="0x00000001"/>
+		</s:ArrayList>
 	</fx:Declarations>
-	<s:layout>
-		<s:VerticalLayout horizontalAlign="center"/>
-	</s:layout>
-		
-	<s:HGroup height="100%" width="100%">
-		
-		<s:SpinnerListContainer includeInLayout="{NativeAlert.isBadgeSupported()}">
-			<s:SpinnerList height="100%" width="100%" typicalItem="999" change="spinner1_changeHandler(event)">
-				<s:NumericDataProvider />
-			</s:SpinnerList>
-		</s:SpinnerListContainer>
-		
-		<s:Spacer width="100%"/>
-		<s:VGroup>
-			<s:TextInput id="titleInput" />
-			<s:TextInput id="messageInput" />
-			<s:TextInput id="closeLabelInput" text="OK" />
-			<s:TextInput id="otherLabels" text="YES,NO" />
-			<s:CheckBox id="canclebleCheckbox" label="cancleble" selected="true"/>
+
+	<s:states>
+		<s:State name="phone"/>
+		<s:State name="tablet"/>
+	</s:states>
+	
+	<s:Scroller height="100%" width="100%">
+		<s:VGroup width="100%" height="100%" horizontalAlign="center">
+			<s:Group height="100%" width="100%" id="content">
+				<s:SpinnerListContainer includeInLayout="{NativeAlert.isBadgeSupported()}">
+					<s:SpinnerList height="100%" width="100%" typicalItem="999" change="spinner1_changeHandler(event)">
+						<s:NumericDataProvider />
+					</s:SpinnerList>
+				</s:SpinnerListContainer>
+				
+				<s:Spacer width="100%" visible.phone="false" includeInLayout.phone="false"/>
+				<s:VGroup>
+					<s:TextInput id="titleInput" />
+					<s:TextInput id="messageInput" />
+					<s:TextInput id="closeLabelInput" text="OK" />
+					<s:TextInput id="otherLabels" text="YES,NO" />
+					<s:CheckBox id="canclebleCheckbox" label="cancleble" selected="true"/>
+				</s:VGroup>
+				
+				<s:SpinnerListContainer>
+					<s:SpinnerList id="ThemeSelector" fontWeight="bold" labelField="name" minWidth="300"/>
+				</s:SpinnerListContainer>
+				<s:Spacer width="100%"  visible.phone="false" includeInLayout.phone="false"/>
+			</s:Group>
+			
+			<s:HGroup verticalAlign="middle" visible="{NativeProgress.isNetworkActivityIndicatoror()}" includeInLayout="{NativeProgress.isNetworkActivityIndicatoror()}" >
+				<s:ToggleSwitch label="SnetworkActivityIndicator"  change="togglebutton1_changeHandler(event)"/>
+				<s:Label text="Snetwork Activity Indicator"/>
+			</s:HGroup>
+			
+			<s:Button width="100%" click="callNativeAlret(event)" label="call native Alert" height="60"/>
+			
+			<s:VGroup width="100%" height="100%" >
+				
+				<s:HGroup width="100%" includeInLayout="{NativeProgress.isSupported}" verticalAlign="middle">
+					<s:Button width="100%" label="horizontal progress popup" click="openProgressPopup(NativeProgress.STYLE_HORIZONTAL)" height="60"/>
+					<s:CheckBox id="indeterminateInput" label="indeterminate" selected="{Capabilities.os.toLowerCase().indexOf('iph')==-1}"/>
+					<s:Button width="100%" label="spinner progress popup" click="openProgressPopup(NativeProgress.STYLE_SPINNER)" height="60"/>
+				</s:HGroup>
+				<s:HGroup width="100%" includeInLayout="{NativeListDialog.isSupported}">
+					<s:Button width="100%" click="openMultiChoiceDialog(event)" label="open Multi Choice Dialog" height="60" />
+					<s:Button width="100%" click="openSingleChoiceDialog(event)" label="open Single Choice Dialog" height="60" />
+				</s:HGroup>
+				<s:HGroup width="100%"  includeInLayout="{Toast.isSupported}" >
+					<s:Button width="100%" click="showToast(event)" label="show Toast" height="60"/>
+					<s:Button width="100%" click="showCenteredToast(event)" label="show Toast in random gravity" height="60"/>
+				</s:HGroup>
+				<s:Button width="100%" click="showNotification(event)" label="dispach Notification" height="60" includeInLayout="{NativeNotifiction.isSupported}" />
+				<s:Button width="100%" click="openTextInputDialog(event)" label="open Text Input Dialog" height="60" includeInLayout="{NativeTextInputDialog.isSupported}" />
+			</s:VGroup>
+			
+			<s:TextArea id="returnText" width="100%" height="100%" selectable="false" editable="false" />
 		</s:VGroup>
-		
-		<s:SpinnerListContainer includeInLayout="{Capabilities.os.indexOf('Linux')>-1}">
-			<s:SpinnerList id="ThemeSelector" fontWeight="bold" labelField="name" minWidth="300" dataProvider="{themes}" selectedItem="{themes.getItemAt(0)}"/>
-		</s:SpinnerListContainer>
-		<s:Spacer width="100%"/>
-	</s:HGroup>
+	</s:Scroller>
 	
-	<s:HGroup verticalAlign="middle">
-		<s:ToggleSwitch label="SnetworkActivityIndicator" visible="{NativeProgress.isNetworkActivityIndicatoror()}" change="togglebutton1_changeHandler(event)"/>
-		<s:Label text="Snetwork Activity Indicator"/>
-	</s:HGroup>
-	
-	<s:Button width="100%" click="callNativeAlret(event)" label="call native Alert" height="60"/>
-	
-	<s:VGroup width="100%" height="100%" >
-		
-		<s:HGroup width="100%" includeInLayout="{NativeProgress.isSupported}" verticalAlign="middle">
-			<s:Button width="100%" label="show horizontal progress popup" click="openProgressPopup(NativeProgress.STYLE_HORIZONTAL)" height="60"/>
-			<s:CheckBox id="indeterminateInput" label="indeterminate" selected="{Capabilities.os.toLowerCase().indexOf('iph')==-1}"/>
-			<s:Button width="100%" label="show spinner progress popup" click="openProgressPopup(NativeProgress.STYLE_SPINNER)" height="60"/>
-		</s:HGroup>
-		<s:HGroup width="100%" includeInLayout="{NativeListDialog.isSupported}">
-			<s:Button width="100%" click="openMultiChoiceDialog(event)" label="open Multi Choice Dialog" height="60" />
-			<s:Button width="100%" click="openSingleChoiceDialog(event)" label="open Single Choice Dialog" height="60" />
-		</s:HGroup>
-		<s:HGroup width="100%"  includeInLayout="{Toast.isSupported}" >
-			<s:Button width="100%" click="showToast(event)" label="show Toast" height="60"/>
-			<s:Button width="100%" click="showCenteredToast(event)" label="show Toast in random gravity" height="60"/>
-		</s:HGroup>
-		<s:Button width="100%" click="showNotification(event)" label="dispach Notification" height="60" includeInLayout="{NativeNotifiction.isSupported}" />
-		<s:Button width="100%" click="openTextInputDialog(event)" label="open Text Input Dialog" height="60" includeInLayout="{NativeTextInputDialog.isSupported}" />
-	</s:VGroup>
-		
-	<s:TextArea id="returnText" width="100%" height="100%" selectable="false" editable="false" />
 </s:View>

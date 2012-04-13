@@ -17,7 +17,7 @@
 
 
 #import "SlideNotification.h"
-
+//#import "SVProgressHUD.h"
 MobileAlert *alert;
 
 
@@ -76,7 +76,7 @@ FREObject showProgressPopup(FREContext ctx, void* funcData, uint32_t argc, FREOb
     double progressParam;
     
     uint32_t showActivityValue, cancleble;
-    int32_t style;
+    int32_t style,theme;
     //Turn our actionscrpt code into native code.
     FREGetObjectAsDouble(argv[0], &progressParam);
     ///Secondary progress ignored
@@ -85,22 +85,49 @@ FREObject showProgressPopup(FREContext ctx, void* funcData, uint32_t argc, FREOb
     FREGetObjectAsUTF8(argv[4], &messageLength, &message);
     FREGetObjectAsBool(argv[5], &cancleble);
     FREGetObjectAsBool(argv[6], &showActivityValue);
+    FREGetObjectAsInt32(argv[7], &theme);
     
     //Create our Strings for our Alert.
     NSInteger styleValue=(NSInteger)style;
+  
     NSString *titleString = [NSString stringWithUTF8String:(char*)title];
     NSString *messageString = [NSString stringWithUTF8String:(char*)message];
     NSNumber *progressValue =[NSNumber numberWithDouble:progressParam];
     
-    alert = [[MobileAlert alloc] init];
-    [alert showProgressPopup:titleString 
-                       style:styleValue
-                     message:messageString 
-                    progress:progressValue
-                showActivity:showActivityValue
-                   cancleble:cancleble
-                     context:ctx];
-    
+   /* if(theme == 2){
+        if(messageString && ![messageString isEqualToString:@""])
+            if(cancleble)
+                //[SVProgressHUD showWithStatus:messageString];
+            else
+                //[SVProgressHUD showWithStatus:messageString maskType:SVProgressHUDMaskTypeBlack];
+        else {
+            if (cancleble) 
+                [SVProgressHUD show];
+            else
+                [SVProgressHUD showWithMaskType:SVProgressHUDMaskTypeBlack];
+        }
+    }else if(theme == 3){
+        if(messageString && ![messageString isEqualToString:@""])
+            if(cancleble)
+                [SVProgressHUD showWithStatus:messageString];
+            else
+                [SVProgressHUD showWithStatus:messageString maskType:SVProgressHUDMaskTypeClear];
+            else {
+                if (cancleble) 
+                    [SVProgressHUD show];
+                else
+                    [SVProgressHUD showWithMaskType:SVProgressHUDMaskTypeClear];
+            }
+    }else{*/
+        alert = [[MobileAlert alloc] init];
+        [alert showProgressPopup:titleString 
+                           style:styleValue
+                         message:messageString 
+                        progress:progressValue
+                    showActivity:showActivityValue
+                       cancleble:cancleble
+                         context:ctx];
+   // }
     return NULL;    
 }
 
@@ -148,16 +175,17 @@ FREObject shake(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[] 
 }
 
 FREObject showHidenetworkIndicator(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[] ){
-    
-    uint32_t shownetworkActivity;
-    FREGetObjectAsBool(argv[0], &shownetworkActivity);
-    
     UIApplication* app = [UIApplication sharedApplication];
-    if(app.networkActivityIndicatorVisible != shownetworkActivity)
-        app.networkActivityIndicatorVisible = shownetworkActivity;
-    
+    if(argc>0 && argv[0]){
+        uint32_t shownetworkActivity;
+        FREGetObjectAsBool(argv[0], &shownetworkActivity);
+        
+        if(app && app.networkActivityIndicatorVisible != shownetworkActivity)
+            app.networkActivityIndicatorVisible = shownetworkActivity;
+    }
     FREObject retVal;
-    if(FRENewObjectFromBool(app.networkActivityIndicatorVisible, &retVal) == FRE_OK){
+    
+    if(app && FRENewObjectFromBool(app.networkActivityIndicatorVisible, &retVal) == FRE_OK){
         return retVal;
     }else{
         return nil;
@@ -176,7 +204,9 @@ FREObject updateProgress(FREContext ctx, void* funcData, uint32_t argc, FREObjec
 }	
 FREObject hide(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[] )
 {
-    [alert hide];
+    if(alert)
+        [alert hide];
+    //[SVProgressHUD dismiss];
     //Create our Strings for our Alert.
     return NULL; 
 }
@@ -188,13 +218,17 @@ FREObject updateMessage(FREContext ctx, void* funcData, uint32_t argc, FREObject
     //Turn our actionscrpt code into native code.
     
     FREGetObjectAsUTF8(argv[0], &messageLength, &message);
-    if(alert!=NULL){
-        NSString *nsMessage =@"";
-        if(message!=NULL){
-            nsMessage = [NSString stringWithUTF8String:(char*)message];
-        }
-        [alert updateMessage:nsMessage];
+    
+    NSString *nsMessage = nil;
+    if(message){
+        nsMessage = [NSString stringWithUTF8String:(char*)message];
+      //  if(SVProgressHUD.isVisible)
+      //      [SVProgressHUD setStatus:nsMessage];
+        if(alert)
+            [alert updateMessage:nsMessage];
     }
+    
+    
     //Create our Strings for our Alert.
     return NULL;    
 }
@@ -206,9 +240,9 @@ FREObject updateTitle(FREContext ctx, void* funcData, uint32_t argc, FREObject a
     //Turn our actionscrpt code into native code.
     
     FREGetObjectAsUTF8(argv[0], &titleLength, &title);
-    if(alert!=NULL){
+    if(alert){
         NSString *nsTitle =@"";
-        if(title!=NULL){
+        if(title){
              [NSString stringWithUTF8String:(char*)title];
         }
         [alert updateTitle:nsTitle];
@@ -223,6 +257,8 @@ FREObject isShowing(FREContext ctx, void* funcData, uint32_t argc, FREObject arg
     if (alert) {
         ret = alert.isShowing;
     }
+    //if(SVProgressHUD.isVisible)
+      //  ret = YES;
     FREObject retVal;
     if(FRENewObjectFromBool(ret, &retVal) == FRE_OK){
         return retVal;
@@ -405,7 +441,15 @@ NSString * getMacAddress()
 }
 
 //[[UIApplication sharedApplication] setApplicationIconBadgeNumber:99];
-
+NSString* getCustomUDID(){
+    NSString *uuidString = nil;
+    CFUUIDRef uuid = CFUUIDCreate(NULL);
+    if (uuid) {
+        uuidString = (NSString *)CFUUIDCreateString(NULL, uuid);
+        CFRelease(uuid);
+    }
+    return [uuidString autorelease];
+}
 
 FREObject getSystemProperties(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[] ){
     
@@ -415,8 +459,21 @@ FREObject getSystemProperties(FREContext ctx, void* funcData, uint32_t argc, FRE
         
         const char *osCh = [[device systemName] UTF8String];
         const char *versionCh = [[device systemVersion] UTF8String];
-        const char *udidCh = [[device uniqueIdentifier] UTF8String];
-        const char *uidCh = "";//[[[UIApplication sharedApplication] uniqueInstallationIdentifier] UTF8String];
+        //const char *udidCh = [[device uniqueIdentifier] UTF8String];
+        
+        NSString *uid = nil;
+        NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+        if ([defaults objectForKey:@"NativeAletUID"] == nil) {
+            uid = getCustomUDID();
+            [defaults setObject:uid forKey:@"NativeAletUID"];
+            [defaults synchronize];
+        }else{
+            uid = [defaults objectForKey:@"NativeAletUID"];
+        }
+        
+        const char *udidCh = [uid UTF8String];
+        
+        //const char *uidCh = "";//[[[UIApplication sharedApplication] uniqueInstallationIdentifier] UTF8String];
         const char *nameCh = [[device name] UTF8String];
         const char *MACadress = [getMacAddress() UTF8String];
         const char *localizedModel = [[device localizedModel] UTF8String];
@@ -424,7 +481,7 @@ FREObject getSystemProperties(FREContext ctx, void* funcData, uint32_t argc, FRE
         // float batLevel = [device batteryLevel];
         
        
-        FREObject uidObj;
+        //FREObject uidObj;
         FREObject udidObj;
         FREObject osObj;
         FREObject versionObj;
@@ -436,7 +493,7 @@ FREObject getSystemProperties(FREContext ctx, void* funcData, uint32_t argc, FRE
         
         
         FRENewObjectFromUTF8(strlen(udidCh)+1, (const uint8_t*)udidCh, &udidObj);
-        FRENewObjectFromUTF8(strlen(uidCh)+1, (const uint8_t*)uidCh, &uidObj);
+        //FRENewObjectFromUTF8(strlen(uidCh)+1, (const uint8_t*)uidCh, &uidObj);
         FRENewObjectFromUTF8(strlen(osCh)+1, (const uint8_t*)osCh, &osObj);
         FRENewObjectFromUTF8(strlen(versionCh)+1, (const uint8_t*)versionCh, &versionObj);
         FRENewObjectFromUTF8(strlen(nameCh)+1, (const uint8_t*)nameCh, &nameObj);
@@ -445,7 +502,7 @@ FREObject getSystemProperties(FREContext ctx, void* funcData, uint32_t argc, FRE
         FRENewObjectFromUTF8(strlen(localizedModel)+1, (const uint8_t*)localizedModel, &localizedModelObj);
         FRENewObjectFromUTF8(strlen(model)+1, (const uint8_t*)model, &modelObj);
 
-        FRESetObjectProperty(dic, (const uint8_t*)"UID", uidObj, NULL);
+       // FRESetObjectProperty(dic, (const uint8_t*)"UID", uidObj, NULL);
         FRESetObjectProperty(dic, (const uint8_t*)"UDID", udidObj, NULL);
         FRESetObjectProperty(dic, (const uint8_t*)"os", osObj, NULL);
         FRESetObjectProperty(dic, (const uint8_t*)"version", versionObj, NULL);

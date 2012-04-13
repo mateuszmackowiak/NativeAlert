@@ -33,7 +33,7 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 		 * <ul><li>"none"</li>
 		 * <li>"word"</li>
 		 * <li>"sentence"</li>
-		 * <li>"all"</li>
+		 * <li>"all"</li></ul>
 		 * <p>This property is only a hint to the underlying platform, because not all devices and operating systems support this functionality.</p>
 		 * @default AutoCapitalize.NONE
 		 * @playerversion 3.0
@@ -82,7 +82,7 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 		 * <li>"url"</li>
 		 * <li>"number"</li>
 		 * <li>"contact"</li>
-		 * <li>"email"</li>
+		 * <li>"email"</li></ul>
 		 * <p>These values serve as hints, to help a device display the best keyboard for the current operation.</p>
 		 * @default SoftKeyboardType.DEFAULT
 		 * @playerversion 3.0

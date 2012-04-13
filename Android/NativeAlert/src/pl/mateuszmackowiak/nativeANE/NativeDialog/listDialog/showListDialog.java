@@ -130,7 +130,8 @@ public class showListDialog implements FREFunction {
         public void onCancel(DialogInterface dialog) 
         {
      	    context.dispatchStatusEventAsync(NativeExtension.CANCELED,String.valueOf(-1));        
-            dialog.cancel();
+            dialog.dismiss();
+            context =null;
         }
     }
 	private class ConfitmListener implements DialogInterface.OnClickListener{
@@ -144,6 +145,7 @@ public class showListDialog implements FREFunction {
         {
      	    context.dispatchStatusEventAsync(NativeExtension.CLOSED,String.valueOf(id));     
             dialog.dismiss();
+            context =null;
         }
     }
 	

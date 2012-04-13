@@ -3,12 +3,10 @@ package pl.mateuszmackowiak.nativeANE.NativeDialog.progressDialog;
 import java.util.HashMap;
 import java.util.Map;
 
-import pl.mateuszmackowiak.nativeANE.NativeDialog.NativeExtension;
 import pl.mateuszmackowiak.nativeANE.NativeDialog.isSupportedFunction;
 
 import com.adobe.fre.FREContext;
 import com.adobe.fre.FREFunction;
-import com.adobe.fre.FREObject;
 
 public class ProgressContext extends FREContext {
 

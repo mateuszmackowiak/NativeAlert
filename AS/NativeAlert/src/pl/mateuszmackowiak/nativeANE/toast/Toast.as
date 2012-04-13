@@ -9,13 +9,17 @@ package pl.mateuszmackowiak.nativeANE.toast
 	import flash.external.ExtensionContext;
 	import flash.system.Capabilities;
 	/**
-	 * Toast Message 
+	 * <b>Toast Message</b><br> 
 	 * A toast is a view containing a quick little message for the user. The toast class helps you create and show those.
+	 * <img src="https://github.com/mateuszmackowiak/NativeAlert/raw/master/images/AndoridToast.png"></img>
+	 * <img src="https://github.com/mateuszmackowiak/NativeAlert/raw/master/images/IOSToast.png"></img>
 	 * @author Mateusz Maćkowiak
 	 * @see http://mateuszmackowiak.wordpress.com/
 	 * @see http://developer.android.com/reference/android/widget/Toast.html
+	 * @see https://github.com/mateuszmackowiak/SlideNotification
+	 * 
 	 */
-	public class Toast extends EventDispatcher
+	public class Toast
 	{
 		
 		//---------------------------------------------------------------------
@@ -24,9 +28,10 @@ package pl.mateuszmackowiak.nativeANE.toast
 		//
 		//---------------------------------------------------------------------
 		/**
+		 * @private
 		 *  the id of the extension that has to be added in the descriptor file
 		 */
-		public static const EXTENSION_ID : String = "pl.mateuszmackowiak.nativeANE.NativeAlert";
+		private static const EXTENSION_ID : String = "pl.mateuszmackowiak.nativeANE.NativeAlert";
 		/**
 		 * Show the view or text notification for a long period of time. This time could be user-definable.
 		 */
@@ -61,7 +66,7 @@ package pl.mateuszmackowiak.nativeANE.toast
 		 * Constant indicating that no gravity has been set
 		 * <br>Constant Value: 0 (0x00000000)
 		 */
-		public static const NO_GRAVITY:int = 0x00000000;
+		public static const GRAVITY_NON:int = 0x00000000;
 		/**
 		 * Push object to the right of its container, not changing its size.
 		 * <br>Constant Value: 5 (0x00000005)
@@ -101,10 +106,10 @@ package pl.mateuszmackowiak.nativeANE.toast
 		
 		/**
 		 * Make a standard toast that just contains a text with the text from a resource.
-		 * @param message- the text displayed on the Toast 
-		 * @param duration - How long to display the message. Either LENGTH_SHORT or LENGTH_LONG
-		 * @see pl.mateuszmackowiak.nativeANE.toast.Toast.LENGTH_SHORT
-		 * @see pl.mateuszmackowiak.nativeANE.toast.Toast.LENGTH_LONG
+		 * @param message the text displayed on the Toast 
+		 * @param duration How long to display the message. Either <code>LENGTH_SHORT</code> or <code>LENGTH_LONG</code>
+		 * @see pl.mateuszmackowiak.nativeANE.toast.Toast#LENGTH_SHORT
+		 * @see pl.mateuszmackowiak.nativeANE.toast.Toast#LENGTH_LONG
 		 */
 		public static function show(message:String , duration:int=0x00000001):void
 		{
@@ -128,13 +133,14 @@ package pl.mateuszmackowiak.nativeANE.toast
 		}
 		/**
 		 * Make a standard toast that just contains a text with the text from a resource.
-		 * @param message- the text displayed on the Toast 
-		 * @param duration - How long to display the message. Either LENGTH_SHORT or LENGTH_LONG
-		 * 
-		 * @param gravity - Set the location at which the notification should appear on the screen.(GRAVITY_BOTTOM , GRAVITY_CENTER,...)
-		 * @see pl.mateuszmackowiak.nativeANE.toast.Toast.show()
-		 * @see pl.mateuszmackowiak.nativeANE.toast.Toast.LENGTH_SHORT
-		 * @see pl.mateuszmackowiak.nativeANE.toast.Toast.LENGTH_LONG
+		 * @param message the text displayed on the Toast 
+		 * @param duration How long to display the message. Either <code>LENGTH_SHORT</code> or <code>LENGTH_LONG</code>
+		 * @param gravity Set the location at which the notification should appear on the screen.(<code>GRAVITY_BOTTOM</code> , <code>GRAVITY_CENTER</code>,...) (<b>only on Android</b>)
+		 * @param xOffset the x offset from the gravity point (<b>only on Android</b>)
+		 * @param yOffset the y offset from the gravity point (<b>only on Android</b>)
+		 * @see pl.mateuszmackowiak.nativeANE.toast.Toast#show()
+		 * @see pl.mateuszmackowiak.nativeANE.toast.Toast#LENGTH_SHORT
+		 * @see pl.mateuszmackowiak.nativeANE.toast.Toast#LENGTH_LONG
 		 * 
 		 * @see http://developer.android.com/reference/android/view/Gravity.html
 		 */
@@ -202,6 +208,7 @@ package pl.mateuszmackowiak.nativeANE.toast
 			//FlexGlobals.topLevelApplication.dispatchEvent(new NativeAlertErrorEvent(NativeAlertErrorEvent.ERROR,false,false,message,id));
 		}
 	}
-	
-
 }
+
+
+

@@ -17,7 +17,7 @@
 
 
 #import "SlideNotification.h"
-//#import "SVProgressHUD.h"
+#import "SVProgressHUD.h"
 MobileAlert *alert;
 
 
@@ -94,12 +94,12 @@ FREObject showProgressPopup(FREContext ctx, void* funcData, uint32_t argc, FREOb
     NSString *messageString = [NSString stringWithUTF8String:(char*)message];
     NSNumber *progressValue =[NSNumber numberWithDouble:progressParam];
     
-   /* if(theme == 2){
+    if(theme == 2){
         if(messageString && ![messageString isEqualToString:@""])
             if(cancleble)
-                //[SVProgressHUD showWithStatus:messageString];
+                [SVProgressHUD showWithStatus:messageString];
             else
-                //[SVProgressHUD showWithStatus:messageString maskType:SVProgressHUDMaskTypeBlack];
+                [SVProgressHUD showWithStatus:messageString maskType:SVProgressHUDMaskTypeBlack];
         else {
             if (cancleble) 
                 [SVProgressHUD show];
@@ -118,7 +118,7 @@ FREObject showProgressPopup(FREContext ctx, void* funcData, uint32_t argc, FREOb
                 else
                     [SVProgressHUD showWithMaskType:SVProgressHUDMaskTypeClear];
             }
-    }else{*/
+    }else{
         alert = [[MobileAlert alloc] init];
         [alert showProgressPopup:titleString 
                            style:styleValue
@@ -127,7 +127,7 @@ FREObject showProgressPopup(FREContext ctx, void* funcData, uint32_t argc, FREOb
                     showActivity:showActivityValue
                        cancleble:cancleble
                          context:ctx];
-   // }
+    }
     return NULL;    
 }
 
@@ -206,7 +206,7 @@ FREObject hide(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[] )
 {
     if(alert)
         [alert hide];
-    //[SVProgressHUD dismiss];
+    [SVProgressHUD dismiss];
     //Create our Strings for our Alert.
     return NULL; 
 }
@@ -222,8 +222,8 @@ FREObject updateMessage(FREContext ctx, void* funcData, uint32_t argc, FREObject
     NSString *nsMessage = nil;
     if(message){
         nsMessage = [NSString stringWithUTF8String:(char*)message];
-      //  if(SVProgressHUD.isVisible)
-      //      [SVProgressHUD setStatus:nsMessage];
+       if(SVProgressHUD.isVisible)
+            [SVProgressHUD setStatus:nsMessage];
         if(alert)
             [alert updateMessage:nsMessage];
     }
@@ -257,8 +257,8 @@ FREObject isShowing(FREContext ctx, void* funcData, uint32_t argc, FREObject arg
     if (alert) {
         ret = alert.isShowing;
     }
-    //if(SVProgressHUD.isVisible)
-      //  ret = YES;
+    if(SVProgressHUD.isVisible)
+        ret = YES;
     FREObject retVal;
     if(FRENewObjectFromBool(ret, &retVal) == FRE_OK){
         return retVal;
@@ -288,7 +288,7 @@ FREObject showToast(FREContext ctx, void* funcData, uint32_t argc, FREObject arg
         duration = [SlideNotification LONG];
     //NSLog(@"%f",dur);
     if(messageString!=nil && ![messageString isEqualToString:@""]){
-        [SlideNotification showMessage2:messageString duration:duration];
+        [SlideNotification showMessage:messageString duration:duration];
     }
     
     

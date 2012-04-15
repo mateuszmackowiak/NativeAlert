@@ -48,7 +48,7 @@
 			
 			protected function view_creationComplete():void
 			{
-				var isTablet:Boolean = height > 960 || width > 960;
+				var isTablet:Boolean = height > 900 || width > 900;
 				if(isTablet){
 					currentState = "tablet";
 					content.layout = new HorizontalLayout();
@@ -455,8 +455,9 @@
 			<fx:Object name="THEME_TRADITIONAL" data="0x00000001"/>
 		</s:ArrayList>
 		<s:ArrayList id="themesIOS">
-			<fx:Object name="IOS_SVHUD_BLACK_BACKGROUND_THEME" data="0x00000002"/>
-			<fx:Object name="IOS_SVHUD_NON_BACKGROUND_THEME" data="0x00000003"/>
+			<fx:Object name="IOS_SVHUD_GRADIENT_BACKGROUND_THEME" data="0x00000004" />
+			<fx:Object name="IOS_SVHUD_BLACK_BACKGROUND_THEME" data="0x00000002" />
+			<fx:Object name="IOS_SVHUD_NON_BACKGROUND_THEME" data="0x00000003" />
 			<fx:Object name="DEFAULT_THEME" data="0x00000001"/>
 		</s:ArrayList>
 	</fx:Declarations>

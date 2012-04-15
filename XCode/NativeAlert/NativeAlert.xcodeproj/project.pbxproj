@@ -11,10 +11,11 @@
 		009AC4F3145369A8001C38F5 /* NativeAlert.m in Sources */ = {isa = PBXBuildFile; fileRef = 009AC4F1145369A8001C38F5 /* NativeAlert.m */; };
 		00C6A1C4145390C400AD3496 /* MobileAlert.h in Headers */ = {isa = PBXBuildFile; fileRef = 00C6A1BE145370D200AD3496 /* MobileAlert.h */; };
 		00C6A1C5145390C900AD3496 /* MobileAlert.m in Sources */ = {isa = PBXBuildFile; fileRef = 00C6A1BF145370D200AD3496 /* MobileAlert.m */; };
-		8C058D321538B5A300498079 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8C058D311538B5A300498079 /* UIKit.framework */; };
-		8C058D351538B5AB00498079 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8C058D341538B5AB00498079 /* QuartzCore.framework */; };
-		9A5DFBCB15253109001C08B5 /* SlideNotification.h in Headers */ = {isa = PBXBuildFile; fileRef = 9A5DFBC915253109001C08B5 /* SlideNotification.h */; };
-		9A5DFBCC15253109001C08B5 /* SlideNotification.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A5DFBCA15253109001C08B5 /* SlideNotification.m */; };
+		8C29152415396A3200F8DAC4 /* SlideNotification.h in Headers */ = {isa = PBXBuildFile; fileRef = 8C29152215396A3200F8DAC4 /* SlideNotification.h */; };
+		8C29152515396A3200F8DAC4 /* SlideNotification.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C29152315396A3200F8DAC4 /* SlideNotification.m */; };
+		8C29152815396A4300F8DAC4 /* FlashRuntimeExtensions.h in Headers */ = {isa = PBXBuildFile; fileRef = 8C29152715396A4300F8DAC4 /* FlashRuntimeExtensions.h */; };
+		8CEE8A6B15396D130047FE10 /* SVProgressHUD.h in Headers */ = {isa = PBXBuildFile; fileRef = 8CEE8A6915396D130047FE10 /* SVProgressHUD.h */; };
+		8CEE8A6C15396D130047FE10 /* SVProgressHUD.m in Sources */ = {isa = PBXBuildFile; fileRef = 8CEE8A6A15396D130047FE10 /* SVProgressHUD.m */; };
 		9A6B76B415225D19004B17CA /* FlashRuntimeExtensions.h in Headers */ = {isa = PBXBuildFile; fileRef = 9A6B76B315225D19004B17CA /* FlashRuntimeExtensions.h */; };
 /* End PBXBuildFile section */
 
@@ -25,10 +26,11 @@
 		009AC4F1145369A8001C38F5 /* NativeAlert.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NativeAlert.m; sourceTree = "<group>"; };
 		00C6A1BE145370D200AD3496 /* MobileAlert.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MobileAlert.h; sourceTree = "<group>"; };
 		00C6A1BF145370D200AD3496 /* MobileAlert.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MobileAlert.m; sourceTree = "<group>"; };
-		8C058D311538B5A300498079 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
-		8C058D341538B5AB00498079 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
-		9A5DFBC915253109001C08B5 /* SlideNotification.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SlideNotification.h; path = ../../../../../Projekty/XCode/test/test/SlideToastNotification/SlideNotification.h; sourceTree = "<group>"; };
-		9A5DFBCA15253109001C08B5 /* SlideNotification.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SlideNotification.m; path = ../../../../../Projekty/XCode/test/test/SlideToastNotification/SlideNotification.m; sourceTree = "<group>"; };
+		8C29152215396A3200F8DAC4 /* SlideNotification.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SlideNotification.h; path = SlideToastNotification/SlideNotification.h; sourceTree = "<group>"; };
+		8C29152315396A3200F8DAC4 /* SlideNotification.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SlideNotification.m; path = SlideToastNotification/SlideNotification.m; sourceTree = "<group>"; };
+		8C29152715396A4300F8DAC4 /* FlashRuntimeExtensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FlashRuntimeExtensions.h; sourceTree = "<group>"; };
+		8CEE8A6915396D130047FE10 /* SVProgressHUD.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SVProgressHUD.h; sourceTree = "<group>"; };
+		8CEE8A6A15396D130047FE10 /* SVProgressHUD.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SVProgressHUD.m; sourceTree = "<group>"; };
 		9A6B76B315225D19004B17CA /* FlashRuntimeExtensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FlashRuntimeExtensions.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -37,8 +39,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8C058D351538B5AB00498079 /* QuartzCore.framework in Frameworks */,
-				8C058D321538B5A300498079 /* UIKit.framework in Frameworks */,
 				009AC4D61453648D001C38F5 /* Foundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -49,10 +49,11 @@
 		009AC4C71453648D001C38F5 = {
 			isa = PBXGroup;
 			children = (
-				8C058D341538B5AB00498079 /* QuartzCore.framework */,
-				8C058D311538B5A300498079 /* UIKit.framework */,
-				9A5DFBC915253109001C08B5 /* SlideNotification.h */,
-				9A5DFBCA15253109001C08B5 /* SlideNotification.m */,
+				8CEE8A6915396D130047FE10 /* SVProgressHUD.h */,
+				8CEE8A6A15396D130047FE10 /* SVProgressHUD.m */,
+				8C29152215396A3200F8DAC4 /* SlideNotification.h */,
+				8C29152315396A3200F8DAC4 /* SlideNotification.m */,
+				8C29152715396A4300F8DAC4 /* FlashRuntimeExtensions.h */,
 				9A6B76B315225D19004B17CA /* FlashRuntimeExtensions.h */,
 				00C6A1BE145370D200AD3496 /* MobileAlert.h */,
 				00C6A1BF145370D200AD3496 /* MobileAlert.m */,
@@ -104,7 +105,9 @@
 			files = (
 				00C6A1C4145390C400AD3496 /* MobileAlert.h in Headers */,
 				9A6B76B415225D19004B17CA /* FlashRuntimeExtensions.h in Headers */,
-				9A5DFBCB15253109001C08B5 /* SlideNotification.h in Headers */,
+				8C29152415396A3200F8DAC4 /* SlideNotification.h in Headers */,
+				8C29152815396A4300F8DAC4 /* FlashRuntimeExtensions.h in Headers */,
+				8CEE8A6B15396D130047FE10 /* SVProgressHUD.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -160,7 +163,8 @@
 			files = (
 				00C6A1C5145390C900AD3496 /* MobileAlert.m in Sources */,
 				009AC4F3145369A8001C38F5 /* NativeAlert.m in Sources */,
-				9A5DFBCC15253109001C08B5 /* SlideNotification.m in Sources */,
+				8C29152515396A3200F8DAC4 /* SlideNotification.m in Sources */,
+				8CEE8A6C15396D130047FE10 /* SVProgressHUD.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -173,6 +177,7 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CONFIGURATION_TEMP_DIR = "$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
 				COPY_PHASE_STRIP = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -197,6 +202,7 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CONFIGURATION_TEMP_DIR = "$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
 				COPY_PHASE_STRIP = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
@@ -213,17 +219,17 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = NO;
-				CONFIGURATION_BUILD_DIR = ../../build;
+				CONFIGURATION_BUILD_DIR = ../../build/ios;
 				DSTROOT = /tmp/NativeAlert.dst;
 				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_LINK_WITH_DYNAMIC_LIBRARIES = NO;
+				GCC_LINK_WITH_DYNAMIC_LIBRARIES = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = NO;
 				GCC_PREFIX_HEADER = "NativeAlert/NativeAlert-Prefix.pch";
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = NO;
 				IPHONEOS_DEPLOYMENT_TARGET = 4.0;
 				LIBRARY_SEARCH_PATHS = "";
-				MACH_O_TYPE = mh_dylib;
+				MACH_O_TYPE = staticlib;
 				OTHER_LDFLAGS = "-ObjC";
 				PRIVATE_HEADERS_FOLDER_PATH = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -233,6 +239,7 @@
 				STRIP_INSTALLED_PRODUCT = YES;
 				STRIP_STYLE = all;
 				TARGETED_DEVICE_FAMILY = "1,2";
+				VALID_ARCHS = "armv6 armv7 x386";
 			};
 			name = Debug;
 		};
@@ -240,17 +247,17 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = NO;
-				CONFIGURATION_BUILD_DIR = ../../build;
+				CONFIGURATION_BUILD_DIR = ../../build/ios;
 				DSTROOT = /tmp/NativeAlert.dst;
 				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_LINK_WITH_DYNAMIC_LIBRARIES = NO;
+				GCC_LINK_WITH_DYNAMIC_LIBRARIES = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = NO;
 				GCC_PREFIX_HEADER = "NativeAlert/NativeAlert-Prefix.pch";
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = NO;
 				IPHONEOS_DEPLOYMENT_TARGET = 4.0;
 				LIBRARY_SEARCH_PATHS = "";
-				MACH_O_TYPE = mh_dylib;
+				MACH_O_TYPE = staticlib;
 				OTHER_LDFLAGS = "-ObjC";
 				PRIVATE_HEADERS_FOLDER_PATH = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -260,6 +267,7 @@
 				STRIP_INSTALLED_PRODUCT = YES;
 				STRIP_STYLE = all;
 				TARGETED_DEVICE_FAMILY = "1,2";
+				VALID_ARCHS = "armv6 armv7 x386";
 			};
 			name = Release;
 		};

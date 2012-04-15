@@ -3,6 +3,7 @@
 	<name>NativeAlertMobile</name>
 	<comment></comment>
 	<projects>
+		<project>NativeAlert</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

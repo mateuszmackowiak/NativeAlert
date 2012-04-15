@@ -53,6 +53,11 @@ package pl.mateuszmackowiak.nativeANE.progress
 		 * @see http://github.com/samvermette/SVProgressHUD
 		 */
 		public static const IOS_SVHUD_NON_BACKGROUND_THEME:uint=0x00000003;
+		/**
+		 * uses : SVProgressHUD
+		 * @see http://github.com/samvermette/SVProgressHUD
+		 */
+		public static const IOS_SVHUD_GRADIENT_BACKGROUND_THEME:uint=0x00000004;
 		
 		/**
 		 * the default style for bouth IOS and Android devices 
@@ -444,16 +449,23 @@ package pl.mateuszmackowiak.nativeANE.progress
 		
 		/**
 		 * hides the dialog if is showing
+		 * @param message message displayed after closing progress popup <b>ONLY IOS </b> else ignore
+		 * @param error if the message will be displayed with success icon or error icon <b>ONLY IOS </b> else ignored
 		 */
-		public function hide():Boolean
+		public function hide(message:String=null,error:Boolean=false):Boolean
 		{
 			try{
 				_isShowing = false;
-				if(isAndroid)
-					context.call(showProgressPopup,"hide");	
-				else
-					context.call("hideProgress");
-				return true;
+				if(isAndroid){
+					context.call(showProgressPopup,"hide");
+					return true;	
+				}else if(isIOS){
+					if(message)
+						context.call("hideProgress",message,error);
+					else
+						context.call("hideProgress");
+					return true;
+				}
 			}catch(e:Error){
 				showError("Error calling hide method "+e.message,e.errorID);
 			}

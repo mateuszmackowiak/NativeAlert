@@ -38,8 +38,13 @@ typedef enum
 -(id)hide;
 
 -(void)remove;
-
-
+/*
+* shows Toast message
+*/
++(id)showMessage2:(NSString *)message duration:(float)duration;
+/**
+ *shows toast message and adds to que 
+ */
 +(id)showMessage:(NSString*)message duration:(float)duration;
 
 +(float)SHORT;

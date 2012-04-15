@@ -114,20 +114,21 @@ package pl.mateuszmackowiak.nativeANE.toast
 		public static function show(message:String , duration:int=0x00000001):void
 		{
 			if(Capabilities.os.indexOf("Linux")>-1 || Capabilities.os.toLowerCase().indexOf("ip")>-1){
-				if(message==null)
-					message="";
+				if(message==null || message=="")
+					return;
 				if(isNaN(duration))
 					duration = 0;
 				
 				if(context==null){
 					try{
 						context = ExtensionContext.createExtensionContext(EXTENSION_ID, "ToastContext");
+						
 					}catch(e:Error){
 						showError(e.message,e.errorID);
 					}
 				}
-				
 				context.call("Toast",message,duration);
+				
 			}else
 				trace("Toast extension is not supported on this platform");
 		}
@@ -147,8 +148,8 @@ package pl.mateuszmackowiak.nativeANE.toast
 		public static function showWithDifferentGravit(message:String , duration:int=0x00000001, gravity:int=NaN , xOffset:int=0 , yOffset:int=0 ):void
 		{
 			if(Capabilities.os.indexOf("Linux")>-1 || Capabilities.os.toLowerCase().indexOf("ip")>-1){
-				if(message==null)
-					message="";
+				if(message==null || message=="")
+					return;
 				if(isNaN(duration))
 					duration = 0;
 				if(isNaN(gravity) || isNaN(xOffset) || isNaN(yOffset))

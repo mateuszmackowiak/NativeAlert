@@ -93,7 +93,9 @@ static float duration_ = _short;
 
 
 - (void)drawRect:(CGRect)rect
-{CGContextRef context = UIGraphicsGetCurrentContext();
+{
+    
+    CGContextRef context = UIGraphicsGetCurrentContext();
 
     CGRect screenRect = [self getScreenBoundsForCurrentOrientation];
     self.frame = CGRectMake(0.0f, screenRect.size.height-height-20.0f, screenRect.size.width, height);
@@ -204,6 +206,8 @@ static float duration_ = _short;
     
     return self;
 }
+
+
 -(id)hide{
     CGRect screenRect = [self getScreenBoundsForCurrentOrientation];
     CGFloat screenWidth = screenRect.size.width;
@@ -231,7 +235,14 @@ static float duration_ = _short;
 - (void) hideForRemoveFinished:(NSString *)animationID finished:(NSNumber *)finished context:(void *)context {
     isHidden_ = YES;
     [self removeFromSuperview];
+    [self release];
 }
+
+
+
+
+
+
 
 
 - (void)callActionBlock_:(id)sender {
@@ -249,18 +260,20 @@ static float duration_ = _short;
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [[UIDevice currentDevice] endGeneratingDeviceOrientationNotifications];
-    
+        
     [title_ release];
-    
+        
     [super dealloc];
+        
 }
 
 
 -(CGRect)getScreenBoundsForCurrentOrientation
 {
     UIScreen *screen = [UIScreen mainScreen];
-    CGRect fullScreenRect = screen.bounds; //implicitly in Portrait orientation.        
-    if (UIInterfaceOrientationIsLandscape([[UIDevice currentDevice] orientation])) 
+    CGRect fullScreenRect = screen.bounds; //implicitly in Portrait orientation.
+    
+    if (UIInterfaceOrientationIsLandscape([[UIApplication sharedApplication] statusBarOrientation])) 
     {
         CGRect temp;
         temp.size.width = fullScreenRect.size.height;
@@ -275,14 +288,22 @@ static float duration_ = _short;
 
 
 
-
++(id)showMessage2:(NSString *)message duration:(float)duration{
+     SlideNotification*not = [[SlideNotification alloc] initWithTitle:message];
+    [not addAndShowInView:[[[[UIApplication sharedApplication] keyWindow]rootViewController]view]];
+    [[NSRunLoop mainRunLoop] addTimer:[NSTimer timerWithTimeInterval:duration target:self selector:@selector(hideToast2:) userInfo:not repeats:NO] forMode:@"NSDefaultRunLoopMode"];
+    return not;
+}
++(void) hideToast2:(NSTimer*) timer{
+    [[timer userInfo]remove];
+}
 
 +(id)showMessage:(NSString*)message duration:(float)duration{
     if(notification==nil){
         duration_ = duration;
         notification = [[SlideNotification alloc] initWithTitle:message];
         [notification addAndShowInView:[[[[UIApplication sharedApplication] keyWindow]rootViewController]view]];
-        [[NSRunLoop mainRunLoop] addTimer:[NSTimer timerWithTimeInterval:duration target:self selector:@selector(hideToast:) userInfo:nil repeats:NO] forMode:NSDefaultRunLoopMode];
+        [[NSRunLoop mainRunLoop] addTimer:[NSTimer timerWithTimeInterval:duration target:self selector:@selector(hideToast:) userInfo:nil repeats:NO] forMode:@"NSDefaultRunLoopMode"];
     }else {
         if (notification.isHidden) {
             [notification updateTitle:message];
@@ -296,17 +317,13 @@ static float duration_ = _short;
             }
         }
     }    
-   
-    
+
 	return notification;
 }
 
 + (void) hideToast:(NSTimer*) timer{
     if(notifications==nil || [notifications count] ==0){
-        [notification remove];
-        [notification release];
-        notification = nil;
-        notifications = nil;
+        [self cancle];
     }else 
         [notification hideWithAction:@selector( hideToastFinished)];
 	
@@ -319,26 +336,27 @@ static float duration_ = _short;
         [notifications removeObjectAtIndex:0];
         
         [notification updateTitle:message];
+        [message release];
         [notification show];
-        [[NSRunLoop mainRunLoop] addTimer:[NSTimer timerWithTimeInterval:duration_ target:self selector:@selector(hideToast2:) userInfo:nil repeats:NO] forMode:NSDefaultRunLoopMode];
+        [[NSRunLoop mainRunLoop] addTimer:[NSTimer timerWithTimeInterval:duration_ target:self selector:@selector(hideLastToast:) userInfo:nil repeats:NO] forMode:@"NSDefaultRunLoopMode"];
     }
 }
--(void)hideToast2:(NSTimer*) timer{
+-(void)hideLastToast:(NSTimer*) timer{
     if(notifications==nil || [notifications count] ==0){
-        [notification remove];
-        [notification release];
-        notification = nil;
-        notifications = nil;
+        [SlideNotification cancle];
     }else
         [notification hideWithAction:@selector( hideToastFinished)];
 }
 
 
 +(void)cancle{
-    [notification remove];
-    [notification release];
-    [notifications removeAllObjects];
-    [notifications release];
+    if(notification){
+        [notification remove];
+        [notifications removeAllObjects];
+        [notifications release];
+        notification= nil;
+        notifications = nil;
+    }
 }
 
 

@@ -118,7 +118,6 @@ FREObject showProgressPopup(FREContext ctx, void* funcData, uint32_t argc, FREOb
                 else
                     [SVProgressHUD showWithMaskType:SVProgressHUDMaskTypeClear];
             }
-<<<<<<< HEAD
     }else if(theme == 4){
         if(messageString && ![messageString isEqualToString:@""])
             if(cancleble)
@@ -131,8 +130,6 @@ FREObject showProgressPopup(FREContext ctx, void* funcData, uint32_t argc, FREOb
                 else
                     [SVProgressHUD showWithMaskType:SVProgressHUDMaskTypeGradient];
             }
-=======
->>>>>>> 4517cdf0e6257eec4bc83ef7d0dd5c5999c6c71b
     }else{
         alert = [[MobileAlert alloc] init];
         [alert showProgressPopup:titleString 
@@ -221,7 +218,6 @@ FREObject hide(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[] )
 {
     if(alert)
         [alert hide];
-<<<<<<< HEAD
     
     if(argc>0 && argv[0]!=NULL){
         
@@ -242,9 +238,6 @@ FREObject hide(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[] )
         }
     }else
         [SVProgressHUD dismiss];
-=======
-    [SVProgressHUD dismiss];
->>>>>>> 4517cdf0e6257eec4bc83ef7d0dd5c5999c6c71b
     //Create our Strings for our Alert.
     return NULL; 
 }
@@ -326,12 +319,8 @@ FREObject showToast(FREContext ctx, void* funcData, uint32_t argc, FREObject arg
         duration = [SlideNotification LONG];
     NSLog(@" durration %f",dur);
     if(messageString!=nil && ![messageString isEqualToString:@""]){
-<<<<<<< HEAD
         NSLog(@"%@",messageString);
         [SlideNotification showMessage2:messageString duration:duration];
-=======
-        [SlideNotification showMessage:messageString duration:duration];
->>>>>>> 4517cdf0e6257eec4bc83ef7d0dd5c5999c6c71b
     }
     
     

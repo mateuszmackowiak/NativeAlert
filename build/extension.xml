@@ -9,6 +9,7 @@
                 <finalizer>NativeDialogExtFinalizer</finalizer>
             </applicationDeployment>
         </platform>
+<<<<<<< HEAD
         <platform name="iPhone-x86">
             <applicationDeployment>
                 <nativeLibrary>libNativeAlertSimulator.a</nativeLibrary>
@@ -16,6 +17,15 @@
                 <finalizer>NativeDialogExtFinalizer</finalizer>
             </applicationDeployment>
         </platform>
+=======
+    <platform name="iPhone-x86">
+        <applicationDeployment>
+            <nativeLibrary>libNativeAlertSimulator.a</nativeLibrary>
+            <initializer>NativeDialogExtInitializer</initializer>
+            <finalizer>NativeDialogExtFinalizer</finalizer>
+        </applicationDeployment>
+    </platform>
+>>>>>>> 4517cdf0e6257eec4bc83ef7d0dd5c5999c6c71b
 		<platform name="Windows-x86">
             <applicationDeployment>
                 <nativeLibrary>NativeAlertCbDll.dll</nativeLibrary>

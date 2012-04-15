@@ -1,7 +1,7 @@
 # Native Dialogs - Adobe air Native Extension #
-Update: Toast for iOS
+Update: Themes for NativeProgress - changes in the class
 
-Checked iOS 4.3,5.1 / android 3.1
+Checked iOS 5.1 / android 3.1
 
 See more info [here](http://mateuszmackowiak.wordpress.com)
 
@@ -51,7 +51,24 @@ Android and iOS:
 
 NativeProgress for IOS by [memeller](https://github.com/memeller)
 
+Available themes for android:
+
+* ANDROID\_DEVICE\_DEFAULT\_DARK\_THEME
+* ANDROID\_DEVICE\_DEFAULT\_LIGHT\_THEME
+* ANDROID\_HOLO\_DARK\_THEME
+* ANDROID\_HOLO\_LIGHT\_THEME
+* DEFAULT\_THEME
+
+Available themes for IOS:
+
+* IOS\_SVHUD\_BLACK\_BACKGROUND\_THEME - uses [SVProgressHUD](http://github.com/samvermette/SVProgressHUD)
+* IOS\_SVHUD\_NON\_BACKGROUND\_THEME - uses [SVProgressHUD](http://github.com/samvermette/SVProgressHUD)
+* IOS\_SVHUD\_GRADIENT\_BACKGROUND\_THEME - uses [SVProgressHUD](http://github.com/samvermette/SVProgressHUD)
+* DEFAULT\_THEME (cancleble is ignored)
+
+
 iOS only:
+![](https://github.com/mateuszmackowiak/NativeAlert/raw/master/images/NetworkActivityIndicatoror.png)
   The ability to show and hide the native status-bar networki busy indicator.
 
 	if(NativeProgress.isNetworkActivityIndicatorAvalieble())
@@ -64,59 +81,61 @@ iOS only:
 	private var myTimer:Timer = new Timer(100);
 	protected function openProgressPopup(style:int):void
 	{
-    	progressPopup = new NativeProgress(style);
-     	progressPopup.theme = NativeProgress.THEME_HOLO_DARK;
-	 	progressPopup.setSecondaryProgress(45);//This only works in android 
-     	progressPopup.addEventListener(NativeDialogEvent.OPENED,traceEvent);
-     	progressPopup.addEventListener(NativeDialogEvent.CANCELED,closeNativeProcessHandler);
-     	progressPopup.addEventListener(NativeDialogEvent.CLOSED,closeNativeProcessHandler);
-     	progressPopup.addEventListener(NativeExtensionErrorEvent.ERROR,onError);
-	 	progressPopup.setMax(50);
-	 	progressPopup.setIndeterminate = true;//This only works in android
-     	progressPopup.show(0, titleInput.text , messageInput.text,true);
-
-     	myTimer.addEventListener(TimerEvent.TIMER, updateProgress);
-     	myTimer.start();
+    		progressPopup = new NativeProgress(style);
+		progressPopup.setSecondaryProgress(45);
+		progressPopup.addEventListener(NativeDialogEvent.CANCELED,closeNativeProcessHandler);
+		progressPopup.addEventListener(NativeDialogEvent.OPENED,traceEvent);
+		progressPopup.addEventListener(NativeDialogEvent.CLOSED,closeNativeProcessHandler);
+		progressPopup.addEventListener(NativeExtensionErrorEvent.ERROR,onError);
+		progressPopup.theme = ThemeSelector.selectedItem.data;
+		progressPopup.setMax(50);
+		progressPopup.setTitle(titleInput.text);
+		progressPopup.setMessage(messageInput.text);
+		progressPopup.show(canclebleCheckbox.selected,indeterminateInput.selected);
+		myTimer.addEventListener(TimerEvent.TIMER, updateProgress);
+		myTimer.start();
 	}
 
 	private function closeNativeProcessHandler(event:Event):void
 	{
-     	progressPopup.removeEventListener(NativeDialogEvent.CANCELED,closeNativeProcessHandler);
-     	progressPopup.removeEventListener(NativeDialogEvent.CLOSED,closeNativeProcessHandler);
-     	progressPopup.removeEventListener(NativeExtensionErrorEvent.ERROR,onError);
-     	progressPopup.removeEventListener(NativeDialogEvent.OPENED,traceEvent);
+     		progressPopup.removeEventListener(NativeDialogEvent.CANCELED,closeNativeProcessHandler);
+     		progressPopup.removeEventListener(NativeDialogEvent.CLOSED,closeNativeProcessHandler);
+     		progressPopup.removeEventListener(NativeExtensionErrorEvent.ERROR,onError);
+     		progressPopup.removeEventListener(NativeDialogEvent.OPENED,traceEvent);
 
-		progressPopup.kill();
-     	myTimer.removeEventListener(TimerEvent.TIMER,updateProgress);
-     	myTimer.stop();
-    	p = 0;
+		progressPopup.dispose();//before kill()
+     		myTimer.removeEventListener(TimerEvent.TIMER,updateProgress);
+     		myTimer.stop();
+    		p = 0;
 	}
 	private function updateProgress(event:TimerEvent):void
 	{
-    	p++;
-    	if(p>=50){
-    		p = 0;
-    		progressPopup.hide();
+    		p++;
+    		if(p>=50){
+    			p = 0;
+    			progressPopup.hide();
 			(event.target as Timer).stop();
-    	}else
-		progressPopup.setProgress(p);
-	}
+    		}else
+			progressPopup.setProgress(p);
+		}
 	
 	protected function viewBackKeyPressedHandler(event:FlexEvent):void
 	{
-    	event.preventDefault();
-     	myTimer.removeEventListener(TimerEvent.TIMER,updateProgress);
-     	myTimer.stop();
-     	p = 0;
-     	if(progressPopup){
-	    	progressPopup.hide();
-     	}
+    		event.preventDefault();
+     		myTimer.removeEventListener(TimerEvent.TIMER,updateProgress);
+     		myTimer.stop();
+     		p = 0;
+     		if(progressPopup){
+	    		progressPopup.hide();
+     		}
 	}
+	
 	NativeApplication.nativeApplication.addEventListener(Event.EXITING,exiting);
+	
 	protected function exiting(event:Event):void
 	{
-    	if(progressPopup)
-	    	progressPopup.kill();
+    		if(progressPopup)
+	    		progressPopup.dispose();//before kill()
 	}
 
 
@@ -199,7 +218,7 @@ NativeListDialog has the ability to show a native android popup dialog with a mu
 Show a dialog with defined by user input text fields.
 
 ###Important:###
-IOS limitations - There can be only 2 buttons and 2 text inputs. To display message specyfie for the first NativeTextField editable == false
+IOS limitations - Temporary only IOS 5.0. There can be only 2 buttons and 2 text inputs. To display message specyfie for the first NativeTextField editable == false
 
 *Usage:*
 
@@ -245,9 +264,15 @@ IOS limitations - There can be only 2 buttons and 2 text inputs. To display mess
 	
 # Toast (Android / IOS) #
 
+![](https://github.com/mateuszmackowiak/NativeAlert/raw/master/images/AndoridToast.png)
+
 For IOS uses : [SlideNotification](https://github.com/mateuszmackowiak/SlideNotification)
+
+![](https://github.com/mateuszmackowiak/NativeAlert/raw/master/images/IOSToast.png)
+
 ###Important:###
 IOS limitations - Toast will always be on the bottom of the screen (both functions work)
+
 
 *Usage:*
 
@@ -273,9 +298,9 @@ Available parameters:
 * package name (Android)
 * source directory (Android)
 * application uid -always when a application is installed on device the system creates a unique id for setting up the space for it (Android)
-* UID - created a unique ID for the device based on some of the device properties (Android)
+* UID - created a unique ID for the device based on some of the device properties
 
-* UDID - The UDID of the device (IOS)
+* UDID - ####removed - deprecated on IOS####
 * name - the name of the device (IOS)
 * MACAdress - MAC Adress (IOS)
 * localizedModel (IOS)

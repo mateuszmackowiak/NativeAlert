@@ -1,7 +1,7 @@
 # Native Dialogs - Adobe air Native Extension #
 Update: Themes for NativeProgress - changes in the class
 
-Checked iOS 5.1 / android 3.1
+Checked iOS 5.1 / android 2.3/3.1
 
 See more info [here](http://mateuszmackowiak.wordpress.com)
 

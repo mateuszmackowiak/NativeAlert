@@ -465,10 +465,10 @@
 	</fx:Style>
 	<fx:Declarations>
 		<s:ArrayList id="themesAndroid">
-			<fx:Object name="THEME_DEVICE_DEFAULT_DARK" data="0x00000004"/>
-			<fx:Object name="THEME_DEVICE_DEFAULT_LIGHT" data="0x00000005"/>
-			<fx:Object name="THEME_HOLO_DARK" data="0x00000002"/>
-			<fx:Object name="THEME_HOLO_LIGHT" data="0x00000003"/>
+			<fx:Object name="ANDROID_DEVICE_DEFAULT_DARK_THEME" data="0x00000004"/>
+			<fx:Object name="ANDROID_DEVICE_DEFAULT_LIGHT_THEME" data="0x00000005"/>
+			<fx:Object name="ANDROID_HOLO_DARK_THEME" data="0x00000002"/>
+			<fx:Object name="ANDROID_HOLO_LIGHT_THEME" data="0x00000003"/>
 			<fx:Object name="THEME_TRADITIONAL" data="0x00000001"/>
 		</s:ArrayList>
 		<s:ArrayList id="themesIOS">

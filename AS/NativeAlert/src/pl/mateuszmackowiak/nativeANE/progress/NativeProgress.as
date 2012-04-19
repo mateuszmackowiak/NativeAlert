@@ -47,17 +47,17 @@ package pl.mateuszmackowiak.nativeANE.progress
 		 * uses : SVProgressHUD
 		 * @see http://github.com/samvermette/SVProgressHUD
 		 */
-		//public static const IOS_SVHUD_BLACK_BACKGROUND_THEME:uint=0x00000002;
+		public static const IOS_SVHUD_BLACK_BACKGROUND_THEME:uint=0x00000002;
 		/**
 		 * uses : SVProgressHUD
 		 * @see http://github.com/samvermette/SVProgressHUD
 		 */
-		//public static const IOS_SVHUD_NON_BACKGROUND_THEME:uint=0x00000003;
+		public static const IOS_SVHUD_NON_BACKGROUND_THEME:uint=0x00000003;
 		/**
 		 * uses : SVProgressHUD
 		 * @see http://github.com/samvermette/SVProgressHUD
 		 */
-		//public static const IOS_SVHUD_GRADIENT_BACKGROUND_THEME:uint=0x00000004;
+		public static const IOS_SVHUD_GRADIENT_BACKGROUND_THEME:uint=0x00000004;
 		
 		/**
 		 * the default style for bouth IOS and Android devices 

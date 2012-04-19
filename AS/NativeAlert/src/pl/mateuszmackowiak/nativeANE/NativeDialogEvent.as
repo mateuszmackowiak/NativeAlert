@@ -38,7 +38,7 @@ package pl.mateuszmackowiak.nativeANE
 		 */
 		override public function clone() : Event
 		{
-			return new NativeDialogEvent(type,_index);
+			return new NativeDialogEvent(type,_index,bubbles,cancelable);
 		}
 	}
 }

@@ -1,149 +1,0 @@
-TNativeAlert
-v5
-r1
-cCheck dependencies
-cCompileC Release-iphoneos/NativeAlert.build/Objects-normal/armv7/NativeAlert.o /Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/NativeAlert.m normal armv7 objective-c com.apple.compilers.llvm.clang.1_0.compiler
-cCompileC Release-iphoneos/NativeAlert.build/Objects-normal/armv7/MobileAlert.o /Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/MobileAlert.m normal armv7 objective-c com.apple.compilers.llvm.clang.1_0.compiler
-cCompileC Release-iphoneos/NativeAlert.build/Objects-normal/armv7/SlideNotification.o /Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/SlideToastNotification/SlideNotification.m normal armv7 objective-c com.apple.compilers.llvm.clang.1_0.compiler
-cCompileC Release-iphoneos/NativeAlert.build/Objects-normal/armv7/SVProgressHUD.o /Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/SVProgressHUD.m normal armv7 objective-c com.apple.compilers.llvm.clang.1_0.compiler
-cLibtool /Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/../../build/ios/libNativeAlert.a normal armv7
-
-N/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS5.1.sdk
-c000000004F6F8F9A0000000000000110
-t1332711322
-s272
-
-N/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS5.1.sdk/System/Library/Frameworks/Foundation.framework/Foundation
-c000000004F598E4F000000000052C940
-t1331269199
-s5425472
-
-N/Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/../../build/ios/libNativeAlert.a
-t2
-s0
-
-N/Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/MobileAlert.m
-c000000004F88EC8E0000000000003509
-t1334373518
-s13577
-
-N/Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/NativeAlert.m
-c000000004F8AA9BC0000000000006155
-t1334487484
-s24917
-
-N/Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/NativeAlert/NativeAlert-Prefix.pch
-c000000004F88EC8E00000000000000E5
-t1334373518
-s229
-
-N/Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/Release-iphoneos/NativeAlert.build/Objects-normal/armv7/MobileAlert.o
-t2
-s0
-
-N/Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/Release-iphoneos/NativeAlert.build/Objects-normal/armv7/NativeAlert.LinkFileList
-c000000004F8AAB0D0000000000000220
-t1334487821
-s544
-
-N/Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/Release-iphoneos/NativeAlert.build/Objects-normal/armv7/NativeAlert.o
-t2
-s0
-
-N/Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/Release-iphoneos/NativeAlert.build/Objects-normal/armv7/SVProgressHUD.o
-t2
-s0
-
-N/Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/Release-iphoneos/NativeAlert.build/Objects-normal/armv7/SlideNotification.o
-t2
-s0
-
-N/Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/SVProgressHUD.m
-c000000004F88EC8E0000000000004ED1
-t1334373518
-s20177
-
-N/Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/SlideToastNotification/SlideNotification.m
-c000000004F750A340000000000002AB8
-t1333070388
-s10936
-
-CBuild AST from /Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/MobileAlert.m
-r0
-
-CBuild AST from /Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/NativeAlert.m
-r0
-
-CBuild AST from /Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/SVProgressHUD.m
-r0
-
-CBuild AST from /Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/SlideToastNotification/SlideNotification.m
-r0
-
-CCheck dependencies
-r0
-lSLF05#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection18"Check dependencies18ecda8de23ab541^639ae18de23ab541^---0#1#0#--18"Check dependencies36"71CB1640-C89B-4DB9-B0C5-6452B844CE68-
-
-CCompileC Release-iphoneos/NativeAlert.build/Objects-normal/armv7/MobileAlert.o /Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/MobileAlert.m normal armv7 objective-c com.apple.compilers.llvm.clang.1_0.compiler
-s356180621.883983
-e356180622.388900
-r1
-xCompileC
-xRelease-iphoneos/NativeAlert.build/Objects-normal/armv7/MobileAlert.o
-x/Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/MobileAlert.m
-xnormal
-xarmv7
-xobjective-c
-xcom.apple.compilers.llvm.clang.1_0.compiler
-lSLF05#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection85"Compile /Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/MobileAlert.mb473e28de23ab541^9199638ee23ab541^---0#0#0#-19%DVTDocumentLocation2@93"file://localhost/Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/MobileAlert.m0000000000000000^3134"CompileC Release-iphoneos/NativeAlert.build/Objects-normal/armv7/MobileAlert.o MobileAlert.m normal armv7 objective-c com.apple.compilers.llvm.clang.1_0.compiler    cd /Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert    setenv LANG en_US.US-ASCII    setenv PATH "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin:/Applications/Xcode.app/Contents/Developer/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin"    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -x objective-c -arch armv7 -fmessage-length=0 -std=gnu99 -Wno-trigraphs -fpascal-strings -Os -Wno-missing-field-initializers -Wno-missing-prototypes -Wreturn-type -Wno-implicit-atomic-properties -Wformat -Wno-missing-braces -Wparentheses -Wswitch -Wno-unused-function -Wno-unused-label -Wno-unused-parameter -Wunused-variable -Wunused-value -Wno-uninitialized -Wno-unknown-pragmas -Wno-shadow -Wno-four-char-constants -Wno-sign-compare -Wno-shorten-64-to-32 -Wpointer-sign -Wno-newline-eof -Wno-selector -Wno-strict-selector-match -Wno-undeclared-selector -Wno-deprecated-implementations -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS5.1.sdk -Wprotocol -Wdeprecated-declarations -g -Wno-conversion -Wno-sign-conversion -mthumb "-DIBOutlet=__attribute__((iboutlet))" "-DIBOutletCollection(ClassName)=__attribute__((iboutletcollection(ClassName)))" "-DIBAction=void)__attribute__((ibaction)" -miphoneos-version-min=4.0 -iquote /Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/Release-iphoneos/NativeAlert.build/NativeAlert-generated-files.hmap -I/Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/Release-iphoneos/NativeAlert.build/NativeAlert-own-target-headers.hmap -I/Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/Release-iphoneos/NativeAlert.build/NativeAlert-all-target-headers.hmap -iquote /Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/Release-iphoneos/NativeAlert.build/NativeAlert-project-headers.hmap -I/Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/../../build/ios/include -I/Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/Release-iphoneos/NativeAlert.build/DerivedSources/armv7 -I/Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/Release-iphoneos/NativeAlert.build/DerivedSources -F/Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/../../build/ios -include /Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/NativeAlert/NativeAlert-Prefix.pch -MMD -MT dependencies -MF /Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/Release-iphoneos/NativeAlert.build/Objects-normal/armv7/MobileAlert.d --serialize-diagnostics /Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/Release-iphoneos/NativeAlert.build/Objects-normal/armv7/MobileAlert.dia -c /Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/MobileAlert.m -o /Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/Release-iphoneos/NativeAlert.build/Objects-normal/armv7/MobileAlert.o36"E33C75AB-3B6A-4156-87B7-35209A7C6C63-
-
-CCompileC Release-iphoneos/NativeAlert.build/Objects-normal/armv7/NativeAlert.o /Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/NativeAlert.m normal armv7 objective-c com.apple.compilers.llvm.clang.1_0.compiler
-s356180621.883975
-e356180622.411672
-r1
-xCompileC
-xRelease-iphoneos/NativeAlert.build/Objects-normal/armv7/NativeAlert.o
-x/Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/NativeAlert.m
-xnormal
-xarmv7
-xobjective-c
-xcom.apple.compilers.llvm.clang.1_0.compiler
-lSLF05#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection85"Compile /Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/NativeAlert.m29aee28de23ab541^6763698ee23ab541^---0#0#0#-19%DVTDocumentLocation2@93"file://localhost/Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/NativeAlert.m0000000000000000^3134"CompileC Release-iphoneos/NativeAlert.build/Objects-normal/armv7/NativeAlert.o NativeAlert.m normal armv7 objective-c com.apple.compilers.llvm.clang.1_0.compiler    cd /Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert    setenv LANG en_US.US-ASCII    setenv PATH "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin:/Applications/Xcode.app/Contents/Developer/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin"    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -x objective-c -arch armv7 -fmessage-length=0 -std=gnu99 -Wno-trigraphs -fpascal-strings -Os -Wno-missing-field-initializers -Wno-missing-prototypes -Wreturn-type -Wno-implicit-atomic-properties -Wformat -Wno-missing-braces -Wparentheses -Wswitch -Wno-unused-function -Wno-unused-label -Wno-unused-parameter -Wunused-variable -Wunused-value -Wno-uninitialized -Wno-unknown-pragmas -Wno-shadow -Wno-four-char-constants -Wno-sign-compare -Wno-shorten-64-to-32 -Wpointer-sign -Wno-newline-eof -Wno-selector -Wno-strict-selector-match -Wno-undeclared-selector -Wno-deprecated-implementations -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS5.1.sdk -Wprotocol -Wdeprecated-declarations -g -Wno-conversion -Wno-sign-conversion -mthumb "-DIBOutlet=__attribute__((iboutlet))" "-DIBOutletCollection(ClassName)=__attribute__((iboutletcollection(ClassName)))" "-DIBAction=void)__attribute__((ibaction)" -miphoneos-version-min=4.0 -iquote /Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/Release-iphoneos/NativeAlert.build/NativeAlert-generated-files.hmap -I/Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/Release-iphoneos/NativeAlert.build/NativeAlert-own-target-headers.hmap -I/Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/Release-iphoneos/NativeAlert.build/NativeAlert-all-target-headers.hmap -iquote /Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/Release-iphoneos/NativeAlert.build/NativeAlert-project-headers.hmap -I/Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/../../build/ios/include -I/Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/Release-iphoneos/NativeAlert.build/DerivedSources/armv7 -I/Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/Release-iphoneos/NativeAlert.build/DerivedSources -F/Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/../../build/ios -include /Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/NativeAlert/NativeAlert-Prefix.pch -MMD -MT dependencies -MF /Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/Release-iphoneos/NativeAlert.build/Objects-normal/armv7/NativeAlert.d --serialize-diagnostics /Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/Release-iphoneos/NativeAlert.build/Objects-normal/armv7/NativeAlert.dia -c /Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/NativeAlert.m -o /Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/Release-iphoneos/NativeAlert.build/Objects-normal/armv7/NativeAlert.o36"E2A80C0D-979C-4171-8FDC-DA3583B3B6CC-
-
-CCompileC Release-iphoneos/NativeAlert.build/Objects-normal/armv7/SVProgressHUD.o /Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/SVProgressHUD.m normal armv7 objective-c com.apple.compilers.llvm.clang.1_0.compiler
-s356180621.884810
-e356180622.494799
-r1
-xCompileC
-xRelease-iphoneos/NativeAlert.build/Objects-normal/armv7/SVProgressHUD.o
-x/Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/SVProgressHUD.m
-xnormal
-xarmv7
-xobjective-c
-xcom.apple.compilers.llvm.clang.1_0.compiler
-lSLF05#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection87"Compile /Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/SVProgressHUD.m8ca3e28de23ab541^bdab7e8ee23ab541^---0#0#0#-19%DVTDocumentLocation2@95"file://localhost/Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/SVProgressHUD.m0000000000000000^3146"CompileC Release-iphoneos/NativeAlert.build/Objects-normal/armv7/SVProgressHUD.o SVProgressHUD.m normal armv7 objective-c com.apple.compilers.llvm.clang.1_0.compiler    cd /Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert    setenv LANG en_US.US-ASCII    setenv PATH "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin:/Applications/Xcode.app/Contents/Developer/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin"    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -x objective-c -arch armv7 -fmessage-length=0 -std=gnu99 -Wno-trigraphs -fpascal-strings -Os -Wno-missing-field-initializers -Wno-missing-prototypes -Wreturn-type -Wno-implicit-atomic-properties -Wformat -Wno-missing-braces -Wparentheses -Wswitch -Wno-unused-function -Wno-unused-label -Wno-unused-parameter -Wunused-variable -Wunused-value -Wno-uninitialized -Wno-unknown-pragmas -Wno-shadow -Wno-four-char-constants -Wno-sign-compare -Wno-shorten-64-to-32 -Wpointer-sign -Wno-newline-eof -Wno-selector -Wno-strict-selector-match -Wno-undeclared-selector -Wno-deprecated-implementations -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS5.1.sdk -Wprotocol -Wdeprecated-declarations -g -Wno-conversion -Wno-sign-conversion -mthumb "-DIBOutlet=__attribute__((iboutlet))" "-DIBOutletCollection(ClassName)=__attribute__((iboutletcollection(ClassName)))" "-DIBAction=void)__attribute__((ibaction)" -miphoneos-version-min=4.0 -iquote /Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/Release-iphoneos/NativeAlert.build/NativeAlert-generated-files.hmap -I/Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/Release-iphoneos/NativeAlert.build/NativeAlert-own-target-headers.hmap -I/Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/Release-iphoneos/NativeAlert.build/NativeAlert-all-target-headers.hmap -iquote /Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/Release-iphoneos/NativeAlert.build/NativeAlert-project-headers.hmap -I/Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/../../build/ios/include -I/Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/Release-iphoneos/NativeAlert.build/DerivedSources/armv7 -I/Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/Release-iphoneos/NativeAlert.build/DerivedSources -F/Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/../../build/ios -include /Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/NativeAlert/NativeAlert-Prefix.pch -MMD -MT dependencies -MF /Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/Release-iphoneos/NativeAlert.build/Objects-normal/armv7/SVProgressHUD.d --serialize-diagnostics /Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/Release-iphoneos/NativeAlert.build/Objects-normal/armv7/SVProgressHUD.dia -c /Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/SVProgressHUD.m -o /Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/Release-iphoneos/NativeAlert.build/Objects-normal/armv7/SVProgressHUD.o36"B588B826-3114-4357-9D7B-16BDE3E28C66-
-
-CCompileC Release-iphoneos/NativeAlert.build/Objects-normal/armv7/SlideNotification.o /Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/SlideToastNotification/SlideNotification.m normal armv7 objective-c com.apple.compilers.llvm.clang.1_0.compiler
-s356180621.884622
-e356180622.415120
-r1
-xCompileC
-xRelease-iphoneos/NativeAlert.build/Objects-normal/armv7/SlideNotification.o
-x/Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/SlideToastNotification/SlideNotification.m
-xnormal
-xarmv7
-xobjective-c
-xcom.apple.compilers.llvm.clang.1_0.compiler
-lSLF05#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection114"Compile /Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/SlideToastNotification/SlideNotification.mbb9ce28de23ab541^39466a8ee23ab541^---0#0#0#-19%DVTDocumentLocation2@122"file://localhost/Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/SlideToastNotification/SlideNotification.m0000000000000000^3216"CompileC Release-iphoneos/NativeAlert.build/Objects-normal/armv7/SlideNotification.o SlideToastNotification/SlideNotification.m normal armv7 objective-c com.apple.compilers.llvm.clang.1_0.compiler    cd /Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert    setenv LANG en_US.US-ASCII    setenv PATH "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin:/Applications/Xcode.app/Contents/Developer/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin"    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -x objective-c -arch armv7 -fmessage-length=0 -std=gnu99 -Wno-trigraphs -fpascal-strings -Os -Wno-missing-field-initializers -Wno-missing-prototypes -Wreturn-type -Wno-implicit-atomic-properties -Wformat -Wno-missing-braces -Wparentheses -Wswitch -Wno-unused-function -Wno-unused-label -Wno-unused-parameter -Wunused-variable -Wunused-value -Wno-uninitialized -Wno-unknown-pragmas -Wno-shadow -Wno-four-char-constants -Wno-sign-compare -Wno-shorten-64-to-32 -Wpointer-sign -Wno-newline-eof -Wno-selector -Wno-strict-selector-match -Wno-undeclared-selector -Wno-deprecated-implementations -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS5.1.sdk -Wprotocol -Wdeprecated-declarations -g -Wno-conversion -Wno-sign-conversion -mthumb "-DIBOutlet=__attribute__((iboutlet))" "-DIBOutletCollection(ClassName)=__attribute__((iboutletcollection(ClassName)))" "-DIBAction=void)__attribute__((ibaction)" -miphoneos-version-min=4.0 -iquote /Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/Release-iphoneos/NativeAlert.build/NativeAlert-generated-files.hmap -I/Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/Release-iphoneos/NativeAlert.build/NativeAlert-own-target-headers.hmap -I/Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/Release-iphoneos/NativeAlert.build/NativeAlert-all-target-headers.hmap -iquote /Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/Release-iphoneos/NativeAlert.build/NativeAlert-project-headers.hmap -I/Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/../../build/ios/include -I/Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/Release-iphoneos/NativeAlert.build/DerivedSources/armv7 -I/Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/Release-iphoneos/NativeAlert.build/DerivedSources -F/Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/../../build/ios -include /Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/NativeAlert/NativeAlert-Prefix.pch -MMD -MT dependencies -MF /Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/Release-iphoneos/NativeAlert.build/Objects-normal/armv7/SlideNotification.d --serialize-diagnostics /Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/Release-iphoneos/NativeAlert.build/Objects-normal/armv7/SlideNotification.dia -c /Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/SlideToastNotification/SlideNotification.m -o /Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/Release-iphoneos/NativeAlert.build/Objects-normal/armv7/SlideNotification.o36"9E51B4DD-6F68-4FD0-A968-9C4CE6240C0A-
-
-CLibtool /Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/../../build/ios/libNativeAlert.a normal armv7
-s356180622.501551
-e356180622.512483
-r1
-xLibtool
-x/Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/../../build/ios/libNativeAlert.a
-xnormal
-xarmv7
-o/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/libtool: -dynamic not specified the following flags are invalid: -ObjC 
-lSLF05#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection53"Libtool ../../build/ios/libNativeAlert.a normal armv77783808ee23ab541^1a35838ee23ab541^-159"/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/libtool: -dynamic not specified the following flags are invalid: -ObjC -0#0#0#--958"Libtool ../../build/ios/libNativeAlert.a normal armv7    cd /Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert    setenv IPHONEOS_DEPLOYMENT_TARGET 4.0    setenv PATH "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin:/Applications/Xcode.app/Contents/Developer/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin"    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/libtool -static -arch_only armv7 -syslibroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS5.1.sdk -L/Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/../../build/ios -filelist /Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/Release-iphoneos/NativeAlert.build/Objects-normal/armv7/NativeAlert.LinkFileList -ObjC -framework Foundation -o /Users/mmmackowiak/Documents/git/NativeDialog/XCode/NativeAlert/../../build/ios/libNativeAlert.a36"D2F00656-010D-40B3-BFD1-A637C7FC2F90-
-

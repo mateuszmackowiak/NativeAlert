@@ -151,7 +151,7 @@ static SVProgressHUD *sharedView = nil;
 		self.userInteractionEnabled = NO;
         self.backgroundColor = [UIColor clearColor];
 		self.alpha = 0;
-        self.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+        self.autoresizingMask = (1 << 1) | (1 << 4);
     }
 	
     return self;
@@ -180,7 +180,7 @@ static SVProgressHUD *sharedView = nil;
             
             CGPoint center = CGPointMake(self.bounds.size.width/2, self.bounds.size.height/2);
             float radius = MIN(self.bounds.size.width , self.bounds.size.height) ;
-            CGContextDrawRadialGradient (context, gradient, center, 0, center, radius, kCGGradientDrawsAfterEndLocation);
+            CGContextDrawRadialGradient (context, gradient, center, 0, center, radius, (1 << 1));
             CGGradientRelease(gradient);
             
             break;
@@ -194,7 +194,7 @@ static SVProgressHUD *sharedView = nil;
     CGFloat hudHeight = 100;
     CGFloat stringWidth = 0;
     CGFloat stringHeight = 0;
-    CGRect labelRect = CGRectZero;
+    CGRect labelRect = CGRectMake(0,0,0,0);
     
     if(string) {
         CGSize stringSize = [string sizeWithFont:self.stringLabel.font constrainedToSize:CGSizeMake(200, 300)];
@@ -244,27 +244,27 @@ static SVProgressHUD *sharedView = nil;
 - (void)registerNotifications {
     [[NSNotificationCenter defaultCenter] addObserver:self 
                                              selector:@selector(positionHUD:) 
-                                                 name:UIApplicationDidChangeStatusBarOrientationNotification 
+                                                 name:@"UIApplicationDidChangeStatusBarOrientationNotification"
                                                object:nil];  
     
     [[NSNotificationCenter defaultCenter] addObserver:self 
                                              selector:@selector(positionHUD:) 
-                                                 name:UIKeyboardWillHideNotification
+                                                 name:@"UIKeyboardWillHideNotification"
                                                object:nil];
     
     [[NSNotificationCenter defaultCenter] addObserver:self 
                                              selector:@selector(positionHUD:) 
-                                                 name:UIKeyboardDidHideNotification
+                                                 name:@"UIKeyboardDidHideNotification"
                                                object:nil];
     
     [[NSNotificationCenter defaultCenter] addObserver:self 
                                              selector:@selector(positionHUD:) 
-                                                 name:UIKeyboardWillShowNotification
+                                                 name:@"UIKeyboardWillShowNotification"
                                                object:nil];
     
     [[NSNotificationCenter defaultCenter] addObserver:self 
                                              selector:@selector(positionHUD:) 
-                                                 name:UIKeyboardDidShowNotification
+                                                 name:@"UIKeyboardDidShowNotification"
                                                object:nil];
 }
 
@@ -278,10 +278,10 @@ static SVProgressHUD *sharedView = nil;
     
     if(notification) {
         NSDictionary* keyboardInfo = [notification userInfo];
-        CGRect keyboardFrame = [[keyboardInfo valueForKey:UIKeyboardFrameBeginUserInfoKey] CGRectValue];
-        animationDuration = [[keyboardInfo valueForKey:UIKeyboardAnimationDurationUserInfoKey] doubleValue];
+        CGRect keyboardFrame = [[keyboardInfo valueForKey:@"UIKeyboardFrameBeginUserInfoKey"] CGRectValue];
+        animationDuration = [[keyboardInfo valueForKey:@"UIKeyboardAnimationDurationUserInfoKey"] doubleValue];
         
-        if(notification.name == UIKeyboardWillShowNotification || notification.name == UIKeyboardDidShowNotification) {
+        if(notification.name == @"UIKeyboardWillShowNotification" || notification.name == @"UIKeyboardDidShowNotification") {
             if(UIInterfaceOrientationIsPortrait(orientation))
                 keyboardHeight = keyboardFrame.size.height;
             else
@@ -337,12 +337,18 @@ static SVProgressHUD *sharedView = nil;
     } 
     
     if(notification) {
+        
+        [UIView beginAnimations:nil context:NULL];
+        [self moveToPoint:newCenter rotateAngle:rotateAngle];
+        [UIView setAnimationDuration:animationDuration];
+        [UIView commitAnimations];
+        /*
         [UIView animateWithDuration:animationDuration 
                               delay:0 
-                            options:UIViewAnimationOptionAllowUserInteraction 
+                            options:(1 <<  1) 
                          animations:^{
                              [self moveToPoint:newCenter rotateAngle:rotateAngle];
-                         } completion:NULL];
+                         } completion:NULL];*/
     } 
     
     else {
@@ -389,14 +395,22 @@ static SVProgressHUD *sharedView = nil;
         [self registerNotifications];
 		self.hudView.transform = CGAffineTransformScale(self.hudView.transform, 1.3, 1.3);
 		
-		[UIView animateWithDuration:0.15
+        [UIView beginAnimations:nil context:NULL];
+        self.hudView.transform = CGAffineTransformScale(self.hudView.transform, 1/1.3, 1/1.3);
+        self.alpha = 1;
+        
+        [UIView setAnimationDuration:0.15];
+        [UIView commitAnimations];
+        
+        
+		/*[UIView animateWithDuration:0.15
 							  delay:0
-							options:UIViewAnimationOptionAllowUserInteraction | UIViewAnimationCurveEaseOut | UIViewAnimationOptionBeginFromCurrentState
+							options:(1 <<  1) | UIViewAnimationCurveEaseOut | (1 <<  2)
 						 animations:^{	
 							 self.hudView.transform = CGAffineTransformScale(self.hudView.transform, 1/1.3, 1/1.3);
                              self.alpha = 1;
 						 }
-						 completion:NULL];
+						 completion:NULL];*/
 	}
     
     [self setNeedsDisplay];
@@ -439,36 +453,29 @@ static SVProgressHUD *sharedView = nil;
         self.showNetworkIndicator = NO;
     }
 
-	[UIView animateWithDuration:0.15
-						  delay:0
-						options:UIViewAnimationCurveEaseIn | UIViewAnimationOptionAllowUserInteraction
-					 animations:^{	
-						 sharedView.hudView.transform = CGAffineTransformScale(sharedView.hudView.transform, 0.8, 0.8);
-						 sharedView.alpha = 0;
-					 }
-					 completion:^(BOOL finished){ 
-                         if(sharedView.alpha == 0) {
-                             [[NSNotificationCenter defaultCenter] removeObserver:sharedView];
-                             [overlayWindow release], overlayWindow = nil;
-                             [sharedView release], sharedView = nil;
-                             
-                             // find the frontmost window that is an actual UIWindow and make it keyVisible
-                            // [[UIApplication sharedApplication].windows enumerateObjectsWithOptions:
-                              [[UIApplication sharedApplication].windows enumerateObjectsWithOptions:NSEnumerationReverse usingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-                                 UIWindow *window = (UIWindow *)obj;
-                                 if([window isKindOfClass:[UIWindow class]] && window.windowLevel == UIWindowLevelNormal) {
-                                         [window makeKeyWindow];
-                                         *stop = YES;
-                                 }
-                             }];
+    [UIView beginAnimations:nil context:NULL];
+    sharedView.hudView.transform = CGAffineTransformScale(sharedView.hudView.transform, 0.8, 0.8);
+    sharedView.alpha = 0;
+    [UIView setAnimationDelegate:self];
+    [UIView setAnimationDidStopSelector:@selector(animDismisEnd)];
+    [UIView setAnimationDuration:0.15];
+    [UIView commitAnimations];
 
-                             // uncomment to make sure UIWindow is gone from app.windows
-                             //NSLog(@"%@", [UIApplication sharedApplication].windows);
-                             //NSLog(@"keyWindow = %@", [UIApplication sharedApplication].keyWindow);
-                         }
-                     }];
 }
-
+-(void)animDismisEnd{
+    if(sharedView.alpha == 0) {
+        [[NSNotificationCenter defaultCenter] removeObserver:sharedView];
+        [overlayWindow release], overlayWindow = nil;
+        [sharedView release], sharedView = nil;
+        
+        for (UIWindow* wind in [UIApplication sharedApplication].windows) {
+            if([wind isKindOfClass:[UIWindow class]] ) {
+                [wind makeKeyWindow];
+                // *stop = YES;
+            }
+        }
+    } 
+}
 #pragma mark - Utilities
 
 + (BOOL)isVisible {
@@ -481,7 +488,7 @@ static SVProgressHUD *sharedView = nil;
 - (UIWindow *)overlayWindow {
     if(!overlayWindow) {
         overlayWindow = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
-        overlayWindow.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+        overlayWindow.autoresizingMask = (1 <<  1) | (1 <<  4);
         overlayWindow.backgroundColor = [UIColor clearColor];
         overlayWindow.userInteractionEnabled = NO;
     }
@@ -490,11 +497,10 @@ static SVProgressHUD *sharedView = nil;
 
 - (UIView *)hudView {
     if(!hudView) {
-        hudView = [[UIView alloc] initWithFrame:CGRectZero];
+        hudView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 0, 0)];
         hudView.layer.cornerRadius = 10;
 		hudView.backgroundColor = [UIColor colorWithWhite:0 alpha:0.8];
-        hudView.autoresizingMask = (UIViewAutoresizingFlexibleBottomMargin | UIViewAutoresizingFlexibleTopMargin |
-                                    UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleLeftMargin);
+        hudView.autoresizingMask = ((1 <<  5) | (1 <<  3) | (1 <<  2) | (1 <<  0));
         
         [self addSubview:hudView];
     }
@@ -503,7 +509,7 @@ static SVProgressHUD *sharedView = nil;
 
 - (UILabel *)stringLabel {
     if (stringLabel == nil) {
-        stringLabel = [[UILabel alloc] initWithFrame:CGRectZero];
+        stringLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 0, 0)];
 		stringLabel.textColor = [UIColor whiteColor];
 		stringLabel.backgroundColor = [UIColor clearColor];
 		stringLabel.adjustsFontSizeToFitWidth = YES;

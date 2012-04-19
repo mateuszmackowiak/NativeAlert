@@ -5,6 +5,7 @@ import pl.mateuszmackowiak.nativeANE.NativeDialog.NativeExtension;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.text.Html;
+import android.util.Log;
 
 import com.adobe.fre.FREArray;
 import com.adobe.fre.FREContext;
@@ -27,7 +28,7 @@ public class showListDialog implements FREFunction {
 	
 		try{
 		 	function = args[0].getAsString();
-			if(function.equals("show")){
+			if(function.equals("create")){
 		        title = args[1].getAsString();
 		        
 				if(args[2] instanceof FREArray)
@@ -49,24 +50,38 @@ public class showListDialog implements FREFunction {
 		        cancelable = args[5].getAsBool();
 		        theme = args[6].getAsInt();
 	        	mDialog = createPopup(context,title,buttons,choices,checkedItems,checkedItem,cancelable,theme);
-	        	
-	        	
-	        	
-		        mDialog.show();
-				context.dispatchStatusEventAsync(NativeExtension.OPENED,String.valueOf(-2));
-		        
-		        
+
+				context.dispatchStatusEventAsync(NativeExtension.OPENED,"");
+				
+			}else if(function.equals("show") && mDialog!=null){
+				mDialog.show();
+				
 			}else if(function.equals("hide")){
 				if(mDialog!=null && mDialog.isShowing()){
-					mDialog.hide();
-					context.dispatchStatusEventAsync(NativeExtension.CLOSED,String.valueOf(-2));
-				}
-			}else if(function.equals("kill")){
-				if(mDialog!=null){
+					context.dispatchStatusEventAsync(NativeExtension.CANCELED,String.valueOf(-1));
 					mDialog.dismiss();
-					context.dispatchStatusEventAsync(NativeExtension.CLOSED,String.valueOf(-2));
 				}
-			}else if(function.equals("isShowing")){
+				
+			}else if(function.equals("setTitle") && mDialog!=null && mDialog.isShowing()){
+				mDialog.setTitle(Html.fromHtml(title));
+				
+				
+			}else if(function.equals("setCancelable") && mDialog!=null){
+				cancelable = args[1].getAsBool();
+				mDialog.setCancelable(cancelable);
+				 if(cancelable==true)
+					 mDialog.setOnCancelListener(new CancelListener(context));
+				
+				
+			}else if(function.equals("dismiss") && mDialog!=null){
+					mDialog.dismiss();
+			}
+			/*else if(function.equals("kill")){
+				if(mDialog!=null){
+					context.dispatchStatusEventAsync(NativeExtension.CANCELED,String.valueOf(-1));
+					mDialog.dismiss();
+				}
+			}*/else if(function.equals("isShowing")){
 				FREObject b = null;
 				if(mDialog!=null && mDialog.isShowing()==true)
 					b = FREObject.newObject(true);
@@ -96,7 +111,6 @@ public class showListDialog implements FREFunction {
 				builder.setOnCancelListener(new CancelListener(context));
 			
 			if(choices!=null && checkedItem!=null){
-				context.dispatchStatusEventAsync(NativeExtension.LOG_EVENT, KEY+"   jest jeden element "+String.valueOf(checkedItem.intValue()));
 				builder.setSingleChoiceItems(choices, checkedItem.intValue(), new SingleChoiceClickListener(context));
 			}else if(choices!=null && (checkedItems==null || checkedItems.length == choices.length)){
 				builder.setMultiChoiceItems(choices, checkedItems, new IndexChange(context));
@@ -124,14 +138,15 @@ public class showListDialog implements FREFunction {
     	private FREContext context; 
     	CancelListener(FREContext context)
     	{
+    		
     		this.context=context;
     	}
  
-        public void onCancel(DialogInterface dialog) 
+        @Override
+		public void onCancel(DialogInterface dialog) 
         {
+        	Log.e("List Dialog","onCancle");
      	    context.dispatchStatusEventAsync(NativeExtension.CANCELED,String.valueOf(-1));        
-            dialog.dismiss();
-            context =null;
         }
     }
 	private class ConfitmListener implements DialogInterface.OnClickListener{
@@ -141,11 +156,11 @@ public class showListDialog implements FREFunction {
     		this.context=context;
     	}
  
-        public void onClick(DialogInterface dialog,int id) 
+        @Override
+		public void onClick(DialogInterface dialog,int id) 
         {
-     	    context.dispatchStatusEventAsync(NativeExtension.CLOSED,String.valueOf(id));     
-            dialog.dismiss();
-            context =null;
+        	Log.e("List Dialog","onClicked");
+     	    context.dispatchStatusEventAsync(NativeExtension.CLOSED,String.valueOf(Math.abs(id)));     
         }
     }
 	
@@ -157,11 +172,14 @@ public class showListDialog implements FREFunction {
     		this.context=context;
     	}
  
-        public void onClick(DialogInterface dialog,int id) 
+        @Override
+		public void onClick(DialogInterface dialog,int id) 
         {
      	    context.dispatchStatusEventAsync(NativeExtension.LIST_CHANGE,String.valueOf(id));     
         }
     }
+	
+	
 	private class IndexChange implements DialogInterface.OnMultiChoiceClickListener{
     	private FREContext context; 
     	IndexChange(FREContext context)
@@ -169,7 +187,8 @@ public class showListDialog implements FREFunction {
     		this.context=context;
     	}
  
-        public void onClick(DialogInterface dialog,int id , boolean checked) 
+        @Override
+		public void onClick(DialogInterface dialog,int id , boolean checked) 
         {
      	    context.dispatchStatusEventAsync(NativeExtension.LIST_CHANGE,String.valueOf(id)+"_"+String.valueOf(checked));        
         }

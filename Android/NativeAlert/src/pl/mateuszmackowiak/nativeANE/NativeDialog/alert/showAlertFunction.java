@@ -1,11 +1,11 @@
 package pl.mateuszmackowiak.nativeANE.NativeDialog.alert;
 
+import pl.mateuszmackowiak.nativeANE.NativeDialog.NativeExtension;
+
 import com.adobe.fre.FREContext;
 import com.adobe.fre.FREFunction;
-import com.adobe.fre.FREInvalidObjectException;
 import com.adobe.fre.FREObject;
-import com.adobe.fre.FRETypeMismatchException;
-import com.adobe.fre.FREWrongThreadException;
+
 
 import android.content.DialogInterface;
 import android.text.Html;
@@ -25,83 +25,23 @@ public class showAlertFunction implements FREFunction{
         boolean cancelable=false;
         int theme=1;  
         try{
+
             title = args[0].getAsString();
-        }catch (IllegalStateException e){
-            e.printStackTrace();
-        }catch (FRETypeMismatchException e){
-            e.printStackTrace();
-        }catch (FREInvalidObjectException e){
-            e.printStackTrace();
-        }catch (FREWrongThreadException e){
-            e.printStackTrace();
-        }
-        try{
             message = args[1].getAsString();
-        }catch (IllegalStateException e){
-            e.printStackTrace();
-        }catch (FRETypeMismatchException e){
-            e.printStackTrace();
-        }catch (FREInvalidObjectException e){
-            e.printStackTrace();
-        }catch (FREWrongThreadException e){
-            e.printStackTrace();
-        }
-        try{
             closeLabel = args[2].getAsString();
-        }catch (IllegalStateException e){
-            e.printStackTrace();
-        }catch (FRETypeMismatchException e){
-            e.printStackTrace();
-        }catch (FREInvalidObjectException e){
-            e.printStackTrace();
-        }catch (FREWrongThreadException e){
-            e.printStackTrace();
-        }
-        try{
             otherLabel= args[3].getAsString();
-        }catch (IllegalStateException e){
+		    cancelable= args[4].getAsBool();
+			theme= args[5].getAsInt();
+		    creatAlert(context,message,title,closeLabel,otherLabel,cancelable,theme).show();
+
+        }catch (Exception e){
+        	context.dispatchStatusEventAsync(NativeExtension.ERROR_EVENT,String.valueOf(-1));
             e.printStackTrace();
-        }catch (FRETypeMismatchException e){
-            e.printStackTrace();
-        }catch (FREInvalidObjectException e){
-            e.printStackTrace();
-        }catch (FREWrongThreadException e){
-            e.printStackTrace();
-        }
-        if (args.length>=5)
-        {
-	        try{
-	        	cancelable= args[4].getAsBool();
-	        }catch (IllegalStateException e){
-	            e.printStackTrace();
-	        }catch (FRETypeMismatchException e){
-	            e.printStackTrace();
-	        }catch (FREInvalidObjectException e){
-	            e.printStackTrace();
-	        }catch (FREWrongThreadException e){
-	            e.printStackTrace();
-	        }
-		    if (args.length>=6)
-		    {
-		        try{
-		            theme= args[5].getAsInt();
-		        }catch (IllegalStateException e){
-		            e.printStackTrace();
-		        }catch (FRETypeMismatchException e){
-		            e.printStackTrace();
-		        }catch (FREInvalidObjectException e){
-		            e.printStackTrace();
-		        }catch (FREWrongThreadException e){
-		            e.printStackTrace();
-		        }
-		    }
-        }
-        showAlertWithTitleAndMessage(context,message,title,closeLabel,otherLabel,cancelable,theme);
-               
+        }    
         return null;
     }
     
-    private void showAlertWithTitleAndMessage(FREContext context,String message,String title,String closeLabel,String otherLabel,boolean cancelable,int theme)
+    private AlertDialog creatAlert(FREContext context,String message,String title,String closeLabel,String otherLabel,boolean cancelable,int theme)
     {  
     	AlertDialog.Builder builder = (Integer.parseInt(android.os.Build.VERSION.SDK)<11)?new AlertDialog.Builder(context.getActivity()): new AlertDialog.Builder(context.getActivity(),theme);
     	
@@ -152,8 +92,7 @@ public class showAlertFunction implements FREFunction{
 	        	builder.setItems(als2, new AlertListener(context));
 	        }
     	}
-        AlertDialog alert = builder.create();
-        alert.show();
+        return builder.create();
     }
     
     private class CancelListener implements DialogInterface.OnCancelListener{
@@ -163,11 +102,12 @@ public class showAlertFunction implements FREFunction{
     		this.context=context;
     	}
  
-        public void onCancel(DialogInterface dialog) 
+        @Override
+		public void onCancel(DialogInterface dialog) 
         {
-     	    context.dispatchStatusEventAsync("ALERT_CLOSED",String.valueOf(-1));        
-            dialog.dismiss();
-            context =null;
+     	   context.dispatchStatusEventAsync(NativeExtension.CLOSED,String.valueOf(-1));        
+     	   dialog.dismiss();
+           context =null;
         }
     }
     private class AlertListener implements DialogInterface.OnClickListener
@@ -178,7 +118,8 @@ public class showAlertFunction implements FREFunction{
     		this.context=context;
     	}
  
-        public void onClick(DialogInterface dialog, int id) 
+        @Override
+		public void onClick(DialogInterface dialog, int id) 
         {
         	if(id==-1)
         		id=0;
@@ -186,7 +127,7 @@ public class showAlertFunction implements FREFunction{
         		id=1;
         	else if(id==-3)
         		id=0;
-     	    context.dispatchStatusEventAsync("ALERT_CLOSED",String.valueOf(id));        
+     	    context.dispatchStatusEventAsync(NativeExtension.CLOSED,String.valueOf(id));        
             dialog.dismiss();
             context =null;
         }

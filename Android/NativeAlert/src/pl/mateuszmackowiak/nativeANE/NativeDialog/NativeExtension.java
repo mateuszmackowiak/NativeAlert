@@ -17,13 +17,12 @@ import com.adobe.fre.FREExtension;
  */
 public class NativeExtension implements FREExtension{
     
-	public static final String ERROR_EVENT = "nativeError";
+	public static final String ERROR_EVENT = "error";
 	
-	public static final String LOG_EVENT ="logEvent";
 	
 	public static final String CLOSED="nativeDialog_closed";
 	public static final String OPENED="nativeDialog_opened";
-	public static final String CANCELED="nativeDialog_cancled";
+	public static final String CANCELED="nativeDialog_canceled";
 	
 	public static final String LIST_CHANGE = "nativeListDialog_change";
 	

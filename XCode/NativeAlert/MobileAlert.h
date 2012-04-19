@@ -2,19 +2,26 @@
 //  MobileAlert.h
 //  NativeAlert
 //
-//  Created by Anthony McCormick on 22/10/2011.
-//  Copyright (c) 2011 __MyCompanyName__. All rights reserved.
+//  Created by Mateusz Maćkowiak / Paweł Meller / Anthony McCormick on 2011/2012.
 //
 
 #ifdef __OBJC__
     #import <UIKit/UIKit.h>
     #import "FlashRuntimeExtensions.h"
+    #import "SBTableAlert.h"
+    #import "AlertTextView.h"
 #endif
 
+@interface ListItem : NSObject
+@property( nonatomic, retain ) NSString *text;
+@property( nonatomic ) uint32_t selected;
+@end
 
-@interface MobileAlert : NSObject <UIAlertViewDelegate>
+
+@interface MobileAlert : NSObject <UIAlertViewDelegate,SBTableAlertDelegate,SBTableAlertDataSource>
 @property( nonatomic, retain ) UIProgressView *progressView;
 @property( nonatomic, retain ) UIAlertView *alert;
+@property( nonatomic, retain ) SBTableAlert *sbAlert;
 
 -(void)showAlertWithTitle: (NSString *)title 
                   message: (NSString*)message 
@@ -34,6 +41,13 @@
                 textInputs: (FREObject*)textInputs
                    buttons: (FREObject*)buttons
                    context: (FREContext *)ctx;
+
+-(void)showSelectDialogWithTitle: (NSString *)title
+                              message: (NSString*)message
+                              options: (FREObject*)options
+                              checked: (FREObject*)checked
+                              buttons: (FREObject*)buttons
+                              context: (FREContext *)ctx;
 
 - (void)shake;
 

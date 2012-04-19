@@ -2,8 +2,7 @@
 //  NativeAlert.m
 //  NativeAlert
 //
-//  Created by Mateusz Maćkowiak
-//  Copyright (c) 2012 Mateusz Maćkowiak. All rights reserved.
+//  Created by Mateusz Maćkowiak / Paweł Meller / Anthony McCormick on 2011/2012.
 //
 
 #include "FlashRuntimeExtensions.h"
@@ -17,6 +16,7 @@
 
 
 #import "SlideNotification.h"
+
 #import "SVProgressHUD.h"
 MobileAlert *alert;
 
@@ -27,6 +27,7 @@ MobileAlert *alert;
 // ALERT
 //
 //---------------------------------------------------------------------
+#pragma mark - Alert
 FREObject showAlertWithTitleAndMessage(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[] )
 {
     //Temporary values to hold our actionscript code.
@@ -66,6 +67,7 @@ FREObject showAlertWithTitleAndMessage(FREContext ctx, void* funcData, uint32_t 
 // PROGRESS
 //
 //---------------------------------------------------------------------
+#pragma mark - Progress
 FREObject showProgressPopup(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[] )
 {
     //Temporary values to hold our actionscript code.
@@ -143,11 +145,59 @@ FREObject showProgressPopup(FREContext ctx, void* funcData, uint32_t argc, FREOb
     return NULL;    
 }
 
+
+FREObject updateProgress(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[] )
+{
+    //Temporary values to hold our actionscript code.
+    double perc;
+    //Turn our actionscrpt code into native code.
+    FREGetObjectAsDouble(argv[0], &perc);
+    CGFloat percFloat = perc;	
+    [alert updateProgress:percFloat];
+    //Create our Strings for our Alert.
+    return NULL;    
+}	
+
+
+//---------------------------------------------------------------------
+//
+// List DIALOG
+//
+//---------------------------------------------------------------------
+
+#pragma mark - List Dialog
+FREObject showListDialog(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[] )
+{
+    //Temporary values to hold our actionscript code.
+    uint32_t titleLength;
+    const uint8_t *title;
+    uint32_t messageLength;
+    const uint8_t *message;
+    
+    
+    NSString *titleString = nil;
+    NSString *messageString =nil;
+    
+    if(argv[0]!=NULL){
+        FREGetObjectAsUTF8(argv[0], &titleLength, &title);
+        titleString = [NSString stringWithUTF8String:(char*)title];
+    }
+    if(argv[1]!=NULL){
+        FREGetObjectAsUTF8(argv[1], &messageLength, &message);
+        messageString = [NSString stringWithUTF8String:(char*)message]; 
+    }
+    alert = [[MobileAlert alloc] init];
+  
+    [alert showSelectDialogWithTitle:titleString message:messageString options:argv[3] checked: argv[4] buttons:argv[2] context:ctx];
+    
+    return NULL;    
+}
 //---------------------------------------------------------------------
 //
 // TEXT INPUT DIALOG
 //
 //---------------------------------------------------------------------
+#pragma mark - Text Dialog
 FREObject showTextInputDialog(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[] )
 {
     //Temporary values to hold our actionscript code.
@@ -179,6 +229,23 @@ FREObject showTextInputDialog(FREContext ctx, void* funcData, uint32_t argc, FRE
     
     return NULL;    
 }
+
+
+
+
+
+
+
+
+
+//---------------------------------------------------------------------
+//
+// dialog methods
+//
+//---------------------------------------------------------------------
+#pragma mark - dialog methods
+
+
 FREObject shake(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[] )
 {
     if(alert!=NULL)
@@ -186,34 +253,8 @@ FREObject shake(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[] 
     return NULL;
 }
 
-FREObject showHidenetworkIndicator(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[] ){
-    UIApplication* app = [UIApplication sharedApplication];
-    if(argc>0 && argv[0]){
-        uint32_t shownetworkActivity;
-        FREGetObjectAsBool(argv[0], &shownetworkActivity);
-        
-        if(app && app.networkActivityIndicatorVisible != shownetworkActivity)
-            app.networkActivityIndicatorVisible = shownetworkActivity;
-    }
-    FREObject retVal;
-    
-    if(app && FRENewObjectFromBool(app.networkActivityIndicatorVisible, &retVal) == FRE_OK){
-        return retVal;
-    }else{
-        return nil;
-    }
-}
-FREObject updateProgress(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[] )
-{
-    //Temporary values to hold our actionscript code.
-    double perc;
-    //Turn our actionscrpt code into native code.
-    FREGetObjectAsDouble(argv[0], &perc);
-    CGFloat percFloat = perc;	
-    [alert updateProgress:percFloat];
-    //Create our Strings for our Alert.
-    return NULL;    
-}	
+
+
 FREObject hide(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[] )
 {
     if(alert)
@@ -238,6 +279,7 @@ FREObject hide(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[] )
         }
     }else
         [SVProgressHUD dismiss];
+
     //Create our Strings for our Alert.
     return NULL; 
 }
@@ -301,6 +343,33 @@ FREObject isShowing(FREContext ctx, void* funcData, uint32_t argc, FREObject arg
 //
 
 
+
+#pragma mark - Network Indicator
+
+
+FREObject showHidenetworkIndicator(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[] ){
+    UIApplication* app = [UIApplication sharedApplication];
+    if(argc>0 && argv[0]){
+        uint32_t shownetworkActivity;
+        FREGetObjectAsBool(argv[0], &shownetworkActivity);
+        
+        if(app && app.networkActivityIndicatorVisible != shownetworkActivity)
+            app.networkActivityIndicatorVisible = shownetworkActivity;
+    }
+    FREObject retVal;
+    
+    if(app && FRENewObjectFromBool(app.networkActivityIndicatorVisible, &retVal) == FRE_OK){
+        return retVal;
+    }else{
+        return nil;
+    }
+}
+
+
+
+#pragma mark - Toast
+
+
 FREObject showToast(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[] )
 {
     if(argv==NULL)
@@ -327,7 +396,7 @@ FREObject showToast(FREContext ctx, void* funcData, uint32_t argc, FREObject arg
     return NULL;
 }
 
-
+#pragma mark - Notification
 
 FREObject showNotification(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[] )
 {
@@ -400,7 +469,7 @@ FREObject showNotification(FREContext ctx, void* funcData, uint32_t argc, FREObj
 // SYSTEM PROPERTIES
 //
 //---------------------------------------------------------------------
-
+#pragma mark - System Properties
 
 /**
 *John Muchow (http://iPhoneDeveloperTips.com/device/determine-mac-address.html)
@@ -560,12 +629,16 @@ FREObject getSystemProperties(FREContext ctx, void* funcData, uint32_t argc, FRE
 // Required Methods.
 //
 //------------------------------------
+#pragma mark - BASE
+
+
 static const char * SYSTEM_PROPERTIES_KEY = "SystemProperites";
 static const char * PROGRESS_KEY = "ProgressContext";
 static const char * NETWORK_ACTIVITY_INDICATOR = "NetworkActivityIndicatoror";
 static const char * LOCAL_NOTIFICATION = "LocalNotification";
 static const char * TEXT_INPUT_DIALOG = "TextInputDialogContext";
 static const char * TOAST = "ToastContext";
+static const char * LIST_DIALOG ="ListDialogContext";
 
 FREObject setBadge(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[] ){
     int32_t value;
@@ -600,9 +673,16 @@ FREObject isSupported(FREContext ctx, void* funcData, uint32_t argc, FREObject a
 void NativeDialogContextInitializer(void* extData, const uint8_t * ctxType, FREContext ctx, 
 						uint32_t* numFunctionsToTest, const FRENamedFunction** functionsToSet) 
 {
+    
+    
     int count=2;
     if(strcmp((const char *)ctxType, PROGRESS_KEY)==0){
         count = 7;
+        NSLog(@"ctxType %s",ctxType);
+        
+    }else if(strcmp((const char *)ctxType, LIST_DIALOG)==0){
+        count = 6;
+        
         NSLog(@"ctxType %s",ctxType);
     }else if(strcmp((const char *)ctxType, TEXT_INPUT_DIALOG)==0){
         count = 6;
@@ -646,6 +726,29 @@ void NativeDialogContextInitializer(void* extData, const uint8_t * ctxType, FREC
         func[1].functionData = NULL;
         func[1].function = &showNotification;
         
+        
+    }else if(strcmp((const char *)ctxType, LIST_DIALOG)==0){
+        
+        func[1].name = (const uint8_t*) "isShowing";
+        func[1].functionData = NULL;
+        func[1].function = &isShowing;
+        
+        func[2].name = (const uint8_t *) "show";
+        func[2].functionData = NULL;
+        func[2].function = &showListDialog;
+        
+        func[3].name = (const uint8_t*) "updateTitle";
+        func[3].functionData = NULL;
+        func[3].function = &updateTitle;
+        
+        func[4].name = (const uint8_t*) "hide";
+        func[4].functionData = NULL;
+        func[4].function = &hide;
+        
+        func[5].name = (const uint8_t*) "shake";
+        func[5].functionData = NULL;
+        func[5].function = &shake;
+        
     }else if(strcmp((const char *)ctxType, TEXT_INPUT_DIALOG)==0){
     
         func[1].name = (const uint8_t*) "isShowing";
@@ -681,7 +784,7 @@ void NativeDialogContextInitializer(void* extData, const uint8_t * ctxType, FREC
         func[3].functionData = NULL;
         func[3].function = &updateProgress;
         
-        func[4].name = (const uint8_t*) "hideProgress";
+        func[4].name = (const uint8_t*) "hide";
         func[4].functionData = NULL;
         func[4].function = &hide;
         
@@ -705,6 +808,8 @@ void NativeDialogContextInitializer(void* extData, const uint8_t * ctxType, FREC
         func[3].name = (const uint8_t *) "getBadge";
         func[3].functionData = NULL;
         func[3].function = &getBadge;
+        
+
     }
     
     

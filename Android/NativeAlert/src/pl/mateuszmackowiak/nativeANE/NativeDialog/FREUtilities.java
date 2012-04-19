@@ -16,7 +16,7 @@ public class FREUtilities {
     		CharSequence[] csa = new CharSequence[lenth];
         	FREObject obj=null;
         	for (int i = 0; i < lenth; i++) {
-        		obj = freArray.getObjectAt((long)i);
+        		obj = freArray.getObjectAt(i);
         		csa[i] = obj.getAsString();
 			}
         	return csa;
@@ -32,7 +32,7 @@ public class FREUtilities {
     		String[] sa = new String[lenth];
         	FREObject obj=null;
         	for (int i = 0; i < lenth; i++) {
-        		obj = freArray.getObjectAt((long)i);
+        		obj = freArray.getObjectAt(i);
         		sa[i] = obj.getAsString();
 			}
         	return sa;
@@ -46,7 +46,7 @@ public class FREUtilities {
     		boolean[] ba = new boolean[lenth];
         	FREObject obj = null;
         	for (int i = 0; i < lenth; i++) {
-        		obj = freArray.getObjectAt((long)i);
+        		obj = freArray.getObjectAt(i);
         		ba[i] = obj.getAsBool();
 			}
         	return ba;

@@ -118,7 +118,8 @@ public class showProgressPopup implements FREFunction {
 	}
 	
 	public ProgressDialog createProgressDialog(FREContext context,int style,Integer progress,Integer secondaryProgress,String title,String message,int theme,boolean cancleble,boolean indeterminate) {
-		ProgressDialog mDialog = new ProgressDialog(context.getActivity(),theme);
+		
+		ProgressDialog mDialog = (Integer.parseInt(android.os.Build.VERSION.SDK)<11)?new ProgressDialog(context.getActivity()):new ProgressDialog(context.getActivity(),theme);
 		try{
 			if(title!=null && !title.isEmpty())
 				mDialog.setTitle(Html.fromHtml(title));
@@ -137,7 +138,6 @@ public class showProgressPopup implements FREFunction {
 			       		mDialog.setSecondaryProgress(secondaryProgress);
 		        }
 	        }
-	        context.dispatchStatusEventAsync(NativeExtension.LOG_EVENT,KEY+"      setting cancleble    ");
 	       	mDialog.setCancelable(cancleble);
 	       	
 	       	mDialog.setOnCancelListener(new CancelListener(context));
@@ -155,9 +155,11 @@ public class showProgressPopup implements FREFunction {
     		this.context=context;
     	}
  
-        public void onCancel(DialogInterface dialog) 
+        @Override
+		public void onCancel(DialogInterface dialog) 
         {
-     	    context.dispatchStatusEventAsync(NativeExtension.CANCELED,String.valueOf(-1));
+        	if(context!=null)
+        		context.dispatchStatusEventAsync(NativeExtension.CANCELED,String.valueOf(-1));
             dialog.dismiss();
         }
     }

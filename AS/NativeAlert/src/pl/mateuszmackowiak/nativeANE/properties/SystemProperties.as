@@ -6,10 +6,16 @@ package pl.mateuszmackowiak.nativeANE.properties
 	import flash.system.Capabilities;
 	import flash.utils.Dictionary;
 
+	/**
+	 * SystemProperties class can provide some of the missing properties that You can’t get in adobe air
+	 * @author Mateusz Maćkowiak
+	 * @see http://www.mateuszmackowiak.art.pl/blog
+	 * @since 2011
+	 */
 	public class SystemProperties
 	{
 		/**
-		 * IOS Android
+		 * IOS / Android
 		 */
 		public static const OS:String = 'os';
 		/**
@@ -21,7 +27,7 @@ package pl.mateuszmackowiak.nativeANE.properties
 		 */
 		public static const ARCHITECTURE:String = 'arch';
 		/**
-		 * IOS Android
+		 * IOS / Android
 		 */
 		public static const VERSION:String = 'version';
 		/**
@@ -37,10 +43,13 @@ package pl.mateuszmackowiak.nativeANE.properties
 		 */
 		public static const APP_UID:String = 'AppUid';
 		/**
-		 * IOS Android
+		 * IOS / Android
 		 */
 		public static const UID:String = 'UID';
 		
+		/**
+		 * 
+		 */
 		public static function getProperites():Dictionary
 		{
 			try{
@@ -56,7 +65,9 @@ package pl.mateuszmackowiak.nativeANE.properties
 			return null;
 		}
 		
-
+		/**
+		 * If the extension is available on the device (true);<br>otherwise false
+		 */
 		public static function isSupported():Boolean{
 			if(Capabilities.os.indexOf("Linux")>-1 || Capabilities.os.indexOf("iPhone")>-1)
 				return true;

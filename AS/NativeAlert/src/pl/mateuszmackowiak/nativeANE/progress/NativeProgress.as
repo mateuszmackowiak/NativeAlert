@@ -5,15 +5,15 @@
  */
 package pl.mateuszmackowiak.nativeANE.progress
 {
+	import flash.events.ErrorEvent;
 	import flash.events.EventDispatcher;
 	import flash.events.IEventDispatcher;
 	import flash.events.StatusEvent;
 	import flash.external.ExtensionContext;
 	import flash.system.Capabilities;
 	
-	import pl.mateuszmackowiak.nativeANE.LogEvent;
 	import pl.mateuszmackowiak.nativeANE.NativeDialogEvent;
-	import pl.mateuszmackowiak.nativeANE.NativeExtensionErrorEvent;
+
 	
 	/** 
 	 * @author Mateusz Maćkowiak
@@ -47,17 +47,17 @@ package pl.mateuszmackowiak.nativeANE.progress
 		 * uses : SVProgressHUD
 		 * @see http://github.com/samvermette/SVProgressHUD
 		 */
-		public static const IOS_SVHUD_BLACK_BACKGROUND_THEME:uint=0x00000002;
+		//public static const IOS_SVHUD_BLACK_BACKGROUND_THEME:uint=0x00000002;
 		/**
 		 * uses : SVProgressHUD
 		 * @see http://github.com/samvermette/SVProgressHUD
 		 */
-		public static const IOS_SVHUD_NON_BACKGROUND_THEME:uint=0x00000003;
+		//public static const IOS_SVHUD_NON_BACKGROUND_THEME:uint=0x00000003;
 		/**
 		 * uses : SVProgressHUD
 		 * @see http://github.com/samvermette/SVProgressHUD
 		 */
-		public static const IOS_SVHUD_GRADIENT_BACKGROUND_THEME:uint=0x00000004;
+		//public static const IOS_SVHUD_GRADIENT_BACKGROUND_THEME:uint=0x00000004;
 		
 		/**
 		 * the default style for bouth IOS and Android devices 
@@ -118,6 +118,10 @@ package pl.mateuszmackowiak.nativeANE.progress
 				isAndroid = true;
 			else if(Capabilities.os.toLowerCase().indexOf("iph")>-1)
 				isIOS = true;
+			else{
+				trace("NativeProgress is not supported on this platform");
+				return;
+			}
 				
 			if(style == STYLE_HORIZONTAL || style==STYLE_SPINNER)
 				_style = style;
@@ -138,7 +142,7 @@ package pl.mateuszmackowiak.nativeANE.progress
 
 		/**
 		 * shows the nativeProgress dialog
-		 * @param cancleble if pressing outside the popup or the back button hides the popup (IOS default theme not supported)
+		 * @param cancleble if pressing outside the popup or the back button hides the popup
 		 * @param indeterminate if the progressbar should indicate indeterminate values (on IOS shows with <code>STYLE_SPINNER</code>)
 		 * @return if call sucessfull
 		 */
@@ -167,7 +171,7 @@ package pl.mateuszmackowiak.nativeANE.progress
 		
 		/**
 		 * shows the nativeProgress dialog with a Horizontal style progress bar
-		 * @param cancleble if pressing outside the popup or the back button hides the popup (IOS default theme not supported)
+		 * @param cancleble if pressing outside the popup or the back button hides the popup 
 		 * @return if call sucessfull
 		 */
 		public function showHorizontal(cancleble:Boolean=false):Boolean
@@ -195,7 +199,7 @@ package pl.mateuszmackowiak.nativeANE.progress
 		
 		/**
 		 * shows the nativeProgress dialog with a spinner style progress indicator
-		 * @param cancleble if pressing outside the popup or the back button hides the popup (IOS default theme not supported)
+		 * @param cancleble if pressing outside the popup or the back button hides the popup
 		 * @return if call sucessfull
 		 */
 		public function showSpinner(cancleble:Boolean=false):Boolean
@@ -242,8 +246,9 @@ package pl.mateuszmackowiak.nativeANE.progress
 		/**
 		 * If progressbar shows indeterminate values. Only if style set to <code>STYLE_HORIZONTAL</code>
 		 * <br><b>AVAILABLE ONLY ON ANDROID</b>
+		 * @see setIndeterminate()
 		 */
-		public function getIndeterminate():Boolean{
+		public function get indeterminate():Boolean{
 			return _indeterminate;
 		}
 		
@@ -259,7 +264,6 @@ package pl.mateuszmackowiak.nativeANE.progress
 				if(isAndroid && _isShowing){
 					try{
 						context.call(showProgressPopup,"setSecondary",value);
-						_secondary = value;
 						return true;
 					}catch(e:Error){
 						showError("Error setting secondary progress "+e.message,e.errorID);
@@ -271,8 +275,9 @@ package pl.mateuszmackowiak.nativeANE.progress
 		/**
 		 * The second vaule of the progressbar
 		 * <br><b>AVAILABLE ONLY ON ANDROID</b>
+		 * @see setSecondaryProgress()
 		 */
-		public function getSecondaryProgress():int{
+		public function get secondaryProgress():int{
 			return _secondary;
 		}
 		
@@ -301,8 +306,9 @@ package pl.mateuszmackowiak.nativeANE.progress
 		}
 		/**
 		 * The vaule of the progressbar
+		 * @see setProgress()
 		 */
-		public function getProgress():int{
+		public function get progress():int{
 			return _progress;
 		}
 		
@@ -338,8 +344,9 @@ package pl.mateuszmackowiak.nativeANE.progress
 		/**
 		 * The Max vaule of the progressbar
 		 * <br><b>AVAILABLE ONLY ON ANDROID</b>
+		 * @see setMax()
 		 */
-		public function getMax():int{
+		public function get max():int{
 			return _maxProgress;
 		}
 		
@@ -370,8 +377,9 @@ package pl.mateuszmackowiak.nativeANE.progress
 		}
 		/**
 		 * The message of the dialog
+		 * @see setMessage()
 		 */
-		public function getMessage():String
+		public function get message():String
 		{
 			return _message;
 		}
@@ -390,11 +398,14 @@ package pl.mateuszmackowiak.nativeANE.progress
 			if(value!==_title){
 				_title = value;
 				try{
-					if(isAndroid)
+					if(isAndroid){
 						context.call(showProgressPopup,"setTitle",value);
-					else
+						return true;
+					}else{
 						context.call("updateTitle",value);
-					return true;
+						return true;
+					}
+					return false;
 				}catch(e:Error){
 					showError("Error setting title "+e.message,e.errorID);
 				}
@@ -403,8 +414,9 @@ package pl.mateuszmackowiak.nativeANE.progress
 		}
 		/**
 		 * The title of the dialog
+		 * @see setTitle()
 		 */
-		public function getTitle():String
+		public function get title():String
 		{
 			return _title;
 		}
@@ -418,11 +430,13 @@ package pl.mateuszmackowiak.nativeANE.progress
 		public function isShowing():Boolean{
 			if(context){
 				if(isAndroid){
-					return context.call(showProgressPopup,"isShowing");
-					return true;
+					const b:Boolean = context.call(showProgressPopup,"isShowing");
+					_isShowing = b;
+					return b;
 				}else if(isIOS){
-					return context.call("isShowing");
-					return true;
+					const b2:Boolean = context.call("isShowing");
+					_isShowing = b2;
+					return b2;
 				}
 			}
 			return false;
@@ -435,7 +449,10 @@ package pl.mateuszmackowiak.nativeANE.progress
 		 */
 		public function set theme(value:int):void
 		{
-			_theme = value;
+			if(!isNaN(value))
+				_theme = value;
+			else
+				_theme = _defaultTheme;
 		}
 		/**
 		 * @private
@@ -448,22 +465,21 @@ package pl.mateuszmackowiak.nativeANE.progress
 		
 		
 		/**
-		 * hides the dialog if is showing
+		 * hides the dialog if is showing and dispaches NativeDialogEvent.CANCELED
 		 * @param message message displayed after closing progress popup <b>ONLY IOS </b> else ignore
 		 * @param error if the message will be displayed with success icon or error icon <b>ONLY IOS </b> else ignored
+		 * @return if call sucessfull
 		 */
 		public function hide(message:String=null,error:Boolean=false):Boolean
 		{
 			try{
 				_isShowing = false;
-				if(isAndroid){
-					context.call(showProgressPopup,"hide");
-					return true;	
-				}else if(isIOS){
-					if(message)
-						context.call("hideProgress",message,error);
+				
+				if(context){
+					if(message!=null)
+						context.call("hide",message,error);
 					else
-						context.call("hideProgress");
+						context.call("hide");
 					return true;
 				}
 			}catch(e:Error){
@@ -485,7 +501,7 @@ package pl.mateuszmackowiak.nativeANE.progress
 				context.dispose();
 				return true;
 			}catch(e:Error){
-				showError("Error calling hide method "+e.message,e.errorID);
+				showError("Error calling dispose method "+e.message,e.errorID);
 			}
 			return false;
 		}
@@ -564,7 +580,10 @@ package pl.mateuszmackowiak.nativeANE.progress
 			if(Capabilities.os.toLowerCase().indexOf("ip")>-1){
 				try{
 					var context:ExtensionContext = ExtensionContext.createExtensionContext(EXTENSION_ID, "NetworkActivityIndicatoror");
-					var ret:Boolean = context.call("showHidenetworkIndicator",show)as Boolean;
+					const answer:Object = context.call("showHidenetworkIndicator",show);
+					if(answer is Boolean)
+						var ret:Boolean = answer as Boolean;
+					else trace(answer);
 					context.dispose();
 					return ret;
 				}catch(e:Error){
@@ -585,8 +604,8 @@ package pl.mateuszmackowiak.nativeANE.progress
 		 */
 		private function showError(message:String,id:int=0):void
 		{
-			if(hasEventListener(NativeExtensionErrorEvent.ERROR))
-				dispatchEvent(new NativeExtensionErrorEvent(NativeExtensionErrorEvent.ERROR,false,false,message,id));
+			if(hasEventListener(ErrorEvent.ERROR))
+				dispatchEvent(new ErrorEvent(ErrorEvent.ERROR,false,false,message,id));
 			else
 				throw new Error(message,id);
 		}
@@ -598,16 +617,18 @@ package pl.mateuszmackowiak.nativeANE.progress
 			try{
 				if(event.code == NativeDialogEvent.CLOSED)
 				{
+					_isShowing = false;
 					dispatchEvent(new NativeDialogEvent(NativeDialogEvent.CLOSED,event.level));
 				}else if(event.code == NativeDialogEvent.CANCELED){
+					_isShowing = false;
 					dispatchEvent(new NativeDialogEvent(NativeDialogEvent.CANCELED,event.level));
 				}else if(event.code == NativeDialogEvent.OPENED){
 					dispatchEvent(new NativeDialogEvent(NativeDialogEvent.OPENED,event.level));
-				}else if(event.code == LogEvent.LOG_EVENT){
-					dispatchEvent(new LogEvent(LogEvent.LOG_EVENT,event.level));
-				}else if(event.code ==NativeExtensionErrorEvent.ERROR){
-					dispatchEvent(new NativeExtensionErrorEvent(NativeExtensionErrorEvent.ERROR,false,false,event.level,0));
+				}else if(event.code ==ErrorEvent.ERROR){
+					_isShowing = isShowing();
+					dispatchEvent(new ErrorEvent(ErrorEvent.ERROR,false,false,event.level,0));
 				}else{
+					_isShowing = isShowing();
 					showError(event.toString());
 				}
 			}catch(e:Error){

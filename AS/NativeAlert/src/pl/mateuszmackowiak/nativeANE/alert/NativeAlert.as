@@ -9,10 +9,13 @@ package pl.mateuszmackowiak.nativeANE.alert
 {
 	
 	
+	import flash.events.ErrorEvent;
 	import flash.events.EventDispatcher;
 	import flash.events.StatusEvent;
 	import flash.external.ExtensionContext;
 	import flash.system.Capabilities;
+	
+	import pl.mateuszmackowiak.nativeANE.NativeDialogEvent;
 	
 
 		
@@ -46,27 +49,27 @@ package pl.mateuszmackowiak.nativeANE.alert
 		 * use the device's default alert theme with a dark background
 		 * <br>Constant Value: 4 (0x00000004)
 		 */
-		public static const THEME_DEVICE_DEFAULT_DARK:int = 0x00000004;
+		public static const ANDROID_DEVICE_DEFAULT_DARK_THEME:int = 0x00000004;
 		/**
 		 *  use the device's default alert theme with a dark background.
 		 * <br>Constant Value: 5 (0x00000005)
 		 */
-		public static const THEME_DEVICE_DEFAULT_LIGHT:int = 0x00000005;
+		public static const ANDROID_DEVICE_DEFAULT_LIGHT_THEME:int = 0x00000005;
 		/**
 		 * use the holographic alert theme with a dark background
 		 * <br>Constant Value: 2 (0x00000002)
 		 */
-		public static const THEME_HOLO_DARK:int = 0x00000002;
+		public static const ANDROID_HOLO_DARK_THEME:int = 0x00000002;
 		/**
 		 * use the holographic alert theme with a light background
 		 * <br>Constant Value: 3 (0x00000003)
 		 */
-		public static const THEME_HOLO_LIGHT:int = 0x00000003;
+		public static const ANDROID_HOLO_LIGHT_THEME:int = 0x00000003;
 		/**
 		 * use the traditional (pre-Holo) alert dialog theme
 		 * <br>Constant Value: 1 (0x00000001)
 		 */
-		public static const THEME_TRADITIONAL:int = 0x00000001;
+		public static const DEFAULT_THEME:int = 0x00000001;
 		
 		//---------------------------------------------------------------------
 		//
@@ -80,21 +83,23 @@ package pl.mateuszmackowiak.nativeANE.alert
 		/**
 		 * @private
 		 */
-		private static var _theme:int = THEME_HOLO_LIGHT;
+		private static var _theme:int = -1;
+		private static var isAndroid:Boolean=false;
 		
+		private static var _defaultTheme:uint = DEFAULT_THEME;
 		//---------------------------------------------------------------------
 		//
 		// public Properties.
 		//
 		//---------------------------------------------------------------------
-		public var title:String="";
-		public var message:String="";
-		public var closeLabel:String="";
-		public var otherLabels:String ="";
+		private var _title:String="";
+		private var _message:String="";
+		private var _closeLabel:String="OK";
+		private var _otherLabels:String ="";
 		/**
 		 * @private
 		 */
-		private var androidTheme:int = -1;
+		private var _isShowing:Boolean=false;
 		//---------------------------------------------------------------------
 		//
 		// Public Methods.
@@ -108,8 +113,16 @@ package pl.mateuszmackowiak.nativeANE.alert
 		 * @see http://www.liquid-photo.com/2011/10/28/native-extension-for-adobe-air-and-ios-101/
 		 * @see pl.mateuszmackowiak.nativeANE.alert.NativeAlertEvent
 		 */
-		public function NativeAlert()
+		public function NativeAlert(theme:uint=NaN)
 		{
+			if(Capabilities.os.toLowerCase().indexOf("linux")>-1)
+				isAndroid = true;
+
+			if(!isNaN(theme))
+				_theme = theme;
+			else
+				_theme = _defaultTheme;
+			
 			if(context==null){
 				try{
 					context = ExtensionContext.createExtensionContext(EXTENSION_ID, null);
@@ -118,73 +131,180 @@ package pl.mateuszmackowiak.nativeANE.alert
 				}
 			}
 		}
+		
+		override public function willTrigger(type:String):Boolean{
+			if(type == ErrorEvent.ERROR)
+				return context.willTrigger(type);
+			else
+				return super.willTrigger(type);
+		}
+		override public function hasEventListener(type:String):Boolean{
+			if(type == ErrorEvent.ERROR)
+				return context.hasEventListener(type);
+			else
+				return super.hasEventListener(type);
+		}
+		override public function addEventListener(type:String, listener:Function, useCapture:Boolean=false, priority:int=0, useWeakReference:Boolean=false):void{
+			if(type == ErrorEvent.ERROR)
+				context.addEventListener(type,listener,useCapture,priority,useWeakReference);
+			else
+				super.addEventListener(type,listener,useCapture,priority,useWeakReference);
+		}
+		override public function removeEventListener(type:String, listener:Function, useCapture:Boolean=false):void{
+			if(type == ErrorEvent.ERROR)
+				context.removeEventListener(type,listener,useCapture);
+			else
+				super.removeEventListener(type,listener,useCapture);
+		}
+		
+		/**
+		 * list of buttons as a string with comma as separator
+		 */
+		public function set otherLabels(value:String):void
+		{
+			_otherLabels = value;
+		}
+		/**
+		 * @private
+		 */
+		public function get otherLabels():String
+		{
+			return _otherLabels;
+		}
+
+		
+		
+		/**
+		 * cancle button for the alert
+		 * @sefault "OK"
+		 */
+		public function set closeLabel(value:String):void
+		{
+			_closeLabel = value;
+		}
+		/**
+		 * @private
+		 */
+		public function get closeLabel():String
+		{
+			return _closeLabel;
+		}
+
+
+		/**
+		 * The title of the dialog
+		 */
+		public function set title(value:String):void
+		{
+			_title = value;
+		}
+		/**
+		 * The title of the dialog
+		 */
+		public function get title():String
+		{
+			return _title;
+		}
+
+		
+		/**
+		 * the theme of the NativeProgress
+		 * (if isShowing will be ignored until next show)
+		 */
+		public function set theme(value:int):void
+		{
+			if(!isNaN(value))
+				_theme = value;
+			else
+				_theme = _defaultTheme;
+		}
+		/**
+		 * @private
+		 */
+		public function get theme():int
+		{
+			return _theme;
+		}
+		
+		/**
+		 * The message of the dialog
+		 */
+		public function set message(value:String):void
+		{
+			_message = value;
+		}
+		/**
+		 * The message of the dialog
+		 * @see setMessage()
+		 */
+		public function get message():String
+		{
+			return _message;
+		}
+		
+		
 		/**
 		 * Should be called in the end if You know that there will be now reference to NativeAlert
 		 * @copy flash.external.ExtensionContext.dispose()
 		 * @see flash.external.ExtensionContext.dispose()
+		 * @return if the call was saccessful
 		 */
-		public static function dispose():void{
-			if(context){
-				context.dispose();
+		public static function dispose():Boolean{
+			try{
+				if(context)
+					context.dispose();
+				return true;
+			}catch(e:Error){
+				showError("Error calling dispose method "+e.message,e.errorID);
 			}
+			return false;
 		}
 			
 		/**
 		 * @param title Title to be displayed in the Alert.
-		 * @param message Message to be displayed in the Alert.
-		 * @param closeLabel Label for the close button.(NativeAlertEvent)
-		 * @param otherLabels shoud be a comma separated sting of button labels.<br>for example "one,two,three"
-		 * @param androidTheme - default -1 uses the defaultAndroidTheme 
+		 * @param cancelable if pressing outside the dialog or the back button hides the popup 
 		 * 
-		 * @see pl.mateuszmackowiak.nativeANE.alert.NativeAlert.defaultAndroidTheme
+		 * @see pl.mateuszmackowiak.nativeANE.alert.NativeAlert.defaultTheme
 		 * @see pl.mateuszmackowiak.nativeANE.alert.NativeAlert.show
 		 * 
 		 * @see pl.mateuszmackowiak.nativeANE.alert.NativeAlertEvent
 		 */
-		public function showAlert( title : String ="", message : String ="", closeLabel : String ="OK", otherLabels : String = "" ,cancelable:Boolean = true,androidTheme:int = -1) : void
+		public function show(cancelable:Boolean = true) : Boolean
 		{
+			
 			try{
-				if(title!==null && title!=="")
-					this.title = title;
-				if(message!==null && message!=="")
-					this.message = message;
-				if(closeLabel!==null && closeLabel!=="")
-					this.closeLabel = closeLabel;
-				if(otherLabels!==null && otherLabels!=="")
-					this.otherLabels = otherLabels;
-				if(androidTheme>-1)
-					this.androidTheme = androidTheme;
-				else
-					this.androidTheme = _theme;
-				
 				context.addEventListener(StatusEvent.STATUS, onAlertHandler);
-				
-				if(Capabilities.os.indexOf("Linux")>-1)
-					context.call("showAlertWithTitleAndMessage", this.title, this.message, this.closeLabel,this.otherLabels, cancelable, this.androidTheme);
-				else
-					context.call("showAlertWithTitleAndMessage", this.title, this.message, this.closeLabel,this.otherLabels);
-				
+				context.call("showAlertWithTitleAndMessage", _title, _message, _closeLabel, _otherLabels, cancelable, _theme);
+				return true;
 			}catch(e:Error){
 				showError(e.message,e.errorID);
 			}
+			return false;
 		}
 		
+		
+
+		
+		
 		/**
-		 * the theme from which to get the dialog's style (one of the constants THEME_DEVICE_DEFAULT_DARK, THEME_DEVICE_DEFAULT_LIGHT, or THEME_HOLO_LIGHT.
-		 * @see pl.mateuszmackowiak.nativeANE.alert.NativeAlert.THEME_DEVICE_DEFAULT_DARK
-		 * @see pl.mateuszmackowiak.nativeANE.alert.NativeAlert.THEME_DEVICE_DEFAULT_LIGHT
-		 * @see pl.mateuszmackowiak.nativeANE.alert.NativeAlert.THEME_HOLO_LIGHT
-		 * @see pl.mateuszmackowiak.nativeANE.alert.NativeAlert.THEME_HOLO_DARK
-		 * @see pl.mateuszmackowiak.nativeANE.alert.NativeAlert.THEME_TRADITIONAL
+		 * the default theme of all NativeProges dialogs
+		 * @default pl.mateuszmackowiak.nativeANE.progress.NativeProgess#DEFAULT_THEME
 		 */
-		public static function set defaultAndroidTheme(value:int):void
+		public static function set defaultTheme(value:int):void
 		{
-			_theme = value;
+			_defaultTheme = value;
 		}
-		public static function get defaultAndroidTheme():int
+		/**
+		 * @private
+		 */
+		public static function get defaultTheme():int
 		{
-			return _theme;
+			return _defaultTheme;
 		}
+		
+		
+		
+		
 		/**
 		 * Create and show an Alert control
 		 * @param text     Text showed in the Alert control
@@ -197,13 +317,17 @@ package pl.mateuszmackowiak.nativeANE.alert
 		 * 
 		 * @see pl.mateuszmackowiak.nativeANE.alert.NativeAlertEvent
 		 */
-		public static function show(message:String = "", title:String = "Error", closeLabel : String="OK", otherLabels : String = "" , closeHandler:Function = null ,cancelable:Boolean = true, androidTheme:int = NaN):NativeAlert
+		public static function show(message:String = "", title:String = "Error", closeLabel : String="OK", otherLabels : String = "" , closeHandler:Function = null ,cancelable:Boolean = true, theme:int = NaN):NativeAlert
 		{
 				try{
-					var alert:NativeAlert = new NativeAlert();
+					var alert:NativeAlert = new NativeAlert(theme);
 					if (closeHandler !== null)
-						alert.addEventListener(NativeAlertEvent.CLOSE, closeHandler);
-					alert.showAlert(title,message,closeLabel,otherLabels,cancelable,androidTheme);
+						alert.addEventListener(NativeDialogEvent.CLOSED, closeHandler);
+					alert.title = title;
+					alert.message = message;
+					alert.closeLabel = closeLabel;
+					alert.otherLabels = otherLabels;
+					alert.show(cancelable);
 		
 					return alert;
 				}catch(e:Error){
@@ -276,14 +400,14 @@ package pl.mateuszmackowiak.nativeANE.alert
 		private function onAlertHandler( event : StatusEvent ) : void
 		{
 			try{
-				(event.target as ExtensionContext).removeEventListener( StatusEvent.STATUS, onAlertHandler );
-				
-				if( event.code == NativeAlertEvent.CLOSE)
+
+				if( event.code == NativeDialogEvent.CLOSED || event.code =="ALERT_CLOSED")
 				{
 					var level:int = int(event.level);
 					if(Capabilities.os.indexOf("Win")>-1)
 						level--;
-					dispatchEvent(new NativeAlertEvent(NativeAlertEvent.CLOSE,level.toString()));
+					dispatchEvent(new NativeDialogEvent(NativeDialogEvent.CLOSED,level.toString()));
+					(event.target as ExtensionContext).removeEventListener( StatusEvent.STATUS, onAlertHandler );
 				}else{
 					showError(event.toString());
 				}
@@ -298,7 +422,10 @@ package pl.mateuszmackowiak.nativeANE.alert
 		 */
 		private static function showError(message:String,id:int=0):void
 		{
-			trace(message);
+			if(context.hasEventListener(ErrorEvent.ERROR))
+				context.dispatchEvent(new ErrorEvent(ErrorEvent.ERROR,false,false,message,id));
+			else
+				trace(message);
 		}
 	}
 }

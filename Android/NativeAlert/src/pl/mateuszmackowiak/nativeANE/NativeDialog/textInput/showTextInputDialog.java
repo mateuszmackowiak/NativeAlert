@@ -46,7 +46,7 @@ public class showTextInputDialog implements FREFunction {
 			function = args[0].getAsString();
 			
 			if(function!=null){
-				if(function.equals("show")){
+				if(function.equals("create")){
 					
 					String buttons[] = null;
 					FREArray textInputs = null;
@@ -55,14 +55,12 @@ public class showTextInputDialog implements FREFunction {
 					if(args[2] instanceof FREArray)
 						textInputs = (FREArray) args[2];
 					if(args.length>3){
-						if(args[3]!=null && args[3] instanceof FREArray){
+						if(args[3]!=null && args[3] instanceof FREArray)
 							buttons = FREUtilities.convertFREArrayToStringArray((FREArray)args[3]);
-						}else if(args[3]!=null){
-							theme = args[3].getAsInt();
-						}
-						if(args.length>4 && args[4]!=null){
-							theme = args[4].getAsInt();
-						}
+						if(args.length>4 && args[4]!=null)
+							cancelable = args[4].getAsBool();
+						if(args.length>5 && args[5]!=null)
+							theme = args[5].getAsInt();
 					}
 					
 					TextInputDialog textInputDialog = (Integer.parseInt(android.os.Build.VERSION.SDK)<11)?new TextInputDialog(freContext.getActivity(),textInputs):new TextInputDialog(freContext.getActivity(),textInputs,theme);
@@ -79,17 +77,27 @@ public class showTextInputDialog implements FREFunction {
 						if(buttons.length>1)
 							textInputDialog.setNeutralButton(buttons[1], new ClickListener(freContext,textInputDialog));
 						if(buttons.length>2)
-							textInputDialog.setNeutralButton(buttons[2], new ClickListener(freContext,textInputDialog));
+							textInputDialog.setNegativeButton(buttons[2], new ClickListener(freContext,textInputDialog));
 					}else
 						textInputDialog.setPositiveButton("OK",new ClickListener(freContext,textInputDialog));
 				    
 				    mDialog = textInputDialog.create();
-				    textInputDialog.show();
-				    freContext.dispatchStatusEventAsync(NativeExtension.OPENED,String.valueOf(-2));
-				    
-				}else if(function.equals("setTitle") && mDialog!=null && mDialog.isShowing()){
-						mDialog.setTitle(Html.fromHtml(title));
+				    freContext.dispatchStatusEventAsync(NativeExtension.OPENED,"");
+
+				}else if(function.equals("show") && mDialog!=null){
+					mDialog.show();
 					
+					
+				}else if(function.equals("setTitle") && mDialog!=null && mDialog.isShowing()){
+					mDialog.setTitle(Html.fromHtml(title));
+						
+						
+				}else if(function.equals("setCancleble") && mDialog!=null && mDialog.isShowing()){
+					mDialog.setCancelable(args[1].getAsBool());
+					 if(cancelable==true)
+						 mDialog.setOnCancelListener(new CancelListener(freContext));
+					 
+					 
 				}else if(function.equals("isShowing")){
 					FREObject b = null;
 					if(mDialog!=null && mDialog.isShowing()==true){
@@ -99,9 +107,13 @@ public class showTextInputDialog implements FREFunction {
 					}
 			        return b;
 			        
-			    }else if(function.equals("hide") && mDialog!=null && mDialog.isShowing()){
+			        
+				}else if(function.equals("dismiss") && mDialog!=null && mDialog.isShowing()){
 					mDialog.dismiss();
+					_freContext = null;
+			    }else if(function.equals("hide") && mDialog!=null && mDialog.isShowing()){
 					freContext.dispatchStatusEventAsync(NativeExtension.CANCELED,String.valueOf(-1));
+					mDialog.dismiss();
 				}
 			}
 		}catch (Exception e){
@@ -120,10 +132,11 @@ public class showTextInputDialog implements FREFunction {
     		this.context=context;
     	}
  
-        public void onCancel(DialogInterface dialog) 
+        @Override
+		public void onCancel(DialogInterface dialog) 
         {
-	     	 context.dispatchStatusEventAsync(NativeExtension.CLOSED,String.valueOf(-1));        
-	         dialog.dismiss();
+	     	 context.dispatchStatusEventAsync(NativeExtension.CANCELED,String.valueOf(-1));        
+	         //dialog.dismiss();
         }
     }
 	
@@ -304,15 +317,18 @@ public class showTextInputDialog implements FREFunction {
 	        mEditText = e;
 	    }
 
-	    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+	    @Override
+		public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 	    }
 
-	    public void onTextChanged(CharSequence s, int start, int before, int count) {
+	    @Override
+		public void onTextChanged(CharSequence s, int start, int before, int count) {
 	    	String ret=String.valueOf(mEditText.name+"#_#"+mEditText.getText().toString());
 	    	_freContext.dispatchStatusEventAsync("change",ret);  
 	    }
 
-	    public void afterTextChanged(Editable s) {
+	    @Override
+		public void afterTextChanged(Editable s) {
 	    }
 	}
 	
@@ -329,7 +345,8 @@ public class showTextInputDialog implements FREFunction {
     		this.dlg = dlg;
     	}
  
-        public void onClick(DialogInterface dialog,int id) 
+        @Override
+		public void onClick(DialogInterface dialog,int id) 
         {
         	try{
         		Object obj  = _freContext.getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -342,22 +359,21 @@ public class showTextInputDialog implements FREFunction {
 						}
 		        	}
 		        	
-		        	String returnString="";
+		        	
 		        	for (TextInput textinput : dlg.getTextInputs()) {
 		        		if(textinput!=null){
-		        			returnString+="#_#"+textinput.name+"#_#"+textinput.getText().toString();
 		        			textinput.removeWacher();
 		        		}
 					}
-		        	String ret=String.valueOf(id)+returnString;
-		        	_freContext.dispatchStatusEventAsync(NativeExtension.CLOSED,ret);
-		            dialog.dismiss();
+
+		        	_freContext.dispatchStatusEventAsync(NativeExtension.CLOSED,String.valueOf(Math.abs(id)));
+		            //dialog.dismiss();
         		}
         	}catch(Exception e){
         		_freContext.dispatchStatusEventAsync(NativeExtension.ERROR_EVENT,e.toString());
                 e.printStackTrace();
         	}
-        	_freContext = null;
+        	//_freContext = null;
         }
     }
 }

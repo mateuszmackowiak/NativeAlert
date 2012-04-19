@@ -1,22 +1,24 @@
 # Native Dialogs - Adobe air Native Extension #
-Update: Themes for NativeProgress - changes in the class
+
+###Update: MUCH CHANGES IN THIS UPDATE - remove unnecessary events, IOS List Dialogs ###
+
 
 Checked iOS 5.1 / android 2.3/3.1
 
 See more info [here](http://mateuszmackowiak.wordpress.com)
 
-[See compiled demo APK on You're android tablet](https://github.com/mateuszmackowiak/NativeAlert/blob/master/example/NativeAlertMobile/NativeAlertMobile.apk?raw=true)
-###### This project has been started based on [liquid-photo](https://github.com/mccormicka/NativeAlert).
+[See compiled demo APK on You're android device](https://github.com/mateuszmackowiak/NativeAlert/blob/master/example/NativeAlertMobile/NativeAlertMobile.apk?raw=true)
+
 
 This extension enables showing native dialogs within a Air based project.
 
 Available themes for android:
 
-* THEME\_DEVICE\_DEFAULT\_DARK
-* THEME\_DEVICE\_DEFAULT\_LIGHT
-* THEME\_HOLO_DARK
-* THEME\_HOLO_LIGHT
-* THEME\_TRADITIONAL
+* ANDROID\_DEVICE\_DEFAULT\_DARK\_THEME
+* ANDROID\_DEVICE\_DEFAULT\_LIGHT\_THEME
+* ANDROID\_HOLO\_DARK\_THEME
+* ANDROID\_HOLO\_LIGHT\_THEME
+* DEFAULT\_THEME
 
 
 ## NativeAlert (IOS/Android/Windows) ##
@@ -34,11 +36,14 @@ iOS only:
 
 *Usage:*
 
-	NativeAlert.defaultAndroidTheme = NativeAlert.THEME_DEVICE_DEFAULT_DARK;
+	NativeAlert.defaultTheme = NativeAlert.ANDROID_DEVICE_DEFAULT_DARK_THEME;// not necessary
 	if(NativeAlert.isSuported)
 	NativeAlert.show( "some message" , "title" , "first button label" , "otherButtons,LabelsSeperated,WithAComma" , someAnswerFunction);
-	NativeAlert.dispose();`
-
+	
+	NativeAlert.dispose(); //only when exiting app
+	private function someAnswerFunction(event:NativeDialogEvent):void{
+		trace(event.index);
+	}
 
 
 
@@ -50,14 +55,6 @@ Android and iOS:
   The ability to display the native dialog showing a progress bar or a spinner.
 
 NativeProgress for IOS by [memeller](https://github.com/memeller)
-
-Available themes for android:
-
-* ANDROID\_DEVICE\_DEFAULT\_DARK\_THEME
-* ANDROID\_DEVICE\_DEFAULT\_LIGHT\_THEME
-* ANDROID\_HOLO\_DARK\_THEME
-* ANDROID\_HOLO\_LIGHT\_THEME
-* DEFAULT\_THEME
 
 Available themes for IOS:
 
@@ -86,7 +83,7 @@ iOS only:
 		progressPopup.addEventListener(NativeDialogEvent.CANCELED,closeNativeProcessHandler);
 		progressPopup.addEventListener(NativeDialogEvent.OPENED,traceEvent);
 		progressPopup.addEventListener(NativeDialogEvent.CLOSED,closeNativeProcessHandler);
-		progressPopup.addEventListener(NativeExtensionErrorEvent.ERROR,onError);
+		progressPopup.addEventListener(ErrorEvent.ERROR,onError);// changed from NativeExtensionErrorEvent
 		progressPopup.theme = ThemeSelector.selectedItem.data;
 		progressPopup.setMax(50);
 		progressPopup.setTitle(titleInput.text);
@@ -100,7 +97,7 @@ iOS only:
 	{
      		progressPopup.removeEventListener(NativeDialogEvent.CANCELED,closeNativeProcessHandler);
      		progressPopup.removeEventListener(NativeDialogEvent.CLOSED,closeNativeProcessHandler);
-     		progressPopup.removeEventListener(NativeExtensionErrorEvent.ERROR,onError);
+     		progressPopup.removeEventListener(ErrorEvent.ERROR,onError);// changed from NativeExtensionErrorEvent
      		progressPopup.removeEventListener(NativeDialogEvent.OPENED,traceEvent);
 
 		progressPopup.dispose();//before kill()
@@ -126,7 +123,7 @@ iOS only:
      		myTimer.stop();
      		p = 0;
      		if(progressPopup){
-	    		progressPopup.hide();
+	    		progressPopup.hide("some message");
      		}
 	}
 	
@@ -139,7 +136,8 @@ iOS only:
 	}
 
 
-# NativeListDialog(Android) #
+# NativeListDialog(Android / IOS) #
+IOS uses: [SBTableAlert](https://github.com/blommegard/SBTableAlert)
 
 NativeListDialog has the ability to show a native android popup dialog with a multi-choice or single-choice inside a Adobe Air project.
 
@@ -155,39 +153,45 @@ NativeListDialog has the ability to show a native android popup dialog with a mu
 	{
 		choces = new Vector.<String>();
 		//the text of the items to be displayed in the list.
-      	choces.push("one","two","three","four");
-      	checkedItems = new Vector.<Boolean>();  
+      		choces.push("one","two","three","four");
+      		checkedItems = new Vector.<Boolean>();  
 		// specifies which items are checked. It should be null in which case no items are checked. If non null it must be exactly the same length as the array of items.
-      	checkedItems.push(true,false,false,true);
-      	buttons = new Vector.<String>();
+      		checkedItems.push(true,false,false,true);
+      		buttons = new Vector.<String>();
 		//the labels for the buttons. It should be null in which case there will be only one button "OK". If non null max length 3 buttons
-      	buttons.push("OK","Settings","Cancle");
+      		buttons.push("OK","Settings","Cancle");
 	}
 	protected function openMultiChoiceDialog(event:MouseEvent):void
 	{
 		multChDialog = new NativeListDialog();
-    	multChDialog.theme = NativeListDialog.THEME_HOLO_DARK;
-      	multChDialog.addEventListener(NativeDialogEvent.CANCELED,closeNativeDialogHandler);
-      	multChDialog.addEventListener(NativeDialogEvent.OPENED,traceEvent);
-      	multChDialog.addEventListener(NativeDialogEvent.CLOSED,closeNativeDialogHandler);
-      	multChDialog.addEventListener(NativeExtensionErrorEvent.ERROR,onError);
-     	multChDialog.addEventListener(NativeDialogListEvent.LIST_CHANGE,onListChange);
-      	multChDialog.title ="Some Title";
-      	multChDialog.cancleble = true;
-      	multChDialog.showMultiChoice(choces,checkedItems,buttons);
+    		multChDialog.theme = NativeListDialog.ANDROID_DEVICE_DEFAULT_LIGHT_THEME;
+    		
+      		multChDialog.addEventListener(NativeDialogEvent.CANCELED,closeNativeDialogHandler);
+      		multChDialog.addEventListener(NativeDialogEvent.OPENED,traceEvent);
+      		multChDialog.addEventListener(NativeDialogEvent.CLOSED,closeNativeDialogHandler);
+      		multChDialog.addEventListener(ErrorEvent.ERROR,onError);// changed from NativeExtensionErrorEvent
+     		multChDialog.addEventListener(NativeDialogListEvent.LIST_CHANGE,onListChange);
+     		
+      		multChDialog.setTitle(titleInput.text); // before title ="Some Title"; - can change while in popup
+      		multChDialog.setCancelable(canclebleCheckbox.selected);// before cancleble = true;- can change while in popup
+      		multChDialog.buttons = buttons;//before in show method
+      		multChDialog.showMultiChoice(choces,checkedItems);
 	}
 	public function openSingleChoiceDialog(event:MouseEvent):void
 	{
 		singleChDialog = new NativeListDialog();
-		singleChDialog.theme = ThemeSelector.selectedItem.data;
+		singleChDialog.theme = NativeListDialog.ANDROID_DEVICE_DEFAULT_LIGHT_THEME;
 		singleChDialog.addEventListener(NativeDialogEvent.CANCELED,closeNativeDialogHandler);
 		singleChDialog.addEventListener(NativeDialogEvent.OPENED,traceEvent);
 		singleChDialog.addEventListener(NativeDialogEvent.CLOSED,closeNativeDialogHandler);
-		singleChDialog.addEventListener(LogEvent.LOG_EVENT,traceEvent);
-		singleChDialog.addEventListener(NativeExtensionErrorEvent.ERROR,onError);
+
+		singleChDialog.addEventListener(ErrorEvent.ERROR,onError);// changed from NativeExtensionErrorEvent
+		
 		singleChDialog.addEventListener(NativeDialogListEvent.LIST_CHANGE,onListChange);
-		singleChDialog.cancleble = true;
-		singleChDialog.showSingleChoice(choces,selectedIndex,buttons,titleInput.text);
+		singleChDialog.setCancelable(canclebleCheckbox.selected);// before cancleble = true;- can change while in popup
+		singleChDialog.buttons = buttons;//before in show method
+		singleChDialog.setTitle(titleInput.text); // before title ="Some Title"; - can change while in popup
+		singleChDialog.showSingleChoice(choces,selectedIndex);
 	}
 	public function closeNativeDialogHandler(event:NativeDialogEvent):void
 	{
@@ -195,12 +199,12 @@ NativeListDialog has the ability to show a native android popup dialog with a mu
 		dialog.removeEventListener(NativeDialogEvent.CANCELED,closeNativeDialogHandler);
 		dialog.removeEventListener(NativeDialogEvent.CLOSED,closeNativeDialogHandler);
 		dialog.removeEventListener(NativeDialogEvent.OPENED,traceEvent);
-		dialog.removeEventListener(NativeExtensionErrorEvent.ERROR,onError);
-		dialog.kill();
+		dialog.removeEventListener(ErrorEvent.ERROR,onError);// changed from NativeExtensionErrorEvent
+		dialog.dispose();//before kill()
 	}
 	private function onListChange(event:NativeDialogListEvent):void
 	{
-    	var dialog:NativeListDialog = (event.target as NativeListDialog)
+    		var dialog:NativeListDialog = (event.target as NativeListDialog)
 		if(dialog.selectedIndex>-1){
 			selectedIndex = dialog.selectedIndex;
 		}else{
@@ -217,19 +221,21 @@ NativeListDialog has the ability to show a native android popup dialog with a mu
 # Text input Dialog (Android /IOS) #
 Show a dialog with defined by user input text fields.
 
+NOW ON IOS 4.0 (on IOS 5 uses the new methods) - on ios 4 don't know if Apple will not refuses
 ###Important:###
-IOS limitations - Temporary only IOS 5.0. There can be only 2 buttons and 2 text inputs. To display message specyfie for the first NativeTextField editable == false
+IOS limitations -  There can be only 2 buttons and 2 text inputs. To display message specyfie for the first NativeTextField editable == false
 
 *Usage:*
 
 	public function openTextInputDialog(event:MouseEvent):void{
 		if(NativeTextInputDialog.isSupported()){
 			textInputDialog = new NativeTextInputDialog();
-			textInputDialog.theme = NativeTextInputDialog.THEME_HOLO_LIGHT;
+			textInputDialog.theme = NativeTextInputDialog.ANDROID_HOLO_DARK_THEME;
+			
 			textInputDialog.addEventListener(NativeDialogEvent.CANCELED,trace);
 			textInputDialog.addEventListener(NativeDialogEvent.OPENED,trace);
-			textInputDialog.addEventListener(NativeExtensionErrorEvent.ERROR,trace);
-			textInputDialog.addEventListener(NativeTextInputDialogEvent.CLOSED, onTextInputDialogClosedHandler);
+			textInputDialog.addEventListener(ErrorEvent.ERROR,trace);// changed from NativeExtensionErrorEvent
+			textInputDialog.addEventListener(NativeDialogEvent.CLOSED, onTextInputDialogClosedHandler);//before NativeTextInputDialogEvent
 
 			var v:Vector.<NativeTextField> = new Vector.<NativeTextField>();
 				
@@ -253,7 +259,7 @@ IOS limitations - Temporary only IOS 5.0. There can be only 2 buttons and 2 text
 			textInputDialog.show(titleInput.text,v,buttons);
 		}
 	}
-	private function onTextInputDialogClosedHandler(event:NativeTextInputDialogEvent):void
+	private function onTextInputDialogClosedHandler(event:NativeDialogEvent):void // before NativeTextInputDialogEvent
 	{
 		for each (var n:NativeTextField in event.list) 
 		{
@@ -322,3 +328,5 @@ Available parameters:
 		dictionary = null;
 	}
 	
+	
+###### This project has been started based on [liquid-photo](https://github.com/mccormicka/NativeAlert).

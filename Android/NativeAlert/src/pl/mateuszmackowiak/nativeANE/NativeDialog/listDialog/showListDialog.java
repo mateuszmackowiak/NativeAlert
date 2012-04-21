@@ -160,7 +160,7 @@ public class showListDialog implements FREFunction {
 		public void onClick(DialogInterface dialog,int id) 
         {
         	Log.e("List Dialog","onClicked");
-     	    context.dispatchStatusEventAsync(NativeExtension.CLOSED,String.valueOf(Math.abs(id)));     
+     	    context.dispatchStatusEventAsync(NativeExtension.CLOSED,String.valueOf(Math.abs(id-1)));     
         }
     }
 	

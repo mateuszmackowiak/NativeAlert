@@ -46,7 +46,7 @@ public class showTextInputDialog implements FREFunction {
 			function = args[0].getAsString();
 			
 			if(function!=null){
-				if(function.equals("create")){
+				if(function.equals("show")){
 					
 					String buttons[] = null;
 					FREArray textInputs = null;
@@ -83,10 +83,7 @@ public class showTextInputDialog implements FREFunction {
 				    
 				    mDialog = textInputDialog.create();
 				    freContext.dispatchStatusEventAsync(NativeExtension.OPENED,"");
-
-				}else if(function.equals("show") && mDialog!=null){
-					mDialog.show();
-					
+				    mDialog.show();
 					
 				}else if(function.equals("setTitle") && mDialog!=null && mDialog.isShowing()){
 					mDialog.setTitle(Html.fromHtml(title));

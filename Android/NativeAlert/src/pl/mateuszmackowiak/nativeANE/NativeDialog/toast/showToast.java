@@ -24,7 +24,7 @@ public class showToast implements FREFunction {
 		
 		try{
 			text = args[0].getAsString();
-			if(args.length>1)
+			if(args.length>1 && args[1]!=null)
 				duration = args[1].getAsInt();
 			if(args.length>2){
 				gravity = args[2].getAsInt();

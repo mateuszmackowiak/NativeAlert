@@ -42,10 +42,26 @@ package pl.mateuszmackowiak.nativeANE.properties
 		 * Android
 		 */
 		public static const APP_UID:String = 'AppUid';
+		
 		/**
 		 * IOS / Android
 		 */
-		public static const UID:String = 'UID';
+		public static const UID:String = Capabilities.os.toLowerCase().indexOf("iph")>-1?'UDID':'UID';
+		
+		/**
+		 * IOS / Android
+		 */
+		public static const NAME:String = 'name';
+		
+		/**
+		 * IOS
+		 */
+		public static const MAC_ADRESS:String = 'MACAdress';
+		
+		/**
+		 * IOS
+		 */
+		public static const LOCALIZED_MODEL:String = 'localizedModel';
 		
 		/**
 		 * 

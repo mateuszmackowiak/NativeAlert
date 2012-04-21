@@ -153,7 +153,8 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 					if(_buttons.length>3){
 						trace("Warning: There can be only 3 buttons on Andorid NativeTextInputDialog");
 					}
-					context.call(FRE_FUNCTIONL,"create",_title,_textInputs,_buttons,_cancelable,_theme);
+					context.call(FRE_FUNCTIONL,"show",_title,_textInputs,_buttons,_cancelable,_theme);
+					_isShowing = true;
 					return true;
 				}
 				if(isIOS){
@@ -500,19 +501,13 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 				}else if(event.code == NativeDialogEvent.CANCELED){
 					_isShowing = false;
 					if(dispatchEvent(new NativeDialogEvent(NativeDialogEvent.CANCELED,event.level,false,true))){
-						trace("dismiss");
 						if(isAndroid){
 							dismiss();
 						}
 					}
 				}else if(event.code == NativeDialogEvent.OPENED){
-					if(dispatchEvent(new NativeDialogEvent(NativeDialogEvent.OPENED,"",false,true))){
-						trace("show");
-						if(isAndroid){
-							context.call(FRE_FUNCTIONL,"show");
-						}
-						_isShowing = true;
-					}
+					dispatchEvent(new NativeDialogEvent(NativeDialogEvent.OPENED,"",false,true));
+
 				}else{
 					_isShowing = isShowing();
 					showError(event.toString());

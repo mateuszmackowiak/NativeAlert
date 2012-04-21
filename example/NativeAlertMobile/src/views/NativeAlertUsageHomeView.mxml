@@ -185,7 +185,8 @@
 					progressPopup.addEventListener(NativeDialogEvent.OPENED,traceEvent);
 					progressPopup.addEventListener(NativeDialogEvent.CLOSED,closeNativeProgressHandler);
 					progressPopup.addEventListener(ErrorEvent.ERROR,onError);
-					progressPopup.theme = ThemeSelector.selectedItem.data;
+					progressPopup.androidTheme = ThemeSelector.selectedItem.data;
+					progressPopup.iosTheme = ThemeSelector.selectedItem.data;
 					progressPopup.setMax(50);
 					progressPopup.setTitle(titleInput.text);
 					progressPopup.setMessage(messageInput.text);
@@ -406,7 +407,7 @@
 				returnText.appendText("NativeDialogListEvent "+ event.index+"   "+event.selected+"\n");
 				if(dialog.selectedIndex>-1){
 					selectedIndex = dialog.selectedIndex;
-					returnText.appendText("selectedIndex   "+selectedIndex+"\n");
+					returnText.appendText("selectedLabel   "+dialog.selectedLabel+"\n");
 				}else{
 					const a:Vector.<String> = dialog.selectedLabels;
 					returnText.appendText("selectedLabels : \n");

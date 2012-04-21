@@ -18,6 +18,7 @@
 #import "SlideNotification.h"
 
 #import "SVProgressHUD.h"
+
 MobileAlert *alert;
 
 
@@ -673,7 +674,6 @@ FREObject isSupported(FREContext ctx, void* funcData, uint32_t argc, FREObject a
 void NativeDialogContextInitializer(void* extData, const uint8_t * ctxType, FREContext ctx, 
 						uint32_t* numFunctionsToTest, const FRENamedFunction** functionsToSet) 
 {
-    
     
     int count=2;
     if(strcmp((const char *)ctxType, PROGRESS_KEY)==0){

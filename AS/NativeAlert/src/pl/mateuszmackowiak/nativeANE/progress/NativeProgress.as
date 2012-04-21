@@ -78,7 +78,8 @@ package pl.mateuszmackowiak.nativeANE.progress
 		//
 		//---------------------------------------------------------------------
 
-		private static var _defaultTheme:uint = DEFAULT_THEME;
+		private static var _defaultAndroidTheme:uint = DEFAULT_THEME;
+		private static var _defaultIOSTheme:uint = DEFAULT_THEME;
 		private static var _set:Boolean = false;
 		private static var _isSupp:Boolean = false;
 		private static var isAndroid:Boolean=false;
@@ -94,8 +95,9 @@ package pl.mateuszmackowiak.nativeANE.progress
 		private var _secondary:int=NaN;
 		private var _title:String="";
 		private var _message:String = "";
-		private var _style:uint = STYLE_HORIZONTAL;
-		private var _theme:int = -1;
+		private var _style:uint = STYLE_SPINNER;
+		private var _androidTheme:int = -1;
+		private var _iosTheme:int = -1;
 		private var _maxProgress:int  = 100;
 		private var _indeterminate:Boolean = false;
 		private var _isShowing:Boolean=false;
@@ -108,11 +110,12 @@ package pl.mateuszmackowiak.nativeANE.progress
 		 * @author Mateusz Maćkowiak
 		 * @since 2011
 		 * @param defined style of the progress dialog <code>STYLE_HORIZONTAL</code> or <code>STYLE_SPINNER</code> - also defined by <i>style</i> or <i>indeterminate</i> can be ignored. By default set to <code>STYLE_HORIZONTAL</code>
-		 * @param defined theme for progoress dialog. If NaN uses <code>defaultTheme</code>
+		 * @param android theme for progoress dialog. If NaN uses <code>defaultAndroidTheme</code>
+		 * @param theme for progoress dialog. If NaN uses <code>defaultIOSTheme</code>
 		 * @throws Error if not supported or native files not packaged
 		 * @playerversion 3.0
 		 */
-		public function NativeProgress(style:int = 0x00000001,theme:uint=NaN)
+		public function NativeProgress(style:int = 0x00000000,androidTheme:uint=NaN,iosTheme:uint=NaN)
 		{
 			if(Capabilities.os.toLowerCase().indexOf("linux")>-1)
 				isAndroid = true;
@@ -126,10 +129,14 @@ package pl.mateuszmackowiak.nativeANE.progress
 			if(style == STYLE_HORIZONTAL || style==STYLE_SPINNER)
 				_style = style;
 
-			if(!isNaN(theme))
-				_theme = theme;
+			if(!isNaN(androidTheme))
+				_androidTheme = androidTheme;
 			else
-				_theme = _defaultTheme;
+				_androidTheme = _defaultAndroidTheme;
+			if(!isNaN(iosTheme))
+				_iosTheme = iosTheme;
+			else
+				_iosTheme = _defaultIOSTheme;
 			try{
 				context = ExtensionContext.createExtensionContext(EXTENSION_ID, "ProgressContext");
 				context.addEventListener(StatusEvent.STATUS, onStatus);
@@ -152,12 +159,12 @@ package pl.mateuszmackowiak.nativeANE.progress
 				_indeterminate = indeterminate;
 			try{
 				if(isAndroid){
-					context.call(showProgressPopup,"showPopup",_progress,_secondary,_style,_title,_message,cancleble,_indeterminate,_theme);
+					context.call(showProgressPopup,"showPopup",_progress,_secondary,_style,_title,_message,cancleble,_indeterminate,_androidTheme);
 					_isShowing = true;
 					return true;
 				}
 				else if(isIOS){
-					context.call(showProgressPopup,_progress/_maxProgress,null,_style,_title,_message,cancleble,_indeterminate,_theme);
+					context.call(showProgressPopup,_progress/_maxProgress,null,_style,_title,_message,cancleble,_indeterminate,_iosTheme);
 					_isShowing = true;
 					return true;
 				}
@@ -179,7 +186,7 @@ package pl.mateuszmackowiak.nativeANE.progress
 			_indeterminate = true;
 			try{
 				if(isAndroid){
-					context.call(showProgressPopup,"showPopup",_progress,_secondary,STYLE_HORIZONTAL,_title,_message,cancleble,true,_theme);
+					context.call(showProgressPopup,"showPopup",_progress,_secondary,STYLE_HORIZONTAL,_title,_message,cancleble,true,_androidTheme);
 					_isShowing = true;
 					return true;
 				}
@@ -206,12 +213,12 @@ package pl.mateuszmackowiak.nativeANE.progress
 		{
 			try{
 				if(isAndroid){
-					context.call(showProgressPopup,"showPopup",_progress,_secondary,STYLE_SPINNER,_title,_message,cancleble,false,_theme);
+					context.call(showProgressPopup,"showPopup",_progress,_secondary,STYLE_SPINNER,_title,_message,cancleble,false,_androidTheme);
 					_isShowing = true;
 					return true;
 				}
 				else if(isIOS){
-					context.call(showProgressPopup,_progress,null,STYLE_SPINNER,_title,_message,cancleble,true);
+					context.call(showProgressPopup,_progress,null,STYLE_SPINNER,_title,_message,cancleble,true,_iosTheme);
 					_isShowing = true;
 					return true;
 				}
@@ -447,22 +454,39 @@ package pl.mateuszmackowiak.nativeANE.progress
 		 * the theme of the NativeProgress
 		 * (if isShowing will be ignored until next show)
 		 */
-		public function set theme(value:int):void
+		public function set androidTheme(value:int):void
 		{
 			if(!isNaN(value))
-				_theme = value;
+				_androidTheme = value;
 			else
-				_theme = _defaultTheme;
+				_androidTheme = _defaultAndroidTheme;
 		}
 		/**
 		 * @private
 		 */
-		public function get theme():int
+		public function get androidTheme():int
 		{
-			return _theme;
+			return _androidTheme;
 		}
 		
-		
+		/**
+		 * the theme of the NativeProgress
+		 * (if isShowing will be ignored until next show)
+		 */
+		public function set iosTheme(value:int):void
+		{
+			if(!isNaN(value))
+				_iosTheme = value;
+			else
+				_iosTheme = _defaultIOSTheme;
+		}
+		/**
+		 * @private
+		 */
+		public function get iosTheme():int
+		{
+			return _iosTheme;
+		}
 		
 		/**
 		 * hides the dialog if is showing and dispaches NativeDialogEvent.CANCELED
@@ -476,10 +500,14 @@ package pl.mateuszmackowiak.nativeANE.progress
 				_isShowing = false;
 				
 				if(context){
-					if(message!=null)
-						context.call("hide",message,error);
-					else
-						context.call("hide");
+					if(isAndroid){
+						context.call(showProgressPopup,"hide");
+					}else {
+						if(message!=null)
+							context.call("hide",message,error);
+						else
+							context.call("hide");
+					}
 					return true;
 				}
 			}catch(e:Error){
@@ -541,21 +569,35 @@ package pl.mateuszmackowiak.nativeANE.progress
 		}
 		
 		/**
-		 * the default theme of all NativeProges dialogs
+		 * the andorid default theme of all NativeProges dialogs
 		 * @default pl.mateuszmackowiak.nativeANE.progress.NativeProgess#DEFAULT_THEME
 		 */
-		public static function set defaultTheme(value:int):void
+		public static function set defaultAndroidTheme(value:int):void
 		{
-			_defaultTheme = value;
+			_defaultAndroidTheme = value;
 		}
 		/**
 		 * @private
 		 */
-		public static function get defaultTheme():int
+		public static function get defaultAndroidTheme():int
 		{
-			return _defaultTheme;
+			return _defaultAndroidTheme;
 		}
-		
+		/**
+		 * the IOS default theme of all NativeProges dialogs
+		 * @default pl.mateuszmackowiak.nativeANE.progress.NativeProgess#DEFAULT_THEME
+		 */
+		public static function set defaultIOSTheme(value:int):void
+		{
+			_defaultIOSTheme = value;
+		}
+		/**
+		 * @private
+		 */
+		public static function get defaultIOSTheme():int
+		{
+			return _defaultIOSTheme;
+		}
 		
 		
 		

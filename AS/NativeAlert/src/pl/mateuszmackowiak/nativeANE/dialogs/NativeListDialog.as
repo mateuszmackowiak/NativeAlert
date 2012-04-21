@@ -610,7 +610,10 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 					var index:int = -1;
 					if(event.level.indexOf("_")>-1){
 						const args:Array = event.level.split("_");
-						index = int(args[0]);
+						if(isAndroid)
+							index = int(args[0]);
+						else
+							index = _list.length-1-int(args[0]);
 						var selected:Boolean=false;
 						const selectedStr:String= String(args[1]).toLocaleLowerCase();
 						if(selectedStr=="true" || selectedStr=="1")
@@ -619,7 +622,10 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 						
 						dispatchEvent(new NativeDialogListEvent(NativeDialogListEvent.LIST_CHANGE,index,selected));
 					}else{
-						index = int(event.level);
+						if(isAndroid)
+							index = int(event.level);
+						else 
+							index = _list.length-1-int(event.level);
 						_selectedIndex = index;
 						dispatchEvent(new NativeDialogListEvent(NativeDialogListEvent.LIST_CHANGE,index,true));
 					}

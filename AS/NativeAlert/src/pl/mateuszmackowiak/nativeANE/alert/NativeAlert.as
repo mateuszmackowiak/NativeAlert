@@ -100,6 +100,10 @@ package pl.mateuszmackowiak.nativeANE.alert
 		 * @private
 		 */
 		private var _isShowing:Boolean=false;
+		
+		
+
+		private var _closeHandler:Function=null;
 		//---------------------------------------------------------------------
 		//
 		// Public Methods.
@@ -155,6 +159,26 @@ package pl.mateuszmackowiak.nativeANE.alert
 				context.removeEventListener(type,listener,useCapture);
 			else
 				super.removeEventListener(type,listener,useCapture);
+		}
+		
+		
+		
+		/**
+		 * 
+		 */
+		public function set closeHandler(value:Function):void
+		{
+			if(hasEventListener(NativeDialogEvent.CLOSED))
+				removeEventListener(NativeDialogEvent.CLOSED,_closeHandler);
+			addEventListener(NativeDialogEvent.CLOSED,_closeHandler);
+			_closeHandler = value;
+		}
+		/**
+		 * @private
+		 */
+		public function get closeHandler():Function
+		{
+			return _closeHandler;
 		}
 		
 		/**
@@ -321,8 +345,9 @@ package pl.mateuszmackowiak.nativeANE.alert
 		{
 				try{
 					var alert:NativeAlert = new NativeAlert(theme);
-					if (closeHandler !== null)
-						alert.addEventListener(NativeDialogEvent.CLOSED, closeHandler);
+					if (closeHandler !== null){
+						alert.closeHandler = closeHandler;
+					}
 					alert.title = title;
 					alert.message = message;
 					alert.closeLabel = closeLabel;
@@ -407,6 +432,10 @@ package pl.mateuszmackowiak.nativeANE.alert
 					if(Capabilities.os.indexOf("Win")>-1)
 						level--;
 					dispatchEvent(new NativeDialogEvent(NativeDialogEvent.CLOSED,level.toString()));
+					if(closeHandler!=null){
+						removeEventListener(NativeDialogEvent.CLOSED,closeHandler);
+						closeHandler = null;
+					}
 					(event.target as ExtensionContext).removeEventListener( StatusEvent.STATUS, onAlertHandler );
 				}else{
 					showError(event.toString());

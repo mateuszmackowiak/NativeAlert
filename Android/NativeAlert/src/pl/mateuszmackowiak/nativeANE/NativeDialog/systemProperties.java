@@ -55,6 +55,8 @@ public static final String KEY = "SystemProperites";
             	dictionary.setProperty("arch",FREObject.newObject(System.getProperty("os.arch")) );
             	dictionary.setProperty("version",FREObject.newObject(System.getProperty("os.version") ));
             	
+            	dictionary.setProperty("name",FREObject.newObject(android.os.Build.MODEL));
+
             	final Activity activity = context.getActivity();
 
             	PackageInfo pInfo = activity.getPackageManager().getPackageInfo(context.getActivity().getPackageName(), 0);

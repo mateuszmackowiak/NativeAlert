@@ -46,7 +46,8 @@ package pl.mateuszmackowiak.nativeANE.properties
 		/**
 		 * IOS / Android
 		 */
-		public static const UID:String = Capabilities.os.toLowerCase().indexOf("iph")>-1?'UDID':'UID';
+		public static const UID:String = (Capabilities.os.toLowerCase().indexOf("iph")>-1)?'UDID':'UID';
+
 		
 		/**
 		 * IOS / Android
@@ -54,7 +55,7 @@ package pl.mateuszmackowiak.nativeANE.properties
 		public static const NAME:String = 'name';
 		
 		/**
-		 * IOS
+		 * IOS / Android
 		 */
 		public static const MAC_ADRESS:String = 'MACAdress';
 		

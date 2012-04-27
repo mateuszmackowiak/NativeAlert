@@ -28,7 +28,7 @@ public class showListDialog implements FREFunction {
 	
 		try{
 		 	function = args[0].getAsString();
-			if(function.equals("create")){
+			if(function.equals("show")){
 		        title = args[1].getAsString();
 		        
 				if(args[2] instanceof FREArray)
@@ -52,10 +52,8 @@ public class showListDialog implements FREFunction {
 	        	mDialog = createPopup(context,title,buttons,choices,checkedItems,checkedItem,cancelable,theme);
 
 				context.dispatchStatusEventAsync(NativeExtension.OPENED,"");
-				
-			}else if(function.equals("show") && mDialog!=null){
 				mDialog.show();
-				
+			
 			}else if(function.equals("hide")){
 				if(mDialog!=null && mDialog.isShowing()){
 					context.dispatchStatusEventAsync(NativeExtension.CANCELED,String.valueOf(-1));
@@ -146,7 +144,8 @@ public class showListDialog implements FREFunction {
 		public void onCancel(DialogInterface dialog) 
         {
         	Log.e("List Dialog","onCancle");
-     	    context.dispatchStatusEventAsync(NativeExtension.CANCELED,String.valueOf(-1));        
+     	    context.dispatchStatusEventAsync(NativeExtension.CANCELED,String.valueOf(-1));   
+     	   dialog.dismiss();
         }
     }
 	private class ConfitmListener implements DialogInterface.OnClickListener{
@@ -160,7 +159,8 @@ public class showListDialog implements FREFunction {
 		public void onClick(DialogInterface dialog,int id) 
         {
         	Log.e("List Dialog","onClicked");
-     	    context.dispatchStatusEventAsync(NativeExtension.CLOSED,String.valueOf(Math.abs(id-1)));     
+     	    context.dispatchStatusEventAsync(NativeExtension.CLOSED,String.valueOf(Math.abs(id-1)));
+     	   dialog.dismiss();
         }
     }
 	
@@ -175,7 +175,7 @@ public class showListDialog implements FREFunction {
         @Override
 		public void onClick(DialogInterface dialog,int id) 
         {
-     	    context.dispatchStatusEventAsync(NativeExtension.LIST_CHANGE,String.valueOf(id));     
+     	    context.dispatchStatusEventAsync(NativeExtension.LIST_CHANGE,String.valueOf(id));  
         }
     }
 	

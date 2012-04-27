@@ -97,7 +97,7 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 		 * @see pl.mateuszmackowiak.nativeANE.NativeDialogEvent
 		 * @see flash.events.ErrorEvent
 		 */
-		public function NativeTextInputDialog(theme:uint=NaN)
+		public function NativeTextInputDialog(theme:int=-1)
 		{
 			if(Capabilities.os.toLowerCase().indexOf("linux")>-1)
 				isAndroid = true;
@@ -107,7 +107,7 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 				trace("NativeTextInputDialog is not supported on this platform");
 				return;
 			}
-			if(!isNaN(theme))
+			if(!isNaN(theme) && theme>-1)
 				_theme = theme;
 			else
 				_theme = _defaultTheme;
@@ -235,8 +235,20 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 		}
 
 		
-		
-		
+		/**
+		 * helper method to get the text input by name
+		 */
+		public function getTextInputByName(name:String):NativeTextField
+		{
+			if(_textInputs && _textInputs.length>0){
+				for each (var t:NativeTextField in _textInputs) 
+				{
+					if(t.name ==name)
+						return t;
+				}
+			}
+			return null;
+		}
 		
 		/**
 		 * The title of the dialog

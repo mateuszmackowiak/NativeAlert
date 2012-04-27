@@ -96,8 +96,10 @@ package pl.mateuszmackowiak.nativeANE.progress
 		private var _title:String="";
 		private var _message:String = "";
 		private var _style:uint = STYLE_SPINNER;
-		private var _androidTheme:int = -1;
-		private var _iosTheme:int = -1;
+		
+		private var _androidTheme:int = NaN;
+		private var _iosTheme:int = NaN;
+		
 		private var _maxProgress:int  = 100;
 		private var _indeterminate:Boolean = false;
 		private var _isShowing:Boolean=false;
@@ -115,7 +117,7 @@ package pl.mateuszmackowiak.nativeANE.progress
 		 * @throws Error if not supported or native files not packaged
 		 * @playerversion 3.0
 		 */
-		public function NativeProgress(style:int = 0x00000000,androidTheme:uint=NaN,iosTheme:uint=NaN)
+		public function NativeProgress(style:int = 0x00000000,AndroidTheme:int=-1,IOSTheme:int=-1)
 		{
 			if(Capabilities.os.toLowerCase().indexOf("linux")>-1)
 				isAndroid = true;
@@ -129,14 +131,16 @@ package pl.mateuszmackowiak.nativeANE.progress
 			if(style == STYLE_HORIZONTAL || style==STYLE_SPINNER)
 				_style = style;
 
-			if(!isNaN(androidTheme))
-				_androidTheme = androidTheme;
+			if(!isNaN(AndroidTheme) && AndroidTheme>-1)
+				_androidTheme = AndroidTheme;
 			else
 				_androidTheme = _defaultAndroidTheme;
-			if(!isNaN(iosTheme))
-				_iosTheme = iosTheme;
+			
+			if(!isNaN(IOSTheme) && IOSTheme>-1)
+				_iosTheme = IOSTheme;
 			else
 				_iosTheme = _defaultIOSTheme;
+			
 			try{
 				context = ExtensionContext.createExtensionContext(EXTENSION_ID, "ProgressContext");
 				context.addEventListener(StatusEvent.STATUS, onStatus);
@@ -191,7 +195,7 @@ package pl.mateuszmackowiak.nativeANE.progress
 					return true;
 				}
 				else if(isIOS){
-					context.call(showProgressPopup,_progress,null,STYLE_HORIZONTAL,_title,_message,cancleble,true);
+					context.call(showProgressPopup,_progress,null,STYLE_HORIZONTAL,_title,_message,cancleble,true,_iosTheme);
 					_isShowing = true;
 					return true;
 				}
@@ -454,7 +458,7 @@ package pl.mateuszmackowiak.nativeANE.progress
 		 * the theme of the NativeProgress
 		 * (if isShowing will be ignored until next show)
 		 */
-		public function set androidTheme(value:int):void
+		public function set androidTheme(value:uint):void
 		{
 			if(!isNaN(value))
 				_androidTheme = value;
@@ -464,7 +468,7 @@ package pl.mateuszmackowiak.nativeANE.progress
 		/**
 		 * @private
 		 */
-		public function get androidTheme():int
+		public function get androidTheme():uint
 		{
 			return _androidTheme;
 		}
@@ -572,14 +576,14 @@ package pl.mateuszmackowiak.nativeANE.progress
 		 * the andorid default theme of all NativeProges dialogs
 		 * @default pl.mateuszmackowiak.nativeANE.progress.NativeProgess#DEFAULT_THEME
 		 */
-		public static function set defaultAndroidTheme(value:int):void
+		public static function set defaultAndroidTheme(value:uint):void
 		{
 			_defaultAndroidTheme = value;
 		}
 		/**
 		 * @private
 		 */
-		public static function get defaultAndroidTheme():int
+		public static function get defaultAndroidTheme():uint
 		{
 			return _defaultAndroidTheme;
 		}
@@ -587,14 +591,14 @@ package pl.mateuszmackowiak.nativeANE.progress
 		 * the IOS default theme of all NativeProges dialogs
 		 * @default pl.mateuszmackowiak.nativeANE.progress.NativeProgess#DEFAULT_THEME
 		 */
-		public static function set defaultIOSTheme(value:int):void
+		public static function set defaultIOSTheme(value:uint):void
 		{
 			_defaultIOSTheme = value;
 		}
 		/**
 		 * @private
 		 */
-		public static function get defaultIOSTheme():int
+		public static function get defaultIOSTheme():uint
 		{
 			return _defaultIOSTheme;
 		}

@@ -117,12 +117,12 @@ package pl.mateuszmackowiak.nativeANE.alert
 		 * @see http://www.liquid-photo.com/2011/10/28/native-extension-for-adobe-air-and-ios-101/
 		 * @see pl.mateuszmackowiak.nativeANE.alert.NativeAlertEvent
 		 */
-		public function NativeAlert(theme:uint=NaN)
+		public function NativeAlert(theme:int=NaN)
 		{
 			if(Capabilities.os.toLowerCase().indexOf("linux")>-1)
 				isAndroid = true;
 
-			if(!isNaN(theme))
+			if(!isNaN(theme) && theme>-1)
 				_theme = theme;
 			else
 				_theme = _defaultTheme;
@@ -168,10 +168,12 @@ package pl.mateuszmackowiak.nativeANE.alert
 		 */
 		public function set closeHandler(value:Function):void
 		{
+			
 			if(hasEventListener(NativeDialogEvent.CLOSED))
 				removeEventListener(NativeDialogEvent.CLOSED,_closeHandler);
-			addEventListener(NativeDialogEvent.CLOSED,_closeHandler);
 			_closeHandler = value;
+			if(value!=null)
+				addEventListener(NativeDialogEvent.CLOSED,_closeHandler);
 		}
 		/**
 		 * @private
@@ -432,9 +434,9 @@ package pl.mateuszmackowiak.nativeANE.alert
 					if(Capabilities.os.indexOf("Win")>-1)
 						level--;
 					dispatchEvent(new NativeDialogEvent(NativeDialogEvent.CLOSED,level.toString()));
-					if(closeHandler!=null){
-						removeEventListener(NativeDialogEvent.CLOSED,closeHandler);
-						closeHandler = null;
+					if(_closeHandler!=null){
+						removeEventListener(NativeDialogEvent.CLOSED,_closeHandler);
+						_closeHandler = null;
 					}
 					(event.target as ExtensionContext).removeEventListener( StatusEvent.STATUS, onAlertHandler );
 				}else{

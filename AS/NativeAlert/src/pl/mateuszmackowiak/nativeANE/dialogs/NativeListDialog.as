@@ -117,7 +117,7 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 				return;
 			}
 			
-			if(!isNaN(theme))
+			if(!isNaN(theme) && theme>-1)
 				_theme = theme;
 			else
 				_theme = _defaultTheme;
@@ -165,7 +165,7 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 			_selectedIndex = checkedLabel;
 			try{
 				if(isAndroid)
-					context.call("showListDialog","create",_title,_buttons,labels,checkedLabel,_cancelable,_theme);
+					context.call("showListDialog","show",_title,_buttons,labels,checkedLabel,_cancelable,_theme);
 				else
 					context.call("show",_title,_message,_buttons,labels,checkedLabel);
 				return true;
@@ -243,17 +243,17 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 		 * list of selected labels 
 		 */
 		public function get selectedLabels():Vector.<String>{
-			var lab:Vector.<String> = new Vector.<String>();
+			var labels:Vector.<String> = new Vector.<String>();
 			if(_list!==null && _list.length>0){
 				for each (var obj:Object in _list) 
 				{
 					if(obj.selected == true)
-						lab.push(obj.label);
+						labels.push(obj.label);
 				}
-				if(lab.length>0 && _selectedIndex>-1)
-					lab.push(_list[_selectedIndex].label);
+				if(labels.length>0 && _selectedIndex>-1)
+					labels.push(_list[_selectedIndex].label);
 			}
-			return lab;
+			return labels;
 		}
 		
 		/**
@@ -296,7 +296,7 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 		
 		
 		/**
-		 * if the dialog is showing
+		 * if the dialog is showing (only Android)
 		 */
 		public function isShowing():Boolean{
 			if(context){
@@ -520,9 +520,12 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 		{
 			_isShowing = false;
 			try{
-				context.dispose();
-				context.removeEventListener(StatusEvent.STATUS, onStatus);
-				return true;
+				if(context){
+					context.dispose();
+					context.removeEventListener(StatusEvent.STATUS, onStatus);
+					context = null;
+					return true;
+				}
 			}catch(e:Error){
 				showError("Error calling dispose method "+e.message,e.errorID);
 			}
@@ -581,31 +584,14 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 		{
 			try{
 				if(event.code == NativeDialogEvent.CLOSED){
-					if(dispatchEvent(new NativeDialogEvent(NativeDialogEvent.CLOSED,event.level))){
-						trace("dismiss");
-						if(isAndroid){
-							dismiss();
-						}
-						_isShowing = false;
-					}
+					dispatchEvent(new NativeDialogEvent(NativeDialogEvent.CLOSED,event.level));
 					
 				}else if(event.code == NativeDialogEvent.CANCELED){
-					const e2:Event = new NativeDialogEvent(NativeDialogEvent.CANCELED,event.level);
-					if(dispatchEvent(e2)){
-						trace("dismiss");
-						if(isAndroid){
-							dismiss();
-						}
-						_isShowing = false;
-					}
+					new NativeDialogEvent(NativeDialogEvent.CANCELED,event.level);
+
 					
 				}else if(event.code == NativeDialogEvent.OPENED){
-					if(dispatchEvent(new NativeDialogEvent(NativeDialogEvent.OPENED,""))){
-						if(isAndroid){
-							context.call("showListDialog","show");
-						}
-						_isShowing = true;
-					}
+					dispatchEvent(new NativeDialogEvent(NativeDialogEvent.OPENED,""));
 				}else if(event.code == NativeDialogListEvent.LIST_CHANGE){
 					var index:int = -1;
 					if(event.level.indexOf("_")>-1){

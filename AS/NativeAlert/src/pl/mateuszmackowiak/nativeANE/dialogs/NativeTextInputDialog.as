@@ -91,6 +91,9 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 		 *
 		 * <br> flash.events.ErrorEvent
 		 * <br> pl.mateuszmackowiak.nativeANE.NativeDialogEvent
+		 * 
+		 * @param the theme of the dialog - defined by the version of software
+		 * 
 		 * @author Mateusz Maćkowiak
 		 * @see http://www.mateuszmackowiak.art.pl/blog
 		 * @since 2012

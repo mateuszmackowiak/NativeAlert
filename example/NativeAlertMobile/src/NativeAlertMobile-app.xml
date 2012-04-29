@@ -235,6 +235,7 @@
         <manifestAdditions><![CDATA[
 			<manifest android:installLocation="auto">
 			<uses-permission android:name="android.permission.READ_PHONE_STATE" />
+			<uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
 			
 			    <!--See the Adobe AIR documentation for more information about setting Google Android permissions-->
 			    <!--Removing the permission android.permission.INTERNET will have the side effect

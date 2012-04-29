@@ -99,7 +99,7 @@ public class showListDialog implements FREFunction {
 
 
 	public AlertDialog createPopup(FREContext context, String title, String buttons[], CharSequence choices[],boolean checkedItems[],Integer checkedItem, boolean cancelable, int theme) {
-		AlertDialog.Builder builder = (Integer.parseInt(android.os.Build.VERSION.SDK)<11)?new AlertDialog.Builder(context.getActivity()):new AlertDialog.Builder(context.getActivity(),theme);
+		AlertDialog.Builder builder = (android.os.Build.VERSION.SDK_INT<11)?new AlertDialog.Builder(context.getActivity()):new AlertDialog.Builder(context.getActivity(),theme);
 		try{
 			if(title!=null && !title.isEmpty())
 				builder.setTitle(Html.fromHtml(title));

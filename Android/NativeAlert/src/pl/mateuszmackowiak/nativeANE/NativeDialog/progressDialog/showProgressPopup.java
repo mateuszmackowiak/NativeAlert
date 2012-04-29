@@ -119,7 +119,7 @@ public class showProgressPopup implements FREFunction {
 	
 	public ProgressDialog createProgressDialog(FREContext context,int style,Integer progress,Integer secondaryProgress,String title,String message,int theme,boolean cancleble,boolean indeterminate) {
 		
-		ProgressDialog mDialog = (Integer.parseInt(android.os.Build.VERSION.SDK)<11)?new ProgressDialog(context.getActivity()):new ProgressDialog(context.getActivity(),theme);
+		ProgressDialog mDialog = (android.os.Build.VERSION.SDK_INT<11)?new ProgressDialog(context.getActivity()):new ProgressDialog(context.getActivity(),theme);
 		try{
 			if(title!=null && !title.isEmpty())
 				mDialog.setTitle(Html.fromHtml(title));

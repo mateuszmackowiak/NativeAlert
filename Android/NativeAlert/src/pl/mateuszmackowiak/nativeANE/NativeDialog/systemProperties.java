@@ -1,6 +1,5 @@
 package pl.mateuszmackowiak.nativeANE.NativeDialog;
 
-import java.lang.reflect.Method;
 import java.security.MessageDigest;
 import java.util.HashMap;
 import java.util.Map;
@@ -20,7 +19,7 @@ import com.adobe.fre.FREFunction;
 import com.adobe.fre.FREObject;
 /**
 *
-* @author Mateusz Maækowiak
+* @author Mateusz Makowiak
 */
 public class systemProperties  extends FREContext{
 public static final String KEY = "SystemProperites";
@@ -110,9 +109,8 @@ public static final String KEY = "SystemProperites";
 		        	dictionary.setProperty("AppUid",FREObject.newObject(String.valueOf(pInfo.applicationInfo.uid)));
 		        	
 		        	Boolean hasHardwareMenuButton = true;
-		        	if((Integer.parseInt(android.os.Build.VERSION.SDK)>14))
-		        		hasHardwareMenuButton = false;
-		        		//hasHardwareMenuButton = ViewConfiguration.get(activity.getBaseContext()).hasPermanentMenuKey();
+		        	if((android.os.Build.VERSION.SDK_INT>14))
+		        		hasHardwareMenuButton = ViewConfiguration.get(activity.getBaseContext()).hasPermanentMenuKey();
 		        	dictionary.setProperty("hasHardwareMenuButton", FREObject.newObject(hasHardwareMenuButton));
 		        	
 		        	

@@ -55,8 +55,4 @@ public class NativeExtension implements FREExtension{
     {
 		Log.i("NativeAlert", "initialize");        
     }
-    
-    
-    
-    
 }

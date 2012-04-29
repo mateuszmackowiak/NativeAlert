@@ -12,7 +12,7 @@ import android.text.Html;
 import android.app.AlertDialog;
 /**
 *
-* @author Mateusz MaÊkowiak
+* @author Mateusz Maçkowiak
 */
 public class showAlertFunction implements FREFunction{
     

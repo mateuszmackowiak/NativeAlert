@@ -405,10 +405,10 @@
 				
 				var dialog:NativeListDialog = (event.target as NativeListDialog)
 				returnText.appendText("NativeDialogListEvent "+ event.index+"   "+event.selected+"\n");
-				if(dialog.selectedIndex>-1){
+				/*if(dialog.selectedIndex>-1){
 					selectedIndex = dialog.selectedIndex;
 					returnText.appendText("selectedLabel   "+dialog.selectedLabel+"\n");
-				}else{
+				}else{*/
 					const a:Vector.<String> = dialog.selectedLabels;
 					returnText.appendText("selectedLabels : \n");
 					if(a.length>0){
@@ -417,7 +417,7 @@
 							returnText.appendText("   "+a[i]+"\n");
 						}
 					}
-				}
+				//}
 					 
 			}
 			public function closeNativeDialogHandler(event:NativeDialogEvent):void

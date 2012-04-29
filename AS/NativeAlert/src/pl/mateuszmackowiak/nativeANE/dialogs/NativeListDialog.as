@@ -88,6 +88,7 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 		private var _list:Vector.<Object> = null;
 		private var _selectedIndex:int = -1;
 		private var _isShowing:Boolean=false;
+		private var _isSingleChoice:Boolean = false;
 		//---------------------------------------------------------------------
 		//
 		// Public Methods.
@@ -99,6 +100,8 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 		 *
 		 * <br> flash.events.ErrorEvent
 		 * <br> pl.mateuszmackowiak.nativeANE.NativeDialogEvent
+		 * 
+		 * @param the theme of the dialog - defined by the version of software
 		 * @author Mateusz Maćkowiak
 		 * @see http://www.mateuszmackowiak.art.pl/blog
 		 * @since 2012
@@ -106,7 +109,7 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 		 * @see pl.mateuszmackowiak.nativeANE.NativeDialogListEvent
 		 * @see flash.events.ErrorEvent
 		 */
-		public function NativeListDialog(theme:uint=NaN)
+		public function NativeListDialog(theme:int=-1)
 		{
 			if(Capabilities.os.toLowerCase().indexOf("linux")>-1)
 				isAndroid = true;
@@ -143,6 +146,7 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 		 */
 		public function showSingleChoice(labels:Vector.<String>,checkedLabel:int=-1,buttons:Vector.<String>=null,cancleble:Object=null):Boolean
 		{
+			_isSingleChoice = true;
 			if(_theme ==-1)
 				_theme = defaultTheme;
 			if(buttons!=null)
@@ -187,6 +191,7 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 		 */
 		public function showMultiChoice(labels:Vector.<String>,checkedLabels:Vector.<Boolean>,buttons:Vector.<String>=null,cancelable:Object=null):Boolean
 		{
+			_isSingleChoice = false;
 			if(_theme ==-1)
 				_theme = defaultTheme;
 			if(buttons!=null)
@@ -212,7 +217,7 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 			_selectedIndex = -1;
 			try{
 				if(isAndroid)
-					context.call("showListDialog","create",_title,_buttons,labels,checkedLabels,_cancelable,_theme);
+					context.call("showListDialog","show",_title,_buttons,labels,checkedLabels,_cancelable,_theme);
 				else
 					context.call("show",_title,_message,_buttons,labels,checkedLabels);
 				return true;
@@ -240,63 +245,107 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 		
 		
 		/**
-		 * list of selected labels 
+		 * list of selected labels. If <code>type</code> =="SingleChoice" returns a list with one selected label else empty
+		 * @see #type 
 		 */
 		public function get selectedLabels():Vector.<String>{
 			var labels:Vector.<String> = new Vector.<String>();
 			if(_list!==null && _list.length>0){
-				for each (var obj:Object in _list) 
-				{
-					if(obj.selected == true)
-						labels.push(obj.label);
+				if(_isSingleChoice){
+					if(_selectedIndex>-1 && _selectedIndex<_list.length){
+						labels.push(_list[_selectedIndex].label);
+					}
+				}else{
+					for each (var obj:Object in _list) 
+					{
+						if(obj.selected == true)
+							labels.push(obj.label);
+					}
 				}
-				if(labels.length>0 && _selectedIndex>-1)
-					labels.push(_list[_selectedIndex].label);
 			}
 			return labels;
 		}
 		
 		/**
-		 * list of selected indexes
+		 * list of selected indexes. If <code>type</code> =="SingleChoice" returns a list with selected index else empty
+		 * @see #type
 		 */
 		public function get selectedIndexes():Vector.<int>{
 			var indexes:Vector.<int> = new Vector.<int>();
 			if(_list!==null && _list.length>0){
-				for (var i:int = 0; i < _list.length; i++) 
-				{
-					if(_list[i].selected == true)
-						indexes.push(i);
+				if(_isSingleChoice){
+					if(_selectedIndex>-1 && _selectedIndex<_list.length){
+						indexes.push(_selectedIndex);
+					}
+				}else{
+					for (var i:int = 0; i < _list.length; i++) 
+					{
+						if(_list[i].selected == true)
+							indexes.push(i);
+					}
 				}
-				if(indexes.length>0 && _selectedIndex>-1)
-					indexes.push(_selectedIndex);
 			}
 			return indexes;
 		}
 		
 		
 		/**
-		 * selected index. If multichoice -1
+		 * returns the type of dialog
+		 * "MultipleChoice" or "SingleChoice"
+		 */
+		public function get type():String
+		{
+			if(_isSingleChoice)
+				return "SingleChoice";
+			else
+				return "MultipleChoice";
+		}
+		/**
+		 * selected index. If is multiple choice return the first slected index
+		 * @see #type
 		 */
 		public function get selectedIndex():int{
-			return _selectedIndex;
+			if(_isSingleChoice)
+				return _selectedIndex;
+			else if(_list!==null && _list.length>0){
+				for (var i:int = 0; i < _list.length; i++) 
+				{
+					if(_list[i].selected == true)
+						return i;
+				}
+			}
+			
+			return -1;
 		}
 		
 		
 		/**
-		 * selected label. If multichoice null
+		 * selected label. If is multiple choice return the first slected label or null if non selected
+		 * @see type
 		 */
 		public function get selectedLabel():String{
-			if(_selectedIndex>-1 && _list!=null && _list.length>0)
-				return _list[_selectedIndex].label;
-			else
+			if(_isSingleChoice){
+				if(_selectedIndex>-1 && _list!=null && _list.length>0 && _selectedIndex<_list.length)
+					return _list[_selectedIndex].label;
+				else
+					return null;
+			}else{
+				if(_list!=null && _list.length>0){
+					for (var i:int = 0; i < _list.length; i++) 
+					{
+						if(_list[i].selected == true)
+							return _list[i].label;
+					}
+				}
 				return null;
+			}
 		}
 		
 		
 		
 		
 		/**
-		 * if the dialog is showing (only Android)
+		 * if the dialog is showing
 		 */
 		public function isShowing():Boolean{
 			if(context){
@@ -304,11 +353,11 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 					const b:Boolean = context.call("showListDialog","isShowing");
 					_isShowing = b;
 					return b;
-				}/*else if(isIOS){
+				}else if(isIOS){
 					const b2:Boolean = context.call("isShowing");
 					_isShowing = b2;
 					return b2;
-				}*/
+				}
 			}
 			return false;
 			
@@ -330,10 +379,10 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 							context.call("showListDialog","setTitle",value);
 							return true;
 						}
-						/*if(isIOS){
+						if(isIOS){
 							context.call("setTitle",value);
 							return true;
-						}*/
+						}
 						return false;
 					}catch(e:Error){
 						showError("Error setting title "+e.message,e.errorID);

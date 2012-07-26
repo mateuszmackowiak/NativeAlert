@@ -71,8 +71,8 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 		//
 		//---------------------------------------------------------------------
 		private static var _defaultTheme:int = DEFAULT_THEME;
-		private static var isAndroid:Boolean=false;
-		private static var isIOS:Boolean=false;
+		//private static var isAndroid:Boolean=false;
+		//private static var isIOS:Boolean=false;
 		
 		//---------------------------------------------------------------------
 		//
@@ -80,6 +80,7 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 		//
 		//---------------------------------------------------------------------
 		private var context:ExtensionContext;
+		
 		private var _title:String="";
 		private var _buttons:Vector.<String>=null;
 		private var _theme:int = -1;
@@ -96,26 +97,23 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 		//---------------------------------------------------------------------
 		
 		/**
-		 * Events:
-		 *
-		 * <br> flash.events.ErrorEvent
-		 * <br> pl.mateuszmackowiak.nativeANE.NativeDialogEvent
+		 * 
+		 * @event
+		 * flash.events.ErrorEvent
+		 * <br>pl.mateuszmackowiak.nativeANE.NativeDialogEvent
+		 * <br>pl.mateuszmackowiak.nativeANE.NativeDialogListEvent
 		 * 
 		 * @param the theme of the dialog - defined by the version of software
 		 * @author Mateusz Maćkowiak
 		 * @see http://www.mateuszmackowiak.art.pl/blog
 		 * @since 2012
 		 * @see pl.mateuszmackowiak.nativeANE.NativeDialogEvent
-		 * @see pl.mateuszmackowiak.nativeANE.NativeDialogListEvent
-		 * @see flash.events.ErrorEvent
+		 * 
 		 */
 		public function NativeListDialog(theme:int=-1)
 		{
-			if(Capabilities.os.toLowerCase().indexOf("linux")>-1)
-				isAndroid = true;
-			else if(Capabilities.os.toLowerCase().indexOf("iph")>-1)
-				isIOS = true;
-			else{
+			if(!isAndroid() && !isIOS()){
+				
 				trace("NativeListDialog is not supported on this platform");
 				return;
 			}
@@ -133,6 +131,15 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 			}
 		}
 		
+		
+		protected static function isIOS():Boolean
+		{
+			return Capabilities.os.toLowerCase().indexOf("ip")>-1;
+		}
+		protected static function isAndroid():Boolean
+		{
+			return Capabilities.os.toLowerCase().indexOf("linux")>-1;
+		}
 		
 		
 		/**
@@ -168,11 +175,13 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 				return false;
 			_selectedIndex = checkedLabel;
 			try{
-				if(isAndroid)
+				if(isAndroid()){
 					context.call("showListDialog","show",_title,_buttons,labels,checkedLabel,_cancelable,_theme);
-				else
+					return true;
+				}else if(isIOS()){
 					context.call("show",_title,_message,_buttons,labels,checkedLabel);
-				return true;
+					return true;
+				}
 			}catch(e:Error){
 				showError("Error calling show method "+e.message,e.errorID);
 			}
@@ -191,13 +200,6 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 		 */
 		public function showMultiChoice(labels:Vector.<String>,checkedLabels:Vector.<Boolean>,buttons:Vector.<String>=null,cancelable:Object=null):Boolean
 		{
-			_isSingleChoice = false;
-			if(_theme ==-1)
-				_theme = defaultTheme;
-			if(buttons!=null)
-				_buttons = buttons;
-			if(cancelable!==null)
-				_cancelable = cancelable;
 			
 			if(labels!==null && labels.length>0){
 				_list = new Vector.<Object>();
@@ -214,13 +216,25 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 				}
 			}else
 				return false;
+			
+			if(_theme ==-1)
+				_theme = defaultTheme;
+			if(buttons!=null)
+				_buttons = buttons;
+			if(cancelable!==null)
+				_cancelable = cancelable;
+			
+			_isSingleChoice = false;
 			_selectedIndex = -1;
+			
 			try{
-				if(isAndroid)
+				if(isAndroid()){
 					context.call("showListDialog","show",_title,_buttons,labels,checkedLabels,_cancelable,_theme);
-				else
+					return true;
+				}else if(isIOS()){
 					context.call("show",_title,_message,_buttons,labels,checkedLabels);
-				return true;
+					return true;
+				}
 			}catch(e:Error){
 				showError("Error calling show method "+e.message,e.errorID);
 			}
@@ -307,6 +321,7 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 		public function get selectedIndex():int{
 			if(_isSingleChoice)
 				return _selectedIndex;
+			
 			else if(_list!==null && _list.length>0){
 				for (var i:int = 0; i < _list.length; i++) 
 				{
@@ -349,11 +364,11 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 		 */
 		public function isShowing():Boolean{
 			if(context){
-				if(isAndroid){
+				if(isAndroid()){
 					const b:Boolean = context.call("showListDialog","isShowing");
 					_isShowing = b;
 					return b;
-				}else if(isIOS){
+				}else if(isIOS()){
 					const b2:Boolean = context.call("isShowing");
 					_isShowing = b2;
 					return b2;
@@ -375,11 +390,11 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 				_title = value;
 				if(_isShowing){
 					try{
-						if(isAndroid){
+						if(isAndroid()){
 							context.call("showListDialog","setTitle",value);
 							return true;
 						}
-						if(isIOS){
+						if(isIOS()){
 							context.call("setTitle",value);
 							return true;
 						}
@@ -410,7 +425,7 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 			if(value!==_message){
 				_message = value;
 				try{
-					if(_isShowing && isIOS){
+					if(_isShowing && isIOS()){
 							context.call("updateMessage",value);
 						return true;
 					}
@@ -440,7 +455,7 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 				_cancelable = value;
 				if(_isShowing){
 					try{
-						if(isAndroid){
+						if(isAndroid()){
 							context.call("showListDialog","setCancelable",value);
 							return true;
 						}
@@ -515,10 +530,10 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 		 */
 		public function dismiss():Boolean
 		{
-			_isShowing = false;
 			try{
-				if(context!=null){
-					if(isAndroid){
+				if(context){
+					if(isAndroid()){
+						_isShowing = false;
 						context.call("showListDialog","dismiss");
 						return true;
 					}
@@ -540,10 +555,10 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 		 */
 		public function hide():Boolean
 		{
-			_isShowing = false;
 			try{
-				if(context!=null){
-					if(isAndroid){
+				if(context){
+					if(isAndroid()){
+						_isShowing = false;
 						context.call("showListDialog","hide");
 						return true;
 					}
@@ -563,22 +578,14 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 		 * Disposes of this ExtensionContext instance.<br><br>
 		 * The runtime notifies the native implementation, which can release any associated native resources. After calling <code>dispose()</code>,
 		 * the code cannot call the <code>call()</code> method and cannot get or set the <code>actionScriptData</code> property.
-		 * @return if call sucessfull
 		 */
-		public function dispose():Boolean
+		public function dispose():void
 		{
 			_isShowing = false;
-			try{
-				if(context){
-					context.dispose();
-					context.removeEventListener(StatusEvent.STATUS, onStatus);
-					context = null;
-					return true;
-				}
-			}catch(e:Error){
-				showError("Error calling dispose method "+e.message,e.errorID);
+			if(context){
+				context.dispose();
+				context = null;
 			}
-			return false;
 		}
 		
 		
@@ -591,7 +598,7 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 		 * Whether the extension class is available on the device (true);<br>otherwise false
 		 */
 		public static function get isSupported():Boolean{
-			if(Capabilities.os.toLowerCase().indexOf("linux")>-1 || Capabilities.os.toLowerCase().indexOf("iph")>-1)
+			if(isAndroid() || isIOS())
 				return true;
 			else 
 				return false;
@@ -645,19 +652,19 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 					var index:int = -1;
 					if(event.level.indexOf("_")>-1){
 						const args:Array = event.level.split("_");
-						if(isAndroid)
+						if(isAndroid())
 							index = int(args[0]);
 						else
 							index = _list.length-1-int(args[0]);
 						var selected:Boolean=false;
-						const selectedStr:String= String(args[1]).toLocaleLowerCase();
+						const selectedStr:String= String(args[1]).toLowerCase();
 						if(selectedStr=="true" || selectedStr=="1")
 							selected = true;
 						_list[index].selected = selected;
 						
 						dispatchEvent(new NativeDialogListEvent(NativeDialogListEvent.LIST_CHANGE,index,selected));
 					}else{
-						if(isAndroid)
+						if(isAndroid())
 							index = int(event.level);
 						else 
 							index = _list.length-1-int(event.level);

@@ -10,8 +10,8 @@ import com.adobe.fre.FREObject;
 import android.content.DialogInterface;
 import android.text.Html;
 import android.app.AlertDialog;
+
 /**
-*
 * @author Mateusz Maçkowiak
 */
 public class showAlertFunction implements FREFunction{
@@ -43,7 +43,7 @@ public class showAlertFunction implements FREFunction{
     
     private AlertDialog creatAlert(FREContext context,String message,String title,String closeLabel,String otherLabel,boolean cancelable,int theme)
     {  
-    	AlertDialog.Builder builder = (Integer.parseInt(android.os.Build.VERSION.SDK)<11)?new AlertDialog.Builder(context.getActivity()): new AlertDialog.Builder(context.getActivity(),theme);
+    	AlertDialog.Builder builder = (android.os.Build.VERSION.SDK_INT<11)?new AlertDialog.Builder(context.getActivity()): new AlertDialog.Builder(context.getActivity(),theme);
     	
     	builder.setCancelable(cancelable);
     	if(cancelable==true)

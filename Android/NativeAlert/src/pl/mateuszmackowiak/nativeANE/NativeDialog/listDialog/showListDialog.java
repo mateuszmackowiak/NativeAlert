@@ -116,13 +116,13 @@ public class showListDialog implements FREFunction {
 				context.dispatchStatusEventAsync(NativeExtension.ERROR_EVENT, KEY+"  labels are empty or the list of labels is not equal to list of selected labels ");
 			
 			if(buttons!=null && buttons.length>0){
-				builder.setPositiveButton(buttons[0], new ConfitmListener(context));
+				builder.setPositiveButton(buttons[0], new ConfitmListener(context,0));
 				if(buttons.length>1)
-					builder.setNeutralButton(buttons[1], new ConfitmListener(context));
+					builder.setNeutralButton(buttons[1], new ConfitmListener(context,1));
 				if(buttons.length>2)
-					builder.setNegativeButton(buttons[2], new ConfitmListener(context));
+					builder.setNegativeButton(buttons[2], new ConfitmListener(context,2));
 			}else
-				builder.setPositiveButton("OK",new ConfitmListener(context));
+				builder.setPositiveButton("OK",new ConfitmListener(context,0));
 			
 		}catch(Exception e){
 			context.dispatchStatusEventAsync(NativeExtension.ERROR_EVENT,KEY+"   "+e.toString());
@@ -150,16 +150,17 @@ public class showListDialog implements FREFunction {
     }
 	private class ConfitmListener implements DialogInterface.OnClickListener{
     	private FREContext context; 
-    	ConfitmListener(FREContext context)
+    	private int index;
+    	ConfitmListener(FREContext context,int index)
     	{
     		this.context=context;
+    		this.index = index;
     	}
  
         @Override
 		public void onClick(DialogInterface dialog,int id) 
         {
-        	Log.e("List Dialog","onClicked");
-     	    context.dispatchStatusEventAsync(NativeExtension.CLOSED,String.valueOf(Math.abs(id-1)));
+     	    context.dispatchStatusEventAsync(NativeExtension.CLOSED,String.valueOf(index));//Math.abs(id-1)));
      	   dialog.dismiss();
         }
     }

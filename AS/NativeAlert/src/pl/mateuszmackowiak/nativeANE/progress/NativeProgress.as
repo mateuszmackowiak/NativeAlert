@@ -13,6 +13,7 @@ package pl.mateuszmackowiak.nativeANE.progress
 	import flash.system.Capabilities;
 	
 	import pl.mateuszmackowiak.nativeANE.NativeDialogEvent;
+	import pl.mateuszmackowiak.nativeANE.properties.SystemProperties;
 
 	
 	/** 
@@ -47,17 +48,17 @@ package pl.mateuszmackowiak.nativeANE.progress
 		 * uses : SVProgressHUD
 		 * @see http://github.com/samvermette/SVProgressHUD
 		 */
-		public static const IOS_SVHUD_BLACK_BACKGROUND_THEME:uint=0x00000002;
+		public static const IOS_SVHUD_BLACK_BACKGROUND_THEME:uint = 0x00000002;
 		/**
 		 * uses : SVProgressHUD
 		 * @see http://github.com/samvermette/SVProgressHUD
 		 */
-		public static const IOS_SVHUD_NON_BACKGROUND_THEME:uint=0x00000003;
+		public static const IOS_SVHUD_NON_BACKGROUND_THEME:uint = 0x00000003;
 		/**
 		 * uses : SVProgressHUD
 		 * @see http://github.com/samvermette/SVProgressHUD
 		 */
-		public static const IOS_SVHUD_GRADIENT_BACKGROUND_THEME:uint=0x00000004;
+		public static const IOS_SVHUD_GRADIENT_BACKGROUND_THEME:uint = 0x00000004;
 		
 		/**
 		 * the default style for bouth IOS and Android devices 
@@ -80,10 +81,6 @@ package pl.mateuszmackowiak.nativeANE.progress
 
 		private static var _defaultAndroidTheme:uint = DEFAULT_THEME;
 		private static var _defaultIOSTheme:uint = DEFAULT_THEME;
-		private static var _set:Boolean = false;
-		private static var _isSupp:Boolean = false;
-		private static var isAndroid:Boolean=false;
-		private static var isIOS:Boolean=false;
 		
 		//---------------------------------------------------------------------
 		//
@@ -91,6 +88,7 @@ package pl.mateuszmackowiak.nativeANE.progress
 		//
 		//---------------------------------------------------------------------
 		private var context:ExtensionContext;
+		
 		private var _progress:int=0;
 		private var _secondary:int=NaN;
 		private var _title:String="";
@@ -119,15 +117,11 @@ package pl.mateuszmackowiak.nativeANE.progress
 		 */
 		public function NativeProgress(style:int = 0x00000000,AndroidTheme:int=-1,IOSTheme:int=-1)
 		{
-			if(Capabilities.os.toLowerCase().indexOf("linux")>-1)
-				isAndroid = true;
-			else if(Capabilities.os.toLowerCase().indexOf("iph")>-1)
-				isIOS = true;
-			else{
+			if(!isAndroid() && !isIOS()){
 				trace("NativeProgress is not supported on this platform");
 				return;
 			}
-				
+
 			if(style == STYLE_HORIZONTAL || style==STYLE_SPINNER)
 				_style = style;
 
@@ -150,6 +144,14 @@ package pl.mateuszmackowiak.nativeANE.progress
 		}
 		
 		
+		protected static function isIOS():Boolean
+		{
+			return Capabilities.os.toLowerCase().indexOf("ip")>-1;
+		}
+		protected static function isAndroid():Boolean
+		{
+			return Capabilities.os.toLowerCase().indexOf("linux")>-1;
+		}
 
 		/**
 		 * shows the nativeProgress dialog
@@ -162,12 +164,12 @@ package pl.mateuszmackowiak.nativeANE.progress
 			if(indeterminate!==null)
 				_indeterminate = indeterminate;
 			try{
-				if(isAndroid){
+				if(isAndroid()){
 					context.call(showProgressPopup,"showPopup",_progress,_secondary,_style,_title,_message,cancleble,_indeterminate,_androidTheme);
 					_isShowing = true;
 					return true;
 				}
-				else if(isIOS){
+				else if(isIOS()){
 					context.call(showProgressPopup,_progress/_maxProgress,null,_style,_title,_message,cancleble,_indeterminate,_iosTheme);
 					_isShowing = true;
 					return true;
@@ -189,12 +191,12 @@ package pl.mateuszmackowiak.nativeANE.progress
 		{
 			_indeterminate = true;
 			try{
-				if(isAndroid){
+				if(isAndroid()){
 					context.call(showProgressPopup,"showPopup",_progress,_secondary,STYLE_HORIZONTAL,_title,_message,cancleble,true,_androidTheme);
 					_isShowing = true;
 					return true;
 				}
-				else if(isIOS){
+				else if(isIOS()){
 					context.call(showProgressPopup,_progress,null,STYLE_HORIZONTAL,_title,_message,cancleble,true,_iosTheme);
 					_isShowing = true;
 					return true;
@@ -216,12 +218,12 @@ package pl.mateuszmackowiak.nativeANE.progress
 		public function showSpinner(cancleble:Boolean=false):Boolean
 		{
 			try{
-				if(isAndroid){
+				if(isAndroid()){
 					context.call(showProgressPopup,"showPopup",_progress,_secondary,STYLE_SPINNER,_title,_message,cancleble,false,_androidTheme);
 					_isShowing = true;
 					return true;
 				}
-				else if(isIOS){
+				else if(isIOS()){
 					context.call(showProgressPopup,_progress,null,STYLE_SPINNER,_title,_message,cancleble,true,_iosTheme);
 					_isShowing = true;
 					return true;
@@ -243,7 +245,7 @@ package pl.mateuszmackowiak.nativeANE.progress
 		public function setIndeterminate(value:Boolean):Boolean{
 			if(_indeterminate!==value  && value>=0 && value<= _maxProgress){
 				_indeterminate = value;
-				if(isAndroid && _isShowing){
+				if(isAndroid() && _isShowing){
 					try{
 						context.call(showProgressPopup,"setIndeterminate",value);
 						return true;
@@ -272,7 +274,7 @@ package pl.mateuszmackowiak.nativeANE.progress
 		public function setSecondaryProgress(value:int):Boolean{
 			if(_secondary!==value  && value>=0 && value<= _maxProgress){
 				_secondary = value;
-				if(isAndroid && _isShowing){
+				if(isAndroid() && _isShowing){
 					try{
 						context.call(showProgressPopup,"setSecondary",value);
 						return true;
@@ -303,7 +305,7 @@ package pl.mateuszmackowiak.nativeANE.progress
 				_progress = value;
 				try{
 					if(_isShowing){
-						if(isAndroid)
+						if(isAndroid())
 							context.call(showProgressPopup,"update",value);
 						else
 							context.call("updateProgress",value/_maxProgress);
@@ -339,7 +341,7 @@ package pl.mateuszmackowiak.nativeANE.progress
 					_secondary = value;
 				if(!isNaN(value) && _isShowing){
 					try{
-						if(isAndroid)
+						if(isAndroid())
 							context.call(showProgressPopup,"max",value);
 						if(_progress>value)
 							_progress = value;
@@ -374,7 +376,7 @@ package pl.mateuszmackowiak.nativeANE.progress
 				_message = value;
 				try{
 					if(_isShowing){
-						if(isAndroid)
+						if(isAndroid())
 							context.call(showProgressPopup,"setMessage",value);
 						else
 							context.call("updateMessage",value);
@@ -409,7 +411,7 @@ package pl.mateuszmackowiak.nativeANE.progress
 			if(value!==_title){
 				_title = value;
 				try{
-					if(isAndroid){
+					if(isAndroid()){
 						context.call(showProgressPopup,"setTitle",value);
 						return true;
 					}else{
@@ -440,11 +442,11 @@ package pl.mateuszmackowiak.nativeANE.progress
 		 */
 		public function isShowing():Boolean{
 			if(context){
-				if(isAndroid){
+				if(isAndroid()){
 					const b:Boolean = context.call(showProgressPopup,"isShowing");
 					_isShowing = b;
 					return b;
-				}else if(isIOS){
+				}else if(isIOS()){
 					const b2:Boolean = context.call("isShowing");
 					_isShowing = b2;
 					return b2;
@@ -504,7 +506,7 @@ package pl.mateuszmackowiak.nativeANE.progress
 				_isShowing = false;
 				
 				if(context){
-					if(isAndroid){
+					if(isAndroid()){
 						context.call(showProgressPopup,"hide");
 					}else {
 						if(message!=null)
@@ -526,16 +528,13 @@ package pl.mateuszmackowiak.nativeANE.progress
 		 * The runtime notifies the native implementation, which can release any associated native resources. After calling <code>dispose()</code>,
 		 * the code cannot call the <code>call()</code> method and cannot get or set the <code>actionScriptData</code> property.
 		 */
-		public function dispose():Boolean
+		public function dispose():void
 		{
-			try{
-				_isShowing = false;
+			_isShowing = false;
+			if(context){
 				context.dispose();
-				return true;
-			}catch(e:Error){
-				showError("Error calling dispose method "+e.message,e.errorID);
+				context = null;
 			}
-			return false;
 		}
 		
 		
@@ -548,28 +547,9 @@ package pl.mateuszmackowiak.nativeANE.progress
 		 * Whether the extension is available on the device (true);<br>otherwise false
 		 */
 		public static function get isSupported():Boolean{
-			if(!_set){// checks if a value was set before
-				try{
-					_set = true;
-					if(Capabilities.os.indexOf("Linux")>-1){
-						isAndroid = true;
-						var context:ExtensionContext = ExtensionContext.createExtensionContext(EXTENSION_ID, "ProgressContext");
-						_isSupp = context.call("isSupported")==true;
-						context.dispose();
-					}else if(Capabilities.os.toLowerCase().indexOf("ip")>-1)
-					{
-						context = ExtensionContext.createExtensionContext(EXTENSION_ID,null);
-						_isSupp = context.call("isSupported")==true;
-						context.dispose();
-					}
-					else
-						_isSupp = false;
-				}catch(e:Error){
-					trace("NativeProcess Extension is not supported on this platform");
-					return _isSupp;
-				}
-			}	
-			return _isSupp;
+			if(isAndroid() || isIOS())
+				return true;
+			return false;
 		}
 		
 		/**
@@ -608,10 +588,10 @@ package pl.mateuszmackowiak.nativeANE.progress
 		/**
 		 * defines if the Network Activiti Indicatior is availeble on platform (<b>AVAILABLE ONLY ON IOS</b>)
 		 * <br><img src="https://github.com/mateuszmackowiak/NativeAlert/raw/master/images/NetworkActivityIndicatoror.png"></img>
-		 * @see pl.mateuszmackowiak.nativeANE.progress.NativeProgress#showNetworkActivityIndicatoror()
+		 * @see pl.mateuszmackowiak.nativeANE.progress.NativeProgress#showNetworkActivityIndicator()
 		 */
-		public static function isNetworkActivityIndicatoror():Boolean{
-			if(Capabilities.os.toLowerCase().indexOf("ip")>-1){
+		public static function isNetworkActivityIndicatorSupported():Boolean{
+			if(isIOS()){
 				return true;
 			}else
 				return false;
@@ -619,11 +599,11 @@ package pl.mateuszmackowiak.nativeANE.progress
 		/**
 		 * <b>AVAILABLE ONLY ON IOS</b>
 		 * <br><img src="https://github.com/mateuszmackowiak/NativeAlert/raw/master/images/NetworkActivityIndicatoror.png"></img>
-		 * @see pl.mateuszmackowiak.nativeANE.progress.NativeProgress#isNetworkActivityIndicatoror()
+		 * @see pl.mateuszmackowiak.nativeANE.progress.NativeProgress#isNetworkActivityIndicatorSupported()
 		 * @return if call sucessfull
 		 */
-		public static function showNetworkActivityIndicatoror(show:Boolean):Boolean{
-			if(Capabilities.os.toLowerCase().indexOf("ip")>-1){
+		public static function showNetworkActivityIndicator(show:Boolean):Boolean{
+			if(isIOS()){
 				try{
 					var context:ExtensionContext = ExtensionContext.createExtensionContext(EXTENSION_ID, "NetworkActivityIndicatoror");
 					const answer:Object = context.call("showHidenetworkIndicator",show);
@@ -635,7 +615,10 @@ package pl.mateuszmackowiak.nativeANE.progress
 				}catch(e:Error){
 					trace("Error calling showIOSnetworkActivityIndicator method "+e.message,e.errorID);
 				}
-			}return false;
+			}else{
+				trace("Network Activity Indicator is not supported on this platform");
+			}
+			return false;
 		}
 		
 		

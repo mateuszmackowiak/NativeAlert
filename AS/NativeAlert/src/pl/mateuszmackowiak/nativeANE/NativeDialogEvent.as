@@ -16,22 +16,35 @@ package pl.mateuszmackowiak.nativeANE
 		 * Defines the value of the type property of a NativeDialogEvent object.
 		 */
 		public static const OPENED:String = "nativeDialog_opened";
+		
 		/**
 		 * @private
 		 */
 		private var _index:String;
+		
 		
 		public function NativeDialogEvent(type:String,index:String, bubbles:Boolean=false, cancelable:Boolean=false)
 		{
 			_index = index;
 			super(type, bubbles, cancelable);
 		}
+		
+		
 		/**
 		 * the index of the clicked button
 		 */
 		public function get index() : String
 		{
 			return _index;
+		}
+		
+		
+		
+		override public function toString():String
+		{
+			return "[NativeDialogEvent type='"+type+"'  index='"+String(_index)
+				+"' bubbles='"+String(bubbles)+"' cancelable='"+String(cancelable)
+				+"'  eventPhase='"+String(eventPhase)+"' ]";
 		}
 		/**
 		 * @copy flash.events.Event.clone()

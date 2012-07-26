@@ -17,6 +17,7 @@ import android.view.ViewConfiguration;
 import com.adobe.fre.FREContext;
 import com.adobe.fre.FREFunction;
 import com.adobe.fre.FREObject;
+
 /**
 *
 * @author Mateusz Maçkowiak
@@ -36,10 +37,37 @@ public static final String KEY = "SystemProperites";
        
         Map<String, FREFunction> map = new HashMap<String, FREFunction>();
         map.put(getSystemProperty.KEY, new getSystemProperty());
+        map.put(consoleLog.KEY, new consoleLog());
         return map;
         
     }
     
+    
+    /**
+	 * gets the messages while flash gets a Recive event
+	 */
+	public class consoleLog implements FREFunction{
+		public static final String KEY = "console";
+
+		@Override
+		public FREObject call(FREContext context, FREObject[] args) {
+			try{
+				
+				//if(NativeExtension.isDebbuger(context))
+		    		//android.os.Debug.waitForDebugger();
+				
+				String text = args[0].getAsString();
+				
+				Log.i(KEY, text);
+				
+			}catch(Exception e){
+				context.dispatchStatusEventAsync(NativeExtension.ERROR_EVENT,KEY+"   "+e.toString());
+			}
+			return null;
+		}
+	}
+	
+	
     protected static String getImei(Context context) {
         TelephonyManager m = (TelephonyManager) context
                 .getSystemService(Context.TELEPHONY_SERVICE);
@@ -47,12 +75,12 @@ public static final String KEY = "SystemProperites";
         return imei;
     }
     
-    protected static String getDeviceId(Context context) throws Exception {
+    /*protected static String getDeviceId(Context context) throws Exception {
         String imei = getImei(context);
         if (imei != null) return imei;
         String tid = getWifiMacAddress(context);
         return tid;
-    }
+    }*/
     
     protected static String md5(String s) throws Exception {
         MessageDigest md = MessageDigest.getInstance("MD5");
@@ -78,27 +106,55 @@ public static final String KEY = "SystemProperites";
         else return wifiInfo.getMacAddress().replace(":", "").replace(".", "");
     }
     
+    
+	public static Boolean hasHardwareMenuButton(Activity activity)
+    {
+    	if(android.os.Build.VERSION.SDK_INT>11){
+    		if(android.os.Build.VERSION.SDK_INT>14)
+    			return ViewConfiguration.get(activity.getBaseContext()).hasPermanentMenuKey();
+    		return false;
+    	}
+    	return true;
+    }
+    
+	
+	public static String getMyPhoneNumber(Activity activity){
+	    TelephonyManager mTelephonyMgr;
+	    mTelephonyMgr = (TelephonyManager)activity.getSystemService(Context.TELEPHONY_SERVICE);
+	    if(mTelephonyMgr!=null)
+	    	return mTelephonyMgr.getLine1Number();
+	    else
+	    	return null;
+	}
+    
+	
+	
     private class getSystemProperty implements FREFunction
     {
         
         public static final String KEY = "getSystemProperty";
 
-        
-        
         @Override
         public FREObject call(FREContext context, FREObject[] args) 
         {
+        	
+        	
+        	
             FREObject dictionary = null;
             try
             {
             	dictionary = FREObject.newObject("flash.utils.Dictionary",null);
-            	dictionary.setProperty("java",FREObject.newObject(System.getProperty("java.version")));
+            	//dictionary.setProperty("java",FREObject.newObject(System.getProperty("java.specification.version")));
             	dictionary.setProperty("os",FREObject.newObject(System.getProperty("os.name")) );
             	dictionary.setProperty("language",FREObject.newObject(System.getProperty("user.language") ));
             	dictionary.setProperty("arch",FREObject.newObject(System.getProperty("os.arch")) );
             	dictionary.setProperty("version",FREObject.newObject(System.getProperty("os.version") ));
             	
-            	dictionary.setProperty("name",FREObject.newObject(android.os.Build.MODEL));
+            	dictionary.setProperty("model",FREObject.newObject(android.os.Build.MODEL));
+
+            	dictionary.setProperty("serial",FREObject.newObject(android.os.Build.SERIAL));
+            	
+            	dictionary.setProperty("name",FREObject.newObject(android.os.Build.DEVICE));
 
             	final Activity activity = context.getActivity();
 
@@ -108,35 +164,65 @@ public static final String KEY = "SystemProperites";
 		        	dictionary.setProperty("sourceDir",FREObject.newObject(pInfo.applicationInfo.sourceDir));
 		        	dictionary.setProperty("AppUid",FREObject.newObject(String.valueOf(pInfo.applicationInfo.uid)));
 		        	
-		        	Boolean hasHardwareMenuButton = true;
-		        	if((android.os.Build.VERSION.SDK_INT>14))
-		        		hasHardwareMenuButton = ViewConfiguration.get(activity.getBaseContext()).hasPermanentMenuKey();
-		        	dictionary.setProperty("hasHardwareMenuButton", FREObject.newObject(hasHardwareMenuButton));
 		        	
-		        	
-		        	
+            	}catch(Exception e){
+            		context.dispatchStatusEventAsync(NativeExtension.ERROR_EVENT,e.toString());
+            		//dictionary.setProperty("error",FREObject.newObject(e.toString()));
+            	}	
+		        try{
+		        	dictionary.setProperty("phoneNumber", FREObject.newObject(getMyPhoneNumber(activity)));
+		        }catch(Exception e){
+		        	context.dispatchStatusEventAsync(NativeExtension.ERROR_EVENT,e.toString());
+            		//dictionary.setProperty("error",FREObject.newObject(e.toString()));
+            	}	
+		        try{
+		        	dictionary.setProperty("hasHardwareMenuButton", FREObject.newObject(hasHardwareMenuButton(activity)));
+		        }catch(Exception e){
+		        	context.dispatchStatusEventAsync(NativeExtension.ERROR_EVENT,e.toString());
+            		//dictionary.setProperty("error",FREObject.newObject(e.toString()));
+            	}	
+		        try{
 		        	final TelephonyManager tm = (TelephonyManager) activity.getBaseContext().getSystemService(Context.TELEPHONY_SERVICE);
 		
+		        	String imsi = tm.getSubscriberId();
+		        	dictionary.setProperty("IMSI",FREObject.newObject(imsi));
+		        	 
+		        	 
 		    	    final String tmDevice, tmSerial, androidId;
 		    	    tmDevice = "" + tm.getDeviceId();
 		    	    tmSerial = "" + tm.getSimSerialNumber();
 		    	    androidId = "" + android.provider.Settings.Secure.getString(activity.getContentResolver(), android.provider.Settings.Secure.ANDROID_ID);
 		
 		    	    UUID deviceUuid = new UUID(androidId.hashCode(), ((long)tmDevice.hashCode() << 32) | tmSerial.hashCode());
-		    	    
+		    
 		    	    dictionary.setProperty("UID",FREObject.newObject(deviceUuid.toString()));
-		    	    
+
+		        }catch(Exception e){
+		        	context.dispatchStatusEventAsync(NativeExtension.ERROR_EVENT,e.toString());
+            		//dictionary.setProperty("error",FREObject.newObject(e.toString()));
+            	}	
+		        /*try{
 		        	dictionary.setProperty("UID2",FREObject.newObject(getDeviceId(activity.getBaseContext()).toString()));
-		        	
+		        }catch(Exception e){
+            		dictionary.setProperty("error",FREObject.newObject(e.toString()));
+            	}*/	
+		        try{
 		        	String MACAdress = getWifiMacAddress(activity.getBaseContext()).toString();
-		        	dictionary.setProperty("MACAdress",FREObject.newObject(MACAdress));
-		        	
+		        	dictionary.setProperty("MACAddress",FREObject.newObject(MACAdress));
+		        }catch(Exception e){
+		        	context.dispatchStatusEventAsync(NativeExtension.ERROR_EVENT,e.toString());
+            		//dictionary.setProperty("error",FREObject.newObject(e.toString()));
+            	}	
+		        try{
 		        	String IMEI = getImei(activity.getBaseContext()).toString();
 		        	dictionary.setProperty("IMEI",FREObject.newObject(IMEI));
             	}catch(Exception e){
-            		dictionary.setProperty("error",FREObject.newObject(e.toString()));
+            		
+            		context.dispatchStatusEventAsync(NativeExtension.ERROR_EVENT,e.toString());
+            		//dictionary.setProperty("error",FREObject.newObject(e.toString()));
             	}
             }catch (Exception e){
+            	context.dispatchStatusEventAsync(NativeExtension.ERROR_EVENT,e.toString());
                 e.printStackTrace();
             }
             return dictionary;

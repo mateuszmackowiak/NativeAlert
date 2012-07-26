@@ -58,86 +58,72 @@
 				
 				NativeApplication.nativeApplication.addEventListener(Event.EXITING,exiting);
 								
-				if(NativeAlert.isSupported){
-					returnText.text+= "extension IS supported on this device\n";
-				}else{
-					returnText.text+= "extension is NOT supported on this device\n";
-				}
+				
 				choces = new Vector.<String>();
 				choces.push("one","two","three","four");
 				checkedItems = new Vector.<Boolean>();
 				checkedItems.push(true,false,false,true);
 				
-				if(Capabilities.os.indexOf("Linux")>-1){
+				if(SystemProperties.isAndroid()){
 					titleInput.text = "Some <b>simple HTML</b> Title";
 					messageInput.text = "Some <i>simple HTML</i> Message Text";
 
 					ThemeSelector.dataProvider = themesAndroid;
 					ThemeSelector.selectedItem = themesAndroid.getItemAt(0);
-				}else{
+				}else if (SystemProperties.isIOS()){
+					
+					mess("can open url http://maps.google.com/maps?ll=-37.812022,144.969277 " +SystemProperties.getInstance().canOpenUrl("http://maps.google.com/maps?ll=-37.812022,144.969277"));
+					
 					titleInput.text = "Some Title";
 					messageInput.text = "Some Message Text";
 					
 					ThemeSelector.dataProvider = themesIOS;
 					ThemeSelector.selectedItem = themesIOS.getItemAt(0);
+				}else{
+					mess("extension is NOT supported on this device");
 				}
 				
-				if(SystemProperties.isSupported()){
-					var dictionary:Dictionary = SystemProperties.getProperites(); 
-					for (var key:String in dictionary) 
-					{ 
-						var readingType:String = key; 
-						var readingValue:String = dictionary[key]; 
-						returnText.appendText(readingType + "=" + readingValue+"\n"); 
-					} 
-
-					dictionary = null;
-				}
-
 				
+				listAllPropertiesFromSystemProperties();
+
 			}
+			
+			
+			
+			
+			
 			protected function exiting(event:Event):void
 			{
-				
 				NativeAlert.dispose();
+				SystemProperties.getInstance().dispose();
 				Toast.dispose();
-
 			}
 			private function onError(event:*):void
 			{
 				if(event is UncaughtErrorEvent){
 					const e:UncaughtErrorEvent = event;
 					if(e.error is Error){
-						returnText.appendText("UncaughtErrorEvent Error "+ (e.error as Error).message+"   "+(e.error as Error).toString()+"\n");
-						trace("UncaughtErrorEvent Error "+ (e.error as Error).message+"   "+(e.error as Error).toString()+"\n");
+						mess("UncaughtErrorEvent Error "+ (e.error as Error).message+"   "+(e.error as Error).toString());
 					}else{
-						returnText.appendText("UncaughtErrorEvent ErrorEvent "+ (e.error as ErrorEvent).text+"   "+(e.error as ErrorEvent).toString()+"\n");
-						trace("UncaughtErrorEvent ErrorEvent "+ (e.error as ErrorEvent).text+"   "+(e.error as ErrorEvent).toString()+"\n");
+						mess("UncaughtErrorEvent ErrorEvent "+ (e.error as ErrorEvent).text+"   "+(e.error as ErrorEvent).toString());
 					}
 				}else{
-					returnText.appendText("Error "+ event.text+"   "+event.toString()+"\n");
-					trace("Error "+ event.text+"   "+event.toString()+"\n");
+					mess("Error "+ event.text+"   "+event.toString());
 				}
 			}
 			private function traceEvent(event:*):void
 			{
 				if(event.hasOwnProperty("text")){
-					returnText.appendText(event.toString()+"  "+event.text+"\n");
-					trace(event.toString()+"  "+event.text+"\n");
-				}
-				else if(event.hasOwnProperty("index")){
-					returnText.appendText(event.toString()+"  "+event.index+"\n");
-					trace(event.toString()+"  "+event.index+"\n");
+					mess(event.toString()+"  "+event.text);
 				}
 				else{
-					returnText.appendText(event.toString()+"\n");
-					trace(event.toString()+"\n");
+					mess(event.toString());
 				}
 			}
 			protected function view1_backKeyPressedHandler(event:FlexEvent):void
 			{
 				event.preventDefault();
-				returnText.appendText("back key pressed\n");
+				mess("back key pressed");
 				
 				myTimer.removeEventListener(TimerEvent.TIMER,updateProgress);
 				myTimer.stop();
@@ -152,17 +138,66 @@
 			
 			
 		
-			protected function callNativeAlret(event:MouseEvent):void
+			
+			
+			public function listAllPropertiesFromSystemProperties():void
 			{
-				if(Capabilities.os.indexOf('Linux')>-1)
-					NativeAlert.show(messageInput.text,titleInput.text,closeLabelInput.text, otherLabels.text , closeFun,canclebleCheckbox.selected,ThemeSelector.selectedItem.data);
-				else
-					NativeAlert.show(messageInput.text,titleInput.text,closeLabelInput.text, otherLabels.text , closeFun);
+				if(SystemProperties.isSupported){
+					var dictionary:Dictionary = SystemProperties.getInstance().getSystemProperites();//SystemProperties.getProperites();
+					if(!dictionary){
+						mess("return null dictionary");
+						return;
+					}
+						
+					mess("--------------------");
+					for (var key:String in dictionary) 
+					{ 
+						var readingType:String = key; 
+						var readingValue:String = dictionary[key]; 
+						mess(readingType + "=" + readingValue); 
+					} 
+					mess("--------------------");
+					dictionary = null;
+				}else{
+					mess("SystemProperties is NOT supported on this platform!!");
+				}
 			}
-			private function closeFun(event:NativeDialogEvent):void
+			
+			
+			
+			protected function callAlert(event:MouseEvent):void
 			{
-				var n:NativeAlert = event.target as NativeAlert;
-				returnText.appendText("the answer: "+event.index+"\n");
+					NativeAlert.show(messageInput.text,titleInput.text+"0001",closeLabelInput.text, otherLabels.text
+						, function closeFun(event:NativeDialogEvent):void
+						{
+							var n:NativeAlert = event.target as NativeAlert;
+							//event.preventDefault();
+							//n.show();
+							mess(event.toString());
+						}
+						,canclebleCheckbox.selected,ThemeSelector.selectedItem.data);
+					
+					
+					
+					NativeAlert.show(messageInput.text,titleInput.text+"0002",closeLabelInput.text, otherLabels.text
+						, function closeFun(event:NativeDialogEvent):void
+						{
+							var n:NativeAlert = event.target as NativeAlert;
+							//event.preventDefault();
+							//n.show();
+							mess(event.toString());
+						}
+						,canclebleCheckbox.selected,ThemeSelector.selectedItem.data);
+					
+					/*var n2:NativeAlert = NativeAlert.show(messageInput.text,titleInput.text,closeLabelInput.text, otherLabels.text
+						,null
+						,canclebleCheckbox.selected,ThemeSelector.selectedItem.data);
+					n2.addEventListener(NativeDialogEvent.CLOSED,function(event:NativeDialogEvent):void{
+						var n:NativeAlert = event.target as NativeAlert;
+						//event.preventDefault();
+						//n.show();
+						mess(event.toString());
+					});*/
 			}
 			
 			
@@ -191,17 +226,16 @@
 					progressPopup.setTitle(titleInput.text);
 					progressPopup.setMessage(messageInput.text);
 					progressPopup.show(canclebleCheckbox.selected,indeterminateInput.selected);
+					
 					myTimer.addEventListener(TimerEvent.TIMER, updateProgress);
 					myTimer.start();
 				}catch(e:Error){
-					returnText.appendText("Error "+ e.message+"   "+e.toString()+"\n");
-					trace("Error "+ e.message+"   "+e.toString()+"\n");
+					mess("Error "+ e.message+"   "+e.toString());
 				}
 			}
 			private function closeNativeProgressHandler(event:NativeDialogEvent):void
 			{
-				returnText.appendText("button selected "+event.index.toString()+"\n");
-				trace("button selected "+event.index.toString()+"\n");
+				mess(event.toString());
 				
 				progressPopup.removeEventListener(NativeDialogEvent.CANCELED,closeNativeProgressHandler);
 				progressPopup.removeEventListener(NativeDialogEvent.CLOSED,closeNativeProgressHandler);
@@ -218,7 +252,7 @@
 				p++;
 				if(p>=50){
 					p = 0;
-					progressPopup.hide("with some error message");
+					progressPopup.hide("with some message",true);
 					(event.target as Timer).stop();
 				}
 				else{
@@ -230,8 +264,7 @@
 						if(progressPopup.indeterminate==false)
 							progressPopup.setProgress(p);
 					}catch(e:Error){
-						returnText.appendText("Error "+ e.message+"   "+e.toString()+"\n");
-						trace("Error "+ e.message+"   "+e.toString()+"\n");
+						mess("Error "+ e.message+"   "+e.toString());
 					}
 				}
 			}
@@ -299,7 +332,6 @@
 
 				textInputDialog.setTitle("ENTER_SERVER_ADRESS");
 				textInputDialog.show(v,buttons,canclebleCheckbox.selected);
-				//textInputDialog.show("ENTER_SERVER_ADRESS",v,buttons);
 			}
 
 			private function onCloseTextInputDialogHandler(event:NativeDialogEvent):void
@@ -307,32 +339,40 @@
 				event.preventDefault();
 				for each (var n:NativeTextField in NativeTextInputDialog(event.target).textInputs) 
 				{
-					returnText.appendText(n.name+":  "+n.text+"\n");
+					if(n.name)
+						mess("  "+n.name+":  "+n.text);
 				}
-				returnText.appendText("button selected "+event.index.toString()+"\n");
+				mess(event.toString());
 				
 				textInputDialog.removeEventListener(NativeDialogEvent.CANCELED,onCancleTextInputDialogHandler);
 				textInputDialog.removeEventListener(NativeDialogEvent.CLOSED,onCloseTextInputDialogHandler);
 				textInputDialog.removeEventListener(NativeDialogEvent.OPENED,traceEvent);
 				textInputDialog.removeEventListener(ErrorEvent.ERROR,onError);
-				
-				//textInputDialog.dispose();
+			
 			}
 			public function onCancleTextInputDialogHandler(event:NativeDialogEvent):void
 			{
 				event.preventDefault();
-				returnText.appendText("button selected "+event.index+"   "+event.index+"\n");
-				trace("button selected "+event.index+"   "+event.index+"\n");
+				mess(event.toString());
+				
 				textInputDialog.removeEventListener(NativeDialogEvent.CANCELED,onCancleTextInputDialogHandler);
 				textInputDialog.removeEventListener(NativeDialogEvent.CLOSED,onCloseTextInputDialogHandler);
 				textInputDialog.removeEventListener(NativeDialogEvent.OPENED,traceEvent);
 				textInputDialog.removeEventListener(ErrorEvent.ERROR,onError);
-				
-				//textInputDialog.dispose();
+
 			}
 			
 			
-			
+			public function mess(message:String):void
+			{
+				returnText.appendText(message+"\n");
+				trace(message+"\n");
+				try{
+					SystemProperties.getInstance().console(message);
+				}catch(error:Error){
+					trace(error);
+				}
+			}
 			
 			
 			
@@ -348,7 +388,7 @@
 				singleChDialog.theme = ThemeSelector.selectedItem.data;
 				
 				singleChDialog.addEventListener(NativeDialogEvent.CANCELED,closeNativeDialogHandler);
-				//singleChDialog.addEventListener(NativeDialogEvent.OPENED,traceEvent);
+
 				singleChDialog.addEventListener(NativeDialogEvent.CLOSED,closeNativeDialogHandler);
 				singleChDialog.addEventListener(ErrorEvent.ERROR,onError);
 				singleChDialog.addEventListener(NativeDialogListEvent.LIST_CHANGE,onListChange);
@@ -368,7 +408,7 @@
 				singleChDialog.setTitle(titleInput.text);
 				singleChDialog.setCancelable(canclebleCheckbox.selected);
 				singleChDialog.showSingleChoice(choces,selectedIndex);
-				//singleChDialog.showSingleChoice(choces,selectedIndex,buttons,titleInput.text);
+
 			}
 			
 			
@@ -378,7 +418,7 @@
 				multChDialog.theme = ThemeSelector.selectedItem.data;
 				
 				multChDialog.addEventListener(NativeDialogEvent.CANCELED,closeNativeDialogHandler);
-				//multChDialog.addEventListener(NativeDialogEvent.OPENED,traceEvent);
+
 				multChDialog.addEventListener(NativeDialogEvent.CLOSED,closeNativeDialogHandler);
 				multChDialog.addEventListener(ErrorEvent.ERROR,onError);
 				multChDialog.addEventListener(NativeDialogListEvent.LIST_CHANGE,onListChange);
@@ -397,51 +437,44 @@
 				multChDialog.setTitle(titleInput.text);
 				multChDialog.setCancelable(canclebleCheckbox.selected);
 				multChDialog.showMultiChoice(choces,checkedItems);
-				//multChDialog.showMultiChoice(choces,checkedItems,buttons,titleInput.text);
+
 			}
 			
 			private function onListChange(event:NativeDialogListEvent):void
 			{
 				
 				var dialog:NativeListDialog = (event.target as NativeListDialog)
-				returnText.appendText("NativeDialogListEvent "+ event.index+"   "+event.selected+"\n");
-				/*if(dialog.selectedIndex>-1){
-					selectedIndex = dialog.selectedIndex;
-					returnText.appendText("selectedLabel   "+dialog.selectedLabel+"\n");
-				}else{*/
-					const a:Vector.<String> = dialog.selectedLabels;
-					returnText.appendText("selectedLabels : \n");
-					if(a.length>0){
-						for (var i:int = 0; i < a.length; i++) 
-						{
-							returnText.appendText("   "+a[i]+"\n");
-						}
+				mess(event.toString());
+				const a:Vector.<String> = dialog.selectedLabels;
+				mess("selectedLabels :");
+				if(a.length>0){
+					for (var i:int = 0; i < a.length; i++) 
+					{
+						mess("   "+a[i]);
 					}
-				//}
+				}
 					 
 			}
 			public function closeNativeDialogHandler(event:NativeDialogEvent):void
 			{
 				event.preventDefault();
-				returnText.appendText("closeNativeDialogHandler selected index: "+event.index+"\n");
-				trace("closeNativeDialogHandler selected index: "+event.index+"\n");
+				mess(event.toString());
 				var dialog:NativeListDialog = (event.target  as NativeListDialog);
-				//dialog.removeEventListener(NativeDialogEvent.CANCELED,closeNativeDialogHandler);
-				//dialog.removeEventListener(NativeDialogEvent.CLOSED,closeNativeDialogHandler);
-				//dialog.removeEventListener(NativeDialogEvent.OPENED,traceEvent);
-				//dialog.removeEventListener(ErrorEvent.ERROR,onError);
 				
 			}
 			
 			protected function togglebutton1_changeHandler(event:Event):void
 			{
-				NativeProgress.showNetworkActivityIndicatoror(ToggleSwitch(event.target).selected);
+				NativeProgress.showNetworkActivityIndicator(ToggleSwitch(event.target).selected);
 			}
 			
 			protected function spinner1_changeHandler(event:IndexChangeEvent):void
 			{
-				NativeAlert.badge = event.newIndex;
-				returnText.appendText(" setting the badge:  "+event.newIndex+"\n");
+				//NativeAlert.badge = event.newIndex;
+				SystemProperties.getInstance().badge = event.newIndex;
+				mess(" setting the badge:  "+event.newIndex);
+				
+				
 			}
 			
 			protected function showNotification(event:MouseEvent):void
@@ -470,7 +503,7 @@
 			<fx:Object name="ANDROID_DEVICE_DEFAULT_LIGHT_THEME" data="0x00000005"/>
 			<fx:Object name="ANDROID_HOLO_DARK_THEME" data="0x00000002"/>
 			<fx:Object name="ANDROID_HOLO_LIGHT_THEME" data="0x00000003"/>
-			<fx:Object name="THEME_TRADITIONAL" data="0x00000001"/>
+			<fx:Object name="DEFAULT_THEME" data="0x00000001"/>
 		</s:ArrayList>
 		<s:ArrayList id="themesIOS">
 			<fx:Object name="IOS_SVHUD_GRADIENT_BACKGROUND_THEME" data="0x00000004" />
@@ -488,7 +521,7 @@
 	<s:Scroller height="100%" width="100%">
 		<s:VGroup width="100%" height="100%" horizontalAlign="center">
 			<s:Group height="100%" width="100%" id="content">
-				<s:SpinnerListContainer includeInLayout="{NativeAlert.isBadgeSupported()}">
+				<s:SpinnerListContainer includeInLayout="{SystemProperties.isBadgeSupported()}">
 					<s:SpinnerList height="100%" width="100%" typicalItem="999" change="spinner1_changeHandler(event)">
 						<s:NumericDataProvider />
 					</s:SpinnerList>
@@ -509,12 +542,12 @@
 				<s:Spacer width="100%"  visible.phone="false" includeInLayout.phone="false"/>
 			</s:Group>
 			
-			<s:HGroup verticalAlign="middle" visible="{NativeProgress.isNetworkActivityIndicatoror()}" includeInLayout="{NativeProgress.isNetworkActivityIndicatoror()}" >
+			<s:HGroup verticalAlign="middle" visible="{NativeProgress.isNetworkActivityIndicatorSupported()}" includeInLayout="{NativeProgress.isNetworkActivityIndicatorSupported()}" >
 				<s:ToggleSwitch label="SnetworkActivityIndicator"  change="togglebutton1_changeHandler(event)"/>
 				<s:Label text="Snetwork Activity Indicator"/>
 			</s:HGroup>
 			
-			<s:Button width="100%" click="callNativeAlret(event)" label="call native Alert" height="60"/>
+			<s:Button width="100%" click="callAlert(event)" label="call native Alert" height="60"/>
 			
 			<s:VGroup width="100%" height="100%" >
 				

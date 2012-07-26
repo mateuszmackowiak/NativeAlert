@@ -85,11 +85,11 @@ package pl.mateuszmackowiak.nativeANE.toast
 		/**
 		 * @private
 		 */
-		private static var _set:Boolean = false;
+		//private static var _set:Boolean = false;
 		/**
 		 * @private
 		 */
-		private static var _isSupp:Boolean = false;
+		//private static var _isSupp:Boolean = false;
 		
 		
 		
@@ -98,12 +98,13 @@ package pl.mateuszmackowiak.nativeANE.toast
 		 * @copy flash.external.ExtensionContext.dispose()
 		 */
 		public static function dispose():void{
-			if(context)
+			if(context){
 				context.dispose();
+				context = null;
+			}
 		}
 		
-		
-		
+
 		/**
 		 * Make a standard toast that just contains a text with the text from a resource.
 		 * @param message the text displayed on the Toast 
@@ -113,24 +114,21 @@ package pl.mateuszmackowiak.nativeANE.toast
 		 */
 		public static function show(message:String , duration:int=0x00000001):void
 		{
-			if(Capabilities.os.indexOf("Linux")>-1 || Capabilities.os.toLowerCase().indexOf("ip")>-1){
+			if(isSupported){//Capabilities.os.toLowerCase().indexOf("linux")>-1 || Capabilities.os.toLowerCase().indexOf("ip")>-1){
 				if(message==null || message=="")
 					return;
 				if(isNaN(duration))
 					duration = 0;
-				
-				if(context==null){
-					try{
+				try{
+					if(!context){
 						context = ExtensionContext.createExtensionContext(EXTENSION_ID, "ToastContext");
-						
-					}catch(e:Error){
-						showError(e.message,e.errorID);
 					}
+					context.call("Toast",message,duration);
+				}catch(e:Error){
+					showError("Toast extension is not supported on this platform ("+e.message+")",e.errorID);
 				}
-				context.call("Toast",message,duration);
-				
 			}else
-				trace("Toast extension is not supported on this platform");
+				showError("Toast extension is not supported on this platform");
 		}
 		/**
 		 * Make a standard toast that just contains a text with the text from a resource.
@@ -147,7 +145,7 @@ package pl.mateuszmackowiak.nativeANE.toast
 		 */
 		public static function showWithDifferentGravit(message:String , duration:int=0x00000001, gravity:int=NaN , xOffset:int=0 , yOffset:int=0 ):void
 		{
-			if(Capabilities.os.indexOf("Linux")>-1 || Capabilities.os.toLowerCase().indexOf("ip")>-1){
+			if(isSupported){
 				if(message==null || message=="")
 					return;
 				if(isNaN(duration))
@@ -168,29 +166,23 @@ package pl.mateuszmackowiak.nativeANE.toast
 				trace("Toast extension is not supported on this platform");
 		}
 		
-		
+		protected static function isIOS():Boolean
+		{
+			return Capabilities.os.toLowerCase().indexOf("ip")>-1;
+		}
+		protected static function isAndroid():Boolean
+		{
+			return Capabilities.os.toLowerCase().indexOf("linux")>-1;
+		}
 		
 		/**
 		 * Whether a Toast system is available on the device (true);<br>otherwise false
 		 */
 		public static function get isSupported():Boolean{
-			if(!_set){// checks if a value was set before
-				try{
-					_set = true;
-					if(Capabilities.os.indexOf("Linux")>-1 || Capabilities.os.toLowerCase().indexOf("ip")>-1){
-						if(context==null)
-							var context:ExtensionContext = ExtensionContext.createExtensionContext(EXTENSION_ID, "ToastContext");
-						_isSupp = context.call("isSupported")==true;
-						context.dispose();
-					}else
-						_isSupp = false;
-				}catch(e:Error){
-					//showError(e.message,e.errorID);
-					trace("Toast extension is not supported on this platform");
-					return _isSupp;
-				}
-			}	
-			return _isSupp;
+			if(isIOS() || isAndroid())
+				return true;
+			else
+				return false;
 		}
 		
 		

@@ -6,6 +6,8 @@ import pl.mateuszmackowiak.nativeANE.NativeDialog.progressDialog.ProgressContext
 import pl.mateuszmackowiak.nativeANE.NativeDialog.textInput.TextInputDialogContext;
 import pl.mateuszmackowiak.nativeANE.NativeDialog.toast.ToastContext;
 
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.util.Log;
 
 import com.adobe.fre.FREContext;
@@ -13,7 +15,7 @@ import com.adobe.fre.FREExtension;
 
 /**
  *
- * @author Mateusz Makowiak
+ * @author Mateusz MaÂkowiak
  */
 public class NativeExtension implements FREExtension{
     
@@ -44,6 +46,18 @@ public class NativeExtension implements FREExtension{
 			return new AlertContext();
     }
 
+    public static Boolean isDebbuger(FREContext context){
+		try {
+			PackageInfo pInfo = context.getActivity().getPackageManager().getPackageInfo(context.getActivity().getPackageName(), 0);
+	    	if(pInfo.packageName.indexOf("debug")>-1)
+	    		return true;
+		} catch (NameNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	return false;
+	}
+    
     @Override
     public void dispose()
     {

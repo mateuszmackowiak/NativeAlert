@@ -62,19 +62,21 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 		// Private Static Constants
 		//
 		//---------------------------------------------------------------------
-		private static const FRE_FUNCTIONL:String = "showTextInput";
-		private static var _defaultTheme:int = DEFAULT_THEME;
-		private static var _set:Boolean = false;
-		private static var _isSupp:Boolean = false;
+		private static const FRE_FUNCTION:String = "showTextInput";
 		
-		private static var isAndroid:Boolean=false;
-		private static var isIOS:Boolean=false;
+		private static var _defaultTheme:int = DEFAULT_THEME;
+		//private static var _set:Boolean = false;
+		//private static var _isSupp:Boolean = false;
+		
+		//private static var isAndroid:Boolean=false;
+	//	private static var isIOS:Boolean=false;
 		//---------------------------------------------------------------------
 		//
 		// Private Properties.
 		//
 		//---------------------------------------------------------------------
 		private var context:ExtensionContext;
+		
 		private var _title:String="";
 		private var _theme:int = -1;
 		private var _cancelable:Boolean = false;
@@ -102,11 +104,7 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 		 */
 		public function NativeTextInputDialog(theme:int=-1)
 		{
-			if(Capabilities.os.toLowerCase().indexOf("linux")>-1)
-				isAndroid = true;
-			else if(Capabilities.os.toLowerCase().indexOf("iph")>-1)
-				isIOS = true;
-			else{
+			if(!isAndroid() && !isIOS()){
 				trace("NativeTextInputDialog is not supported on this platform");
 				return;
 			}
@@ -123,6 +121,15 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 			}
 		}
 		
+		
+		protected static function isIOS():Boolean
+		{
+			return Capabilities.os.toLowerCase().indexOf("ip")>-1;
+		}
+		protected static function isAndroid():Boolean
+		{
+			return Capabilities.os.toLowerCase().indexOf("linux")>-1;
+		}
 		/**
 		 * shows the NativeTextInput dialog
 		 * @param textInputs list of NativeTextFields where param <code>editable</code> defines if it is a text input or standard lable.
@@ -134,40 +141,39 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 		 * 
 		 */
 		public function show(textInputs:Vector.<NativeTextField>,buttons:Vector.<String>=null,cancelable:Object=null):Boolean{
+			
+			if (!buttons || buttons.length == 0){
+				//no buttons exist, lets make the default buttons
+				trace("Buttons not configured, assigning default CANCEL,OK buttons");
+				buttons = new Vector.<String>();
+				buttons.push("Cancel","OK");
+			}
+			if(textInputs==null || textInputs.length==0){
+				showError("textInputs cannot be null");
+				return false;
+			}
+			
 			_buttons = buttons;
 			_textInputs = textInputs;
 			if(cancelable!==null)
 				_cancelable = cancelable;
 			
-			if (!_buttons || _buttons.length == 0){
-				//no buttons exist, lets make the default buttons
-				trace("Buttons not configured, assigning default CANCEL,OK buttons");
-				_buttons = new Vector.<String>();
-				_buttons.push("Cancel","OK");
-			}
-			if(_textInputs==null || _textInputs.length==0){
-				showError("textInputs cannot be null");
-				return false;
-			}
-			
-			
 			try{
-				if(isAndroid){
-					if(_buttons.length>3){
+				if(isAndroid()){
+					if(buttons.length>3){
 						trace("Warning: There can be only 3 buttons on Andorid NativeTextInputDialog");
 					}
-					context.call(FRE_FUNCTIONL,"show",_title,_textInputs,_buttons,_cancelable,_theme);
+					context.call(FRE_FUNCTION,"show",_title,_textInputs,_buttons,_cancelable,_theme);
 					_isShowing = true;
 					return true;
 				}
-				if(isIOS){
-					var message:String = null;
-					if(_textInputs[0].editable==false)
-						message = _textInputs[0].text;
-					if(_buttons.length>2){
+				if(isIOS()){
+					var message:String = (textInputs[0].editable==false)? message = textInputs[0].text :null;
+					
+					if(buttons.length>2){
 						trace("Warning: There can be only 2 buttons on IOS NativeTextInputDialog");
 					}
-					if(_textInputs.length>3){
+					if(textInputs.length>3){
 						trace("Warning: There can be max only 3 NativeTextFields (first with editable==false to display aditional message) on IOS NativeTextInputDialog ");
 					}
 					
@@ -198,8 +204,8 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 				_cancelable = value;
 				if(_isShowing){
 					try{
-						if(isAndroid){
-							context.call(FRE_FUNCTIONL,"setCancleble",value);
+						if(isAndroid()){
+							context.call(FRE_FUNCTION,"setCancleble",value);
 							return true;
 						}
 						/*if(isIOS){
@@ -263,11 +269,11 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 				_title = value;
 				if(_isShowing){
 					try{
-						if(isAndroid){
-							context.call(FRE_FUNCTIONL,"setTitle",value);
+						if(isAndroid()){
+							context.call(FRE_FUNCTION,"setTitle",value);
 							return true;
 						}
-						if(isIOS){
+						if(isIOS()){
 							context.call("setTitle",value);
 							return true;
 						}
@@ -292,11 +298,11 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 		 */
 		public function isShowing():Boolean{
 			if(context){
-				if(isAndroid){
-					const b:Boolean = context.call(FRE_FUNCTIONL,"isShowing");
+				if(isAndroid()){
+					const b:Boolean = context.call(FRE_FUNCTION,"isShowing");
 					_isShowing = b;
 					return b;
-				}else if(isIOS){
+				}else if(isIOS()){
 					const b2:Boolean = context.call("isShowing");
 					_isShowing = b2;
 					return b2;
@@ -336,8 +342,8 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 			_isShowing = false;
 			try{
 				if(context!=null){
-					if(isAndroid){
-						context.call(FRE_FUNCTIONL,"dismiss");
+					if(isAndroid()){
+						context.call(FRE_FUNCTION,"dismiss");
 						return true;
 					}
 					/*if(isIOS){
@@ -361,11 +367,11 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 			_isShowing = false;
 			try{
 				if(context!=null){
-					if(isAndroid){
-						context.call(FRE_FUNCTIONL,"hide");
+					if(isAndroid()){
+						context.call(FRE_FUNCTION,"hide");
 						return true;
 					}
-					if(isIOS){
+					if(isIOS()){
 						context.call("hide");
 						return true;
 					}
@@ -380,10 +386,16 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 		 * Disposes of this ExtensionContext instance.<br><br>
 		 * The runtime notifies the native implementation, which can release any associated native resources. After calling <code>dispose()</code>,
 		 * the code cannot call the <code>call()</code> method and cannot get or set the <code>actionScriptData</code> property.
-		 * @return if call sucessfull
 		 */
-		public function dispose():Boolean
+		public function dispose():void
 		{
+			_isShowing = false;
+			if(context){
+				context.dispose();
+				context = null;
+			}
+			
+			/*
 			_isShowing = false;
 			try{
 				if(context!=null){
@@ -394,7 +406,7 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 			}catch(e:Error){
 				showError("Error calling kill method "+e.message,e.errorID);
 			}
-			return false;
+			return false;*/
 		}
 		
 		
@@ -405,8 +417,8 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 		public function shake():Boolean
 		{
 			try{
-				if(context!=null && isIOS){
-					context.call(FRE_FUNCTIONL,"shake");
+				if(context!=null && isIOS()){
+					context.call(FRE_FUNCTION,"shake");
 					return true;
 				}
 			}catch(e:Error){
@@ -425,19 +437,9 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 		 * If the extension is available on the device (true);<br>otherwise false
 		 */
 		public static function get isSupported():Boolean{
-			if(!_set){// checks if a value was set before
-				try{
-					_set = true;
-					if(Capabilities.os.indexOf("Linux")>-1 || Capabilities.os.toLowerCase().indexOf("ip")>-1){
-						_isSupp = true;
-					}else
-						_isSupp = false;
-				}catch(e:Error){
-					trace("NativeTextInputDialog extension is not supported on this platform");
-					return _isSupp;
-				}
-			}	
-			return _isSupp;
+			if(isAndroid() || isIOS())
+				return true;
+			return false;
 		}
 		
 		/**
@@ -478,7 +480,7 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 		{
 			try{
 				if(event.code == Event.CHANGE){
-					if(isIOS){
+					if(isIOS()){
 						const a2:Array = event.level.split("#_#");
 						var t:NativeTextField = null;
 						if(_textInputs[0].editable==false){
@@ -491,7 +493,7 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 						
 						t.dispatchEvent(new Event(Event.CHANGE));
 					}
-					if(isAndroid){
+					if(isAndroid()){
 						const a3:Array = event.level.split("#_#");
 						
 						for each (var n1:NativeTextField in _textInputs)
@@ -509,14 +511,14 @@ package pl.mateuszmackowiak.nativeANE.dialogs
 					_isShowing = false;
 					//const a:Array = event.level.split("#_#");
 					if(dispatchEvent(new NativeDialogEvent(NativeDialogEvent.CLOSED,event.level,false,true))){
-						if(isAndroid){
+						if(isAndroid()){
 							dismiss();
 						}
 					}
 				}else if(event.code == NativeDialogEvent.CANCELED){
 					_isShowing = false;
 					if(dispatchEvent(new NativeDialogEvent(NativeDialogEvent.CANCELED,event.level,false,true))){
-						if(isAndroid){
+						if(isAndroid()){
 							dismiss();
 						}
 					}

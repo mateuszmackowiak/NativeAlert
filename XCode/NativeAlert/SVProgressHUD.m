@@ -395,6 +395,7 @@ static SVProgressHUD *sharedView = nil;
         [self registerNotifications];
 		self.hudView.transform = CGAffineTransformScale(self.hudView.transform, 1.3, 1.3);
 		
+        
         [UIView beginAnimations:nil context:NULL];
         self.hudView.transform = CGAffineTransformScale(self.hudView.transform, 1/1.3, 1/1.3);
         self.alpha = 1;

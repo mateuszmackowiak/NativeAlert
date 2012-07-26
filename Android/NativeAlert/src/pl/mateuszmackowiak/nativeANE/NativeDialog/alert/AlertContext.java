@@ -8,8 +8,6 @@ import com.adobe.fre.FREFunction;
 import java.util.HashMap;
 import java.util.Map;
 
-import pl.mateuszmackowiak.nativeANE.NativeDialog.isSupportedFunction;
-
 /**
 *
 * @author Mateusz Maækowiak
@@ -30,9 +28,13 @@ public class AlertContext extends FREContext{
        
         Map<String, FREFunction> map = new HashMap<String, FREFunction>();
         map.put(showAlertFunction.KEY, new showAlertFunction());
-        map.put(isSupportedFunction.KEY, new isSupportedFunction());
+        //map.put(isSupportedFunction.KEY, new isSupportedFunction());
+        
         return map;
         
     }
+    
+    
+    
 
 }

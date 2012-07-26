@@ -19,10 +19,15 @@
 
 #import "SVProgressHUD.h"
 
-MobileAlert *alert;
+MobileAlert *alert = nil;
 
 
-
+void exceptionHandler(NSException *anException)
+{
+    NSLog(@"%@", [anException reason]);
+    NSLog(@"%@", [anException userInfo]);
+    
+}
 //---------------------------------------------------------------------
 //
 // ALERT
@@ -53,6 +58,10 @@ FREObject showAlertWithTitleAndMessage(FREContext ctx, void* funcData, uint32_t 
     NSString *closeLabelString = [NSString stringWithUTF8String:(char*)closeLabel];    
     NSString *otherLabelsString = [NSString stringWithUTF8String:(char*)otherLabels];    
     
+
+    if(alert){
+       // [alert hide];
+    }
     alert = [[MobileAlert alloc] init];
     [alert showAlertWithTitle:titleString 
                       message:messageString 
@@ -66,7 +75,7 @@ FREObject showAlertWithTitleAndMessage(FREContext ctx, void* funcData, uint32_t 
 //---------------------------------------------------------------------
 //
 // PROGRESS
-//
+//_progress/_maxProgress,null,_style,_title,_message,cancleble,_indeterminate,_iosTheme
 //---------------------------------------------------------------------
 #pragma mark - Progress
 FREObject showProgressPopup(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[] )
@@ -75,7 +84,7 @@ FREObject showProgressPopup(FREContext ctx, void* funcData, uint32_t argc, FREOb
     uint32_t titleLength;
     const uint8_t *title;
     uint32_t messageLength;
-    const uint8_t *message;;
+    const uint8_t *message;
     double progressParam;
     
     uint32_t showActivityValue, cancleble;
@@ -84,17 +93,23 @@ FREObject showProgressPopup(FREContext ctx, void* funcData, uint32_t argc, FREOb
     FREGetObjectAsDouble(argv[0], &progressParam);
     ///Secondary progress ignored
     FREGetObjectAsInt32(argv[2], &style);
-    FREGetObjectAsUTF8(argv[3], &titleLength, &title);
-    FREGetObjectAsUTF8(argv[4], &messageLength, &message);
+    if(argv[3])
+        FREGetObjectAsUTF8(argv[3], &titleLength, &title);
+    if(argv[4])
+        FREGetObjectAsUTF8(argv[4], &messageLength, &message);
     FREGetObjectAsBool(argv[5], &cancleble);
     FREGetObjectAsBool(argv[6], &showActivityValue);
     FREGetObjectAsInt32(argv[7], &theme);
     
     //Create our Strings for our Alert.
     NSInteger styleValue=(NSInteger)style;
-  
-    NSString *titleString = [NSString stringWithUTF8String:(char*)title];
-    NSString *messageString = [NSString stringWithUTF8String:(char*)message];
+    NSString *titleString = nil;
+    if(title)
+        titleString = [NSString stringWithUTF8String:(char*)title];
+    NSString *messageString = nil;
+    if(message)
+        messageString =[NSString stringWithUTF8String:(char*)message];
+    
     NSNumber *progressValue =[NSNumber numberWithDouble:progressParam];
     
     if(theme == 2){
@@ -152,9 +167,8 @@ FREObject updateProgress(FREContext ctx, void* funcData, uint32_t argc, FREObjec
     //Temporary values to hold our actionscript code.
     double perc;
     //Turn our actionscrpt code into native code.
-    FREGetObjectAsDouble(argv[0], &perc);
-    CGFloat percFloat = perc;	
-    [alert updateProgress:percFloat];
+    if(alert && FREGetObjectAsDouble(argv[0], &perc)==FRE_OK)
+        [alert updateProgress:perc];
     //Create our Strings for our Alert.
     return NULL;    
 }	
@@ -179,18 +193,21 @@ FREObject showListDialog(FREContext ctx, void* funcData, uint32_t argc, FREObjec
     NSString *titleString = nil;
     NSString *messageString =nil;
     
-    if(argv[0]!=NULL){
-        FREGetObjectAsUTF8(argv[0], &titleLength, &title);
+    if(argv[0] && (FREGetObjectAsUTF8(argv[0], &titleLength, &title)==FRE_OK)){
         titleString = [NSString stringWithUTF8String:(char*)title];
     }
-    if(argv[1]!=NULL){
-        FREGetObjectAsUTF8(argv[1], &messageLength, &message);
+    if(argv[1] && (FREGetObjectAsUTF8(argv[1], &messageLength, &message)==FRE_OK)){
         messageString = [NSString stringWithUTF8String:(char*)message]; 
     }
     alert = [[MobileAlert alloc] init];
   
     [alert showSelectDialogWithTitle:titleString message:messageString options:argv[3] checked: argv[4] buttons:argv[2] context:ctx];
-    
+    //m+<
+    /*if (messageString)
+        [messageString release];
+    if (titleString)
+        [titleString release];*/
+    //m+> 
     return NULL;    
 }
 //---------------------------------------------------------------------
@@ -207,22 +224,16 @@ FREObject showTextInputDialog(FREContext ctx, void* funcData, uint32_t argc, FRE
     uint32_t messageLength;
     const uint8_t *message;
     
-    
-    
-
-    
     //Create our Strings for our Alert.
    
    
     NSString *titleString = nil;
     NSString *messageString =nil;
     
-    if(argv[0]!=NULL){
-        FREGetObjectAsUTF8(argv[0], &titleLength, &title);
+    if(argv[0] &&  (FREGetObjectAsUTF8(argv[0], &titleLength, &title)==FRE_OK)){
         titleString = [NSString stringWithUTF8String:(char*)title];
     }
-    if(argv[1]!=NULL){
-        FREGetObjectAsUTF8(argv[1], &messageLength, &message);
+    if(argv[1] &&  FREGetObjectAsUTF8(argv[1], &messageLength, &message)==FRE_OK){
         messageString = [NSString stringWithUTF8String:(char*)message]; 
     }
     alert = [[MobileAlert alloc] init];
@@ -249,7 +260,7 @@ FREObject showTextInputDialog(FREContext ctx, void* funcData, uint32_t argc, FRE
 
 FREObject shake(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[] )
 {
-    if(alert!=NULL)
+    if(alert)
         [alert shake];
     return NULL;
 }
@@ -261,15 +272,16 @@ FREObject hide(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[] )
     if(alert)
         [alert hide];
     
-    if(argc>0 && argv[0]!=NULL){
+    if(argc>0 && argv[0]){
         
         uint32_t messageLength;
         const uint8_t *message;
         FREGetObjectAsUTF8(argv[0], &messageLength, &message);
         NSString *nsMessage = [NSString stringWithUTF8String:(char*)message];
         
-        uint32_t error;
-        FREGetObjectAsBool(argv[1], &error);
+        uint32_t error =NO;
+        if(argc>1 && argv[1])
+            FREGetObjectAsBool(argv[1], &error);
         
         if(nsMessage && ![nsMessage isEqualToString:@""]){
             if(error==YES)
@@ -317,7 +329,7 @@ FREObject updateTitle(FREContext ctx, void* funcData, uint32_t argc, FREObject a
     if(alert){
         NSString *nsTitle =@"";
         if(title){
-             [NSString stringWithUTF8String:(char*)title];
+             nsTitle=[NSString stringWithUTF8String:(char*)title];
         }
         [alert updateTitle:nsTitle];
     }
@@ -333,6 +345,7 @@ FREObject isShowing(FREContext ctx, void* funcData, uint32_t argc, FREObject arg
     }
     if(SVProgressHUD.isVisible)
         ret = YES;
+    
     FREObject retVal;
     if(FRENewObjectFromBool(ret, &retVal) == FRE_OK){
         return retVal;
@@ -350,16 +363,16 @@ FREObject isShowing(FREContext ctx, void* funcData, uint32_t argc, FREObject arg
 
 FREObject showHidenetworkIndicator(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[] ){
     UIApplication* app = [UIApplication sharedApplication];
+    
     if(argc>0 && argv[0]){
         uint32_t shownetworkActivity;
-        FREGetObjectAsBool(argv[0], &shownetworkActivity);
-        
-        if(app && app.networkActivityIndicatorVisible != shownetworkActivity)
+        if(app && FREGetObjectAsBool(argv[0], &shownetworkActivity)==FRE_OK && app.networkActivityIndicatorVisible != shownetworkActivity)
             app.networkActivityIndicatorVisible = shownetworkActivity;
     }
     FREObject retVal;
-    
-    if(app && FRENewObjectFromBool(app.networkActivityIndicatorVisible, &retVal) == FRE_OK){
+    if(app && FRENewObjectFromBool(app.networkActivityIndicatorVisible, &retVal) == FRE_OK)
+        return retVal;
+    else if(FRENewObjectFromBool(NO, &retVal) == FRE_OK){
         return retVal;
     }else{
         return nil;
@@ -373,7 +386,7 @@ FREObject showHidenetworkIndicator(FREContext ctx, void* funcData, uint32_t argc
 
 FREObject showToast(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[] )
 {
-    if(argv==NULL)
+    if(argc<1 || !argv || !argv[0]|| !argv[1])
         return NULL;
     
     uint32_t messageLength;
@@ -534,7 +547,6 @@ NSString * getMacAddress()
     NSString *macAddressString = [NSString stringWithFormat:@"%02X:%02X:%02X:%02X:%02X:%02X", 
                                   macAddress[0], macAddress[1], macAddress[2], 
                                   macAddress[3], macAddress[4], macAddress[5]];
-    NSLog(@"Mac Address: %@", macAddressString);
     
     // Release the buffer memory
     free(msgBuffer);
@@ -553,74 +565,99 @@ NSString* getCustomUDID(){
     return [uuidString autorelease];
 }
 
-FREObject getSystemProperties(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[] ){
-    
-    FREObject dic;
-    if(FRENewObject((const uint8_t *)"flash.utils.Dictionary",0, NULL, &dic, NULL)==FRE_OK){
-        UIDevice * device = [UIDevice currentDevice];
-        
-        const char *osCh = [[device systemName] UTF8String];
-        const char *versionCh = [[device systemVersion] UTF8String];
-        //const char *udidCh = [[device uniqueIdentifier] UTF8String];
-        
-        NSString *uid = nil;
-        NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-        if ([defaults objectForKey:@"NativeAletUID"] == nil) {
-            uid = getCustomUDID();
-            [defaults setObject:uid forKey:@"NativeAletUID"];
-            [defaults synchronize];
-        }else{
-            uid = [defaults objectForKey:@"NativeAletUID"];
-        }
-        
-        const char *udidCh = [uid UTF8String];
-        
-        //const char *uidCh = "";//[[[UIApplication sharedApplication] uniqueInstallationIdentifier] UTF8String];
-        const char *nameCh = [[device name] UTF8String];
-        const char *MACadress = [getMacAddress() UTF8String];
-        const char *localizedModel = [[device localizedModel] UTF8String];
-        const char *model = [[device model] UTF8String];
-        // float batLevel = [device batteryLevel];
-        
-       
-        //FREObject uidObj;
-        FREObject udidObj;
-        FREObject osObj;
-        FREObject versionObj;
-        FREObject nameObj;
-        FREObject MACadressObj;
-        FREObject localizedModelObj;
-        FREObject modelObj;
-        
-        
-        
-        FRENewObjectFromUTF8(strlen(udidCh)+1, (const uint8_t*)udidCh, &udidObj);
-        //FRENewObjectFromUTF8(strlen(uidCh)+1, (const uint8_t*)uidCh, &uidObj);
-        FRENewObjectFromUTF8(strlen(osCh)+1, (const uint8_t*)osCh, &osObj);
-        FRENewObjectFromUTF8(strlen(versionCh)+1, (const uint8_t*)versionCh, &versionObj);
-        FRENewObjectFromUTF8(strlen(nameCh)+1, (const uint8_t*)nameCh, &nameObj);
-        
-        FRENewObjectFromUTF8(strlen(MACadress)+1, (const uint8_t*)MACadress, &MACadressObj);
-        FRENewObjectFromUTF8(strlen(localizedModel)+1, (const uint8_t*)localizedModel, &localizedModelObj);
-        FRENewObjectFromUTF8(strlen(model)+1, (const uint8_t*)model, &modelObj);
-
-       // FRESetObjectProperty(dic, (const uint8_t*)"UID", uidObj, NULL);
-        FRESetObjectProperty(dic, (const uint8_t*)"UDID", udidObj, NULL);
-        FRESetObjectProperty(dic, (const uint8_t*)"os", osObj, NULL);
-        FRESetObjectProperty(dic, (const uint8_t*)"version", versionObj, NULL);
-        FRESetObjectProperty(dic, (const uint8_t*)"name", nameObj, NULL);
-        
-        FRESetObjectProperty(dic, (const uint8_t*)"MACAdress", MACadressObj, NULL);
-        FRESetObjectProperty(dic, (const uint8_t*)"localizedModel", localizedModelObj, NULL);
-        FRESetObjectProperty(dic, (const uint8_t*)"model", modelObj, NULL);
-        return dic;
-    }else{
-        return nil;
-    }
+void setPropToDic(FREObject *dic,const uint8_t *param,NSString *value)
+{
+    FREObject valueObj=nil;
+    const char *valueCh = (!value)? nil:[value UTF8String];
+    if(valueCh)
+        FRENewObjectFromUTF8(strlen(valueCh)+1, (const uint8_t*)valueCh, &valueObj);
+    if(valueObj!=nil)
+        FRESetObjectProperty(dic, param, valueObj, NULL);
 }
 
 
+FREObject getSystemProperties(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[] ){
+    @try {
+        FREObject dic;
+        if(FRENewObject((const uint8_t *)"flash.utils.Dictionary",0, NULL, &dic, NULL)==FRE_OK){
+            UIDevice * device = [UIDevice currentDevice];
+            
+            NSString *num = nil;
+            NSString *uid = nil;
+            NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
 
+            if (defaults) {
+                num = [defaults stringForKey:@"SBFormattedPhoneNumber"];
+                
+                if ([defaults objectForKey:@"NativeAletUID"] == nil) {
+                    uid = getCustomUDID();
+                    [defaults setObject:uid forKey:@"NativeAletUID"];
+                    [defaults synchronize];
+                }else{
+                    uid = [defaults objectForKey:@"NativeAletUID"];
+                }
+            }
+            
+            /*NSArray *appFolderContents = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:@"/private/var/mobile/Applications" error:NULL];
+            for (NSObject* ob in appFolderContents) {
+                NSLog(@"%@",ob );
+            }*/
+            
+            setPropToDic(dic,(const uint8_t*)"UDID",uid);
+            setPropToDic(dic,(const uint8_t*)"phoneNumber",num);
+            setPropToDic(dic,(const uint8_t*)"language",[[[NSBundle mainBundle] preferredLocalizations] objectAtIndex:0]);
+            setPropToDic(dic,(const uint8_t*)"os",[device systemName]);
+            setPropToDic(dic,(const uint8_t*)"version",[device systemVersion]);
+            setPropToDic(dic,(const uint8_t*)"name",[device name]);
+            setPropToDic(dic,(const uint8_t*)"MACAddress",getMacAddress());
+            setPropToDic(dic,(const uint8_t*)"localizedModel",[device localizedModel]);
+            setPropToDic(dic,(const uint8_t*)"model",[device model]);
+            
+            return dic;
+        }
+    }
+    @catch (NSException *exception) {
+        exceptionHandler(exception);
+    }
+    return nil;
+}
+
+
+FREObject canOpenUrl(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[] ){
+    
+    FREObject retVal;
+    FRENewObjectFromBool(0, &retVal);
+    @try {
+        if(argc==0 || !argv[0])
+            return retVal;
+        
+        if ([UIApplication instancesRespondToSelector:@selector(canOpenURL:)]) {
+            uint32_t urlLength;    
+            const uint8_t *url;
+            
+            //Turn our actionscrpt code into native code.
+            if(FREGetObjectAsUTF8(argv[0], &urlLength, &url)!=FRE_OK){
+                return retVal;
+            }
+            
+            if(!url)
+                return retVal;
+            
+            NSString* nsStringUrl = [NSString stringWithUTF8String:(char*)url];
+            
+            if(!nsStringUrl || [nsStringUrl isEqualToString:@""]){
+                return retVal;
+            }
+            
+            UIApplication *app = [UIApplication sharedApplication];
+            FRENewObjectFromBool([app canOpenURL:[NSURL URLWithString:nsStringUrl]], &retVal);
+        }
+    }
+    @catch (NSException *exception) {
+        exceptionHandler(exception);
+    }
+    return retVal;
+}
 
 
 
@@ -658,6 +695,23 @@ FREObject getBadge(FREContext ctx, void* funcData, uint32_t argc, FREObject argv
     return retObj;
 }
 
+FREObject consoleMessage(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[] ){
+    uint32_t messageLength;    
+    const uint8_t *message;
+    if(argc==0 || !argv[0])
+        return NULL;
+    
+    //Turn our actionscrpt code into native code.
+    FREGetObjectAsUTF8(argv[0], &messageLength, &message);
+    
+    //Create our Strings for our Alert.4
+    NSLog(@"%@",[NSString stringWithUTF8String:(char*)message]);
+    
+    return NULL;
+}
+
+
+/*
 FREObject isSupported(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[] ){
     FREObject retVal;
     if(FRENewObjectFromBool(YES, &retVal) == FRE_OK){
@@ -665,7 +719,7 @@ FREObject isSupported(FREContext ctx, void* funcData, uint32_t argc, FREObject a
     }else{
         return nil;
     }
-}
+}*/
 
 
 // NativeDialogContextInitializer()
@@ -675,22 +729,35 @@ void NativeDialogContextInitializer(void* extData, const uint8_t * ctxType, FREC
 						uint32_t* numFunctionsToTest, const FRENamedFunction** functionsToSet) 
 {
     
-    int count=2;
-    if(strcmp((const char *)ctxType, PROGRESS_KEY)==0){
-        count = 7;
-        NSLog(@"ctxType %s",ctxType);
-        
-    }else if(strcmp((const char *)ctxType, LIST_DIALOG)==0){
-        count = 6;
-        
-        NSLog(@"ctxType %s",ctxType);
-    }else if(strcmp((const char *)ctxType, TEXT_INPUT_DIALOG)==0){
+    int count=1;
+    if(strcmp((const char *)ctxType, PROGRESS_KEY)==0)
+    {
         count = 6;
         NSLog(@"ctxType %s",ctxType);
-    }else if (strcmp((const char *)ctxType, "")==0){
-        count = 4;
+        
+    }
+    else if(strcmp((const char *)ctxType, LIST_DIALOG)==0)
+    {
+        count = 5;
+        NSLog(@"ctxType %s",ctxType);
+    }
+    else if(strcmp((const char *)ctxType, TEXT_INPUT_DIALOG)==0)
+    {
+        count = 5;
+        NSLog(@"ctxType %s",ctxType);
+    }
+    else if(strcmp((const char *)ctxType, SYSTEM_PROPERTIES_KEY)==0)
+    {
+        count = 5;
+        NSLog(@"ctxType %s",ctxType);
+    }
+    else if (strcmp((const char *)ctxType, "")==0)
+    {
+        count = 3;
         NSLog(@"ctxType is empty");
-    }else{
+    }
+    else
+    {
         NSLog(@"ctxType %s",ctxType);
     }
     
@@ -700,120 +767,134 @@ void NativeDialogContextInitializer(void* extData, const uint8_t * ctxType, FREC
 	FRENamedFunction* func = (FRENamedFunction*) malloc(sizeof(FRENamedFunction) * count);
     
     
-    func[0].name = (const uint8_t *) "isSupported";
+    /*func[0].name = (const uint8_t *) "isSupported";
     func[0].functionData = NULL;
     func[0].function = &isSupported;
-    
+    */
     if(strcmp((const char *)ctxType, SYSTEM_PROPERTIES_KEY)==0){
-        func[1].name = (const uint8_t *) "getSystemProperty";
+        
+        func[0].name = (const uint8_t *) "getSystemProperty";
+        func[0].functionData = NULL;
+        func[0].function = &getSystemProperties;
+        
+        func[1].name = (const uint8_t *) "canOpenUrl";
         func[1].functionData = NULL;
-        func[1].function = &getSystemProperties;
+        func[1].function = &canOpenUrl;
+        
+        func[2].name = (const uint8_t *) "console";
+        func[2].functionData = NULL;
+        func[2].function = &consoleMessage;
+        
+        
+        func[3].name = (const uint8_t *) "setBadge";
+        func[3].functionData = NULL;
+        func[3].function = &setBadge;
+        
+        func[4].name = (const uint8_t *) "getBadge";
+        func[4].functionData = NULL;
+        func[4].function = &getBadge;
+        
     }else if(strcmp((const char *)ctxType, TOAST)==0){
         
-        func[1].name = (const uint8_t *) "Toast";
-        func[1].functionData = NULL;
-        func[1].function = &showToast;
+        func[0].name = (const uint8_t *) "Toast";
+        func[0].functionData = NULL;
+        func[0].function = &showToast;
         
     }else if(strcmp((const char *)ctxType, NETWORK_ACTIVITY_INDICATOR)==0){
         
-        func[1].name = (const uint8_t *) "showHidenetworkIndicator";
-        func[1].functionData = NULL;
-        func[1].function = &showHidenetworkIndicator;
+        func[0].name = (const uint8_t *) "showHidenetworkIndicator";
+        func[0].functionData = NULL;
+        func[0].function = &showHidenetworkIndicator;
         
     }else if(strcmp((const char *)ctxType, LOCAL_NOTIFICATION)==0){
         
-        func[1].name = (const uint8_t *) "showNotification";
-        func[1].functionData = NULL;
-        func[1].function = &showNotification;
+        func[0].name = (const uint8_t *) "showNotification";
+        func[0].functionData = NULL;
+        func[0].function = &showNotification;
         
         
     }else if(strcmp((const char *)ctxType, LIST_DIALOG)==0){
         
-        func[1].name = (const uint8_t*) "isShowing";
+        func[0].name = (const uint8_t*) "isShowing";
+        func[0].functionData = NULL;
+        func[0].function = &isShowing;
+        
+        func[1].name = (const uint8_t *) "show";
         func[1].functionData = NULL;
-        func[1].function = &isShowing;
+        func[1].function = &showListDialog;
         
-        func[2].name = (const uint8_t *) "show";
+        func[2].name = (const uint8_t*) "updateTitle";
         func[2].functionData = NULL;
-        func[2].function = &showListDialog;
+        func[2].function = &updateTitle;
         
-        func[3].name = (const uint8_t*) "updateTitle";
+        func[3].name = (const uint8_t*) "hide";
         func[3].functionData = NULL;
-        func[3].function = &updateTitle;
+        func[3].function = &hide;
         
-        func[4].name = (const uint8_t*) "hide";
+        func[4].name = (const uint8_t*) "shake";
         func[4].functionData = NULL;
-        func[4].function = &hide;
-        
-        func[5].name = (const uint8_t*) "shake";
-        func[5].functionData = NULL;
-        func[5].function = &shake;
+        func[4].function = &shake;
         
     }else if(strcmp((const char *)ctxType, TEXT_INPUT_DIALOG)==0){
     
-        func[1].name = (const uint8_t*) "isShowing";
+        func[0].name = (const uint8_t*) "isShowing";
+        func[0].functionData = NULL;
+        func[0].function = &isShowing;
+        
+        func[1].name = (const uint8_t *) "show";
         func[1].functionData = NULL;
-        func[1].function = &isShowing;
+        func[1].function = &showTextInputDialog;
         
-        func[2].name = (const uint8_t *) "show";
+        func[2].name = (const uint8_t*) "updateTitle";
         func[2].functionData = NULL;
-        func[2].function = &showTextInputDialog;
+        func[2].function = &updateTitle;
         
-        func[3].name = (const uint8_t*) "updateTitle";
+        func[3].name = (const uint8_t*) "hide";
         func[3].functionData = NULL;
-        func[3].function = &updateTitle;
+        func[3].function = &hide;
         
-        func[4].name = (const uint8_t*) "hide";
+        func[4].name = (const uint8_t*) "shake";
         func[4].functionData = NULL;
-        func[4].function = &hide;
-        
-        func[5].name = (const uint8_t*) "shake";
-        func[5].functionData = NULL;
-        func[5].function = &shake;
+        func[4].function = &shake;
         
     }else if(strcmp((const char *)ctxType, PROGRESS_KEY)==0){
-        func[1].name = (const uint8_t*) "isShowing";
+        func[0].name = (const uint8_t*) "isShowing";
+        func[0].functionData = NULL;
+        func[0].function = &isShowing;
+        
+        func[1].name = (const uint8_t *) "showProgressPopup";
         func[1].functionData = NULL;
-        func[1].function = &isShowing;
+        func[1].function = &showProgressPopup;
         
-        func[2].name = (const uint8_t *) "showProgressPopup";
+        func[2].name = (const uint8_t*) "updateProgress";
         func[2].functionData = NULL;
-        func[2].function = &showProgressPopup;
+        func[2].function = &updateProgress;
         
-        func[3].name = (const uint8_t*) "updateProgress";
+        func[3].name = (const uint8_t*) "hide";
         func[3].functionData = NULL;
-        func[3].function = &updateProgress;
+        func[3].function = &hide;
         
-        func[4].name = (const uint8_t*) "hide";
+        func[4].name = (const uint8_t*) "updateMessage";
         func[4].functionData = NULL;
-        func[4].function = &hide;
-        
-        func[5].name = (const uint8_t*) "updateMessage";
-        func[5].functionData = NULL;
-        func[5].function = &updateMessage;
+        func[4].function = &updateMessage;
 
-        func[6].name = (const uint8_t*) "updateTitle";
-        func[6].functionData = NULL;
-        func[6].function = &updateTitle;
+        func[5].name = (const uint8_t*) "updateTitle";
+        func[5].functionData = NULL;
+        func[5].function = &updateTitle;
         
     }else{
-        func[1].name = (const uint8_t *) "showAlertWithTitleAndMessage";
+        func[0].name = (const uint8_t *) "showAlertWithTitleAndMessage";
+        func[0].functionData = NULL;
+        func[0].function = &showAlertWithTitleAndMessage;
+        
+        func[1].name = (const uint8_t *) "setBadge";
         func[1].functionData = NULL;
-        func[1].function = &showAlertWithTitleAndMessage;
+        func[1].function = &setBadge;
         
-        func[2].name = (const uint8_t *) "setBadge";
+        func[2].name = (const uint8_t *) "getBadge";
         func[2].functionData = NULL;
-        func[2].function = &setBadge;
-        
-        func[3].name = (const uint8_t *) "getBadge";
-        func[3].functionData = NULL;
-        func[3].function = &getBadge;
-        
-
+        func[2].function = &getBadge;
     }
-    
-    
-    
 	*functionsToSet = func;
 }
 
@@ -829,7 +910,7 @@ void NativeDialogContextInitializer(void* extData, const uint8_t * ctxType, FREC
 void NativeDialogContextFinalizer(FREContext ctx) {
     
     NSLog(@"Entering ContextFinalizer()");
-    if(alert!=NULL){
+    if(alert){
         [alert hide];
         [alert release];
     }

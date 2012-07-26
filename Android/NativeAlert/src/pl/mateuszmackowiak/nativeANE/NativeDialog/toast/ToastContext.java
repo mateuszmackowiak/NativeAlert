@@ -3,8 +3,6 @@ package pl.mateuszmackowiak.nativeANE.NativeDialog.toast;
 import java.util.HashMap;
 import java.util.Map;
 
-import pl.mateuszmackowiak.nativeANE.NativeDialog.isSupportedFunction;
-
 import com.adobe.fre.FREContext;
 import com.adobe.fre.FREFunction;
 
@@ -19,7 +17,7 @@ public class ToastContext extends FREContext {
 	@Override
 	public Map<String, FREFunction> getFunctions() {
 		Map<String, FREFunction> map = new HashMap<String, FREFunction>();
-        map.put(isSupportedFunction.KEY, new isSupportedFunction());
+       // map.put(isSupportedFunction.KEY, new isSupportedFunction());
         map.put(showToast.KEY, new showToast());
         return map;
 	}

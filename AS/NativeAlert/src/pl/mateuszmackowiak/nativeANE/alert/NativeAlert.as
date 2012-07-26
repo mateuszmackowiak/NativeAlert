@@ -83,9 +83,6 @@ package pl.mateuszmackowiak.nativeANE.alert
 		/**
 		 * @private
 		 */
-		private static var _theme:int = -1;
-		private static var isAndroid:Boolean=false;
-		
 		private static var _defaultTheme:uint = DEFAULT_THEME;
 		//---------------------------------------------------------------------
 		//
@@ -96,12 +93,13 @@ package pl.mateuszmackowiak.nativeANE.alert
 		private var _message:String="";
 		private var _closeLabel:String="OK";
 		private var _otherLabels:String ="";
+		
 		/**
 		 * @private
 		 */
 		private var _isShowing:Boolean=false;
-		
-		
+		private var _theme:int = -1;
+
 
 		private var _closeHandler:Function=null;
 		//---------------------------------------------------------------------
@@ -117,15 +115,14 @@ package pl.mateuszmackowiak.nativeANE.alert
 		 * @see http://www.liquid-photo.com/2011/10/28/native-extension-for-adobe-air-and-ios-101/
 		 * @see pl.mateuszmackowiak.nativeANE.alert.NativeAlertEvent
 		 */
-		public function NativeAlert(theme:int=NaN)
+		public function NativeAlert(theme:int=-1)
 		{
-			if(Capabilities.os.toLowerCase().indexOf("linux")>-1)
-				isAndroid = true;
-
 			if(!isNaN(theme) && theme>-1)
 				_theme = theme;
 			else
 				_theme = _defaultTheme;
+			
+			
 			
 			if(context==null){
 				try{
@@ -134,6 +131,7 @@ package pl.mateuszmackowiak.nativeANE.alert
 					showError(e.message,e.errorID);
 				}
 			}
+			
 		}
 		
 		override public function willTrigger(type:String):Boolean{
@@ -169,11 +167,11 @@ package pl.mateuszmackowiak.nativeANE.alert
 		public function set closeHandler(value:Function):void
 		{
 			
-			if(hasEventListener(NativeDialogEvent.CLOSED))
+			if(_closeHandler!=null && hasEventListener(NativeDialogEvent.CLOSED))
 				removeEventListener(NativeDialogEvent.CLOSED,_closeHandler);
 			_closeHandler = value;
 			if(value!=null)
-				addEventListener(NativeDialogEvent.CLOSED,_closeHandler);
+				addEventListener(NativeDialogEvent.CLOSED,value);
 		}
 		/**
 		 * @private
@@ -273,17 +271,16 @@ package pl.mateuszmackowiak.nativeANE.alert
 		 * Should be called in the end if You know that there will be now reference to NativeAlert
 		 * @copy flash.external.ExtensionContext.dispose()
 		 * @see flash.external.ExtensionContext.dispose()
-		 * @return if the call was saccessful
 		 */
-		public static function dispose():Boolean{
+		public static function dispose():void{
 			try{
-				if(context)
+				if(context){
 					context.dispose();
-				return true;
+					context = null;
+				}
 			}catch(e:Error){
 				showError("Error calling dispose method "+e.message,e.errorID);
 			}
-			return false;
 		}
 			
 		/**
@@ -297,13 +294,21 @@ package pl.mateuszmackowiak.nativeANE.alert
 		 */
 		public function show(cancelable:Boolean = true) : Boolean
 		{
-			
 			try{
+				if(!_title)
+					_title="";
+				if(!_closeLabel && (!otherLabels || otherLabels==""))
+					_closeLabel ="OK";
+				if(!otherLabels)
+					otherLabels="";
+				if(!_message)
+					_message="";
+				
 				context.addEventListener(StatusEvent.STATUS, onAlertHandler);
 				context.call("showAlertWithTitleAndMessage", _title, _message, _closeLabel, _otherLabels, cancelable, _theme);
 				return true;
 			}catch(e:Error){
-				showError(e.message,e.errorID);
+				showError("While showAlertWithTitleAndMessage  "+e.message,e.errorID);
 			}
 			return false;
 		}
@@ -329,89 +334,56 @@ package pl.mateuszmackowiak.nativeANE.alert
 		}
 		
 		
-		
-		
 		/**
 		 * Create and show an Alert control
 		 * @param text     Text showed in the Alert control
 		 * @param title    Title of the Alert control
-		 * @param closeLabel Text of the default button (work on IOS)
-		 * @param otherLabels Text of the other buttons. Sepperated with "," adds aditional buttons (work on IOS) in the close event answer is the string representing the label
+		 * @param closeLabel Text of the default button
+		 * @param otherLabels Text of the other buttons. Sepperated with "," adds aditional buttons in the close event answer is the string representing the label
 		 * @param closeHandler  Close function callback (NativeAlertEvent)
-		 * @param cancelable - on back button or outside relese closes with index -1
+		 * @param cancelable - on back button or outside relese closes with index -1 (only Android)
 		 * @param androidTheme - default -1 uses the defaultAndroidTheme 
 		 * 
 		 * @see pl.mateuszmackowiak.nativeANE.alert.NativeAlertEvent
 		 */
-		public static function show(message:String = "", title:String = "Error", closeLabel : String="OK", otherLabels : String = "" , closeHandler:Function = null ,cancelable:Boolean = true, theme:int = NaN):NativeAlert
+		public static function show(message:String = "", title:String = "Error", closeLabel : String="OK", otherLabels : String = "" , closeHandler:Function = null ,cancelable:Boolean = true, theme:int = -1):NativeAlert
 		{
-				try{
-					var alert:NativeAlert = new NativeAlert(theme);
-					if (closeHandler !== null){
-						alert.closeHandler = closeHandler;
-					}
-					alert.title = title;
-					alert.message = message;
-					alert.closeLabel = closeLabel;
-					alert.otherLabels = otherLabels;
-					alert.show(cancelable);
-		
-					return alert;
-				}catch(e:Error){
-					showError(e.message,e.errorID);
-				}
-			return null;
+			var alert:NativeAlert = new NativeAlert(theme);
+			if (closeHandler !== null){
+				alert.closeHandler = closeHandler;
+			}
+			alert.title = title;
+			alert.message = message;
+			alert.closeLabel = closeLabel;
+			alert.otherLabels = otherLabels;
+			alert.show(cancelable);
+
+			return alert;
 		}
 		
+		
+		protected static function isIOS():Boolean
+		{
+			return Capabilities.os.toLowerCase().indexOf("ip")>-1;
+		}
+		protected static function isAndroid():Boolean
+		{
+			return Capabilities.os.toLowerCase().indexOf("linux")>-1;
+		}
+		protected static function isWindows():Boolean
+		{
+			return Capabilities.os.toLowerCase().indexOf("win")>-1;
+		}
 		/**
 		 * Whether NativeAlert class is available on the device (true);<br>otherwise false
 		 */
 		public static function get isSupported():Boolean{
-			if(Capabilities.os.toLowerCase().indexOf("ip")>-1 || Capabilities.os.toLowerCase().indexOf("win")>-1 || Capabilities.os.toLowerCase().indexOf("linux")>-1)
-				return true;
-			else 
-				return false;
-		}
-		/**
-		 * Whether the badge is available on the device (true);<br>otherwise false
-		 * @see pl.mateuszmackowiak.nativeANE.alert.NativeAlert.badge
-		 */
-		public static function isBadgeSupported():Boolean
-		{
-			if(Capabilities.os.toLowerCase().indexOf("ip")>-1)
+			if(isIOS() || isWindows() || isAndroid())
 				return true;
 			else 
 				return false;
 		}
 		
-		/**
-		 * The number currently set as the badge of the application icon in Springboard
-		 * <br>Set to 0 (zero) to hide the badge number. The default is 0.
-		 * @see pl.mateuszmackowiak.nativeANE.alert.NativeAlert.isBadgeSupported
-		 */
-		public static  function set badge(value:uint):void
-		{
-			if(isNaN(value))
-				return;
-			try{
-				if(context==null)
-					context = ExtensionContext.createExtensionContext(EXTENSION_ID, null);
-				context.call("setBadge",value);
-			}catch(e:Error){
-				showError(e.message,e.errorID);
-			}
-		}
-		public static function get badge():uint
-		{
-			try{
-				if(context==null)
-					context = ExtensionContext.createExtensionContext(EXTENSION_ID, null);
-				return context.call("getBadge") as uint;
-			}catch(e:Error){
-				showError(e.message,e.errorID);
-			}
-			return NaN;
-		}
 		//---------------------------------------------------------------------
 		//
 		// Private Methods.
@@ -426,24 +398,23 @@ package pl.mateuszmackowiak.nativeANE.alert
 		 */
 		private function onAlertHandler( event : StatusEvent ) : void
 		{
-			try{
-
-				if( event.code == NativeDialogEvent.CLOSED || event.code =="ALERT_CLOSED")
-				{
-					var level:int = int(event.level);
-					if(Capabilities.os.indexOf("Win")>-1)
-						level--;
-					dispatchEvent(new NativeDialogEvent(NativeDialogEvent.CLOSED,level.toString()));
-					if(_closeHandler!=null){
+			if( event.code == NativeDialogEvent.CLOSED || event.code =="ALERT_CLOSED")
+			{
+				(event.target as ExtensionContext).removeEventListener( StatusEvent.STATUS, onAlertHandler );
+				event.stopImmediatePropagation();
+				var level:int = int(event.level);
+				if(isWindows())
+					level--;
+				
+				if(hasEventListener(NativeDialogEvent.CLOSED)){
+					if(!dispatchEvent(new NativeDialogEvent(NativeDialogEvent.CLOSED,level.toString())) && _closeHandler!=null){
 						removeEventListener(NativeDialogEvent.CLOSED,_closeHandler);
 						_closeHandler = null;
+						dispose();
 					}
-					(event.target as ExtensionContext).removeEventListener( StatusEvent.STATUS, onAlertHandler );
-				}else{
-					showError(event.toString());
 				}
-			}catch(e:Error){
-				showError(e.message,e.errorID);
+			}else{
+				showError(event.toString());
 			}
 		}
 
@@ -457,6 +428,57 @@ package pl.mateuszmackowiak.nativeANE.alert
 				context.dispatchEvent(new ErrorEvent(ErrorEvent.ERROR,false,false,message,id));
 			else
 				trace(message);
+		}
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		[Deprecated(replacement="pl.mateuszmackowiak.nativeANE.properties.SystemProperties.getInstance().isBadgeSupported()")] 
+		/**
+		 * Whether the badge is available on the device (true);<br>otherwise false
+		 * @see pl.mateuszmackowiak.nativeANE.alert.NativeAlert.badge
+		 */
+		public static function isBadgeSupported():Boolean
+		{
+			if(Capabilities.os.toLowerCase().indexOf("ip")>-1)
+				return true;
+			else 
+				return false;
+		}
+		[Deprecated(replacement="pl.mateuszmackowiak.nativeANE.properties.SystemProperties.getInstance().badge")] 
+		/**
+		 * The number currently set as the badge of the application icon in Springboard
+		 * <br>Set to 0 (zero) to hide the badge number. The default is 0.
+		 * @see pl.mateuszmackowiak.nativeANE.alert.NativeAlert.isBadgeSupported
+		 */
+		public static  function set badge(value:uint):void
+		{
+			if(isNaN(value))
+				return;
+			try{
+				if(context==null)
+					context = ExtensionContext.createExtensionContext(EXTENSION_ID, null);
+				context.call("setBadge",value);
+			}catch(e:Error){
+				trace(e.message,e.errorID);
+			}
+		}
+		
+		public static function get badge():uint
+		{
+			try{
+				if(context==null)
+					context = ExtensionContext.createExtensionContext(EXTENSION_ID, null);
+				return context.call("getBadge") as uint;
+			}catch(e:Error){
+				trace(e.message,e.errorID);
+			}
+			return NaN;
 		}
 	}
 }

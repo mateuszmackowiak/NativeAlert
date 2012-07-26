@@ -21,15 +21,17 @@ public class showProgressPopup implements FREFunction {
 	@Override
 	public FREObject call(FREContext context, FREObject[] args) {
 		
-		String function="",title="", message="";
-		int max=0,  style=ProgressDialog.STYLE_HORIZONTAL , theme = 0;
-		Integer secondaryProgress = null,progress=null;
-		boolean cancleble = false,indeterminate =false;
-		
 		try{
+			String function="";
 		 	function = args[0].getAsString();
         
-			if(function.equals("showPopup")){
+			if("showPopup".equals(function)){
+				
+				String title="", message="";
+				int style = ProgressDialog.STYLE_HORIZONTAL , theme = 0;
+				Integer secondaryProgress = null,progress=null;
+				boolean cancleble = false,indeterminate =false;
+				
 				progress= args[1].getAsInt();
 				secondaryProgress = args[2].getAsInt();
 				style = args[3].getAsInt();
@@ -56,44 +58,50 @@ public class showProgressPopup implements FREFunction {
 				mProgressDialog.show();
 				context.dispatchStatusEventAsync(NativeExtension.OPENED,String.valueOf(-2));
 				
-			}else if(function.equals("setTitle")){
+			}else if("setTitle".equals(function)){
+				String title="";
 			    title = args[1].getAsString();
 				if(mProgressDialog!=null)
 					mProgressDialog.setMessage(Html.fromHtml(title));
 				
-			}else if(function.equals("setIndeterminate")){
+			}else if("setIndeterminate".equals(function)){
+				boolean indeterminate =false;
 				indeterminate = args[1].getAsBool();
 				if(mProgressDialog!=null)
 					mProgressDialog.setIndeterminate(indeterminate);
 				
-			}else if(function.equals("setMessage")){
+			}else if("setMessage".equals(function)){
+				String message="";
 			    message = args[1].getAsString();
 				if(mProgressDialog!=null)
 					mProgressDialog.setMessage(Html.fromHtml(message));
 				
-			}else if(function.equals("update")){
+			}else if("update".equals(function)){
+				Integer progress = null;
 				progress= args[1].getAsInt();
 				if(mProgressDialog!=null && mProgressDialog.isIndeterminate()==false)
 					mProgressDialog.setProgress(progress.intValue());
 				
-			}else if(function.equals("setSecondary")){
+			}else if("setSecondary".equals(function)){
+				Integer secondaryProgress = null;
 				secondaryProgress= args[1].getAsInt();
 				if(mProgressDialog!=null)
 					mProgressDialog.setSecondaryProgress(secondaryProgress);
 				
-			}else if(function.equals("max")){
+			}else if("max".equals(function)){
+				int max=0;
 				max= args[1].getAsInt();
 				if(max>=1)
 					MAX_PROGRESS = max;
 				if(mProgressDialog!=null && mProgressDialog.isIndeterminate()==false)
 					mProgressDialog.setMax(max);
 	
-			}else if(function.equals("hide")){
+			}else if("hide".equals(function)){
 				if(mProgressDialog!=null && mProgressDialog.isShowing()){
 					mProgressDialog.hide();
 					context.dispatchStatusEventAsync(NativeExtension.CLOSED,String.valueOf(-2));
 				}
-			}else if(function.equals("isShowing")){
+			}else if("isShowing".equals(function)){
 				FREObject b = null;
 				if(mProgressDialog!=null && mProgressDialog.isShowing()==true){
 		            b = FREObject.newObject(true);
@@ -101,7 +109,7 @@ public class showProgressPopup implements FREFunction {
 		            b = FREObject.newObject(false);
 				}
 		        return b;
-			}else if(function.equals("kill")){
+			}else if("kill".equals(function)){
 				if(mProgressDialog!=null){
 					mProgressDialog.dismiss();
 					context.dispatchStatusEventAsync(NativeExtension.CLOSED,String.valueOf(-2));

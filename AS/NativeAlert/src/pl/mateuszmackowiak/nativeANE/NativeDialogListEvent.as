@@ -11,11 +11,11 @@ package pl.mateuszmackowiak.nativeANE
 		/**
 		 * @private
 		 */
-		private var _index:int=-1;
+		private var _index:int = -1;
 		/**
 		 * @private
 		 */
-		private var _selected:Boolean=false;
+		private var _selected:Boolean = false;
 		
 		
 		/**
@@ -43,13 +43,20 @@ package pl.mateuszmackowiak.nativeANE
 		{
 			return _selected;
 		}
-		
+
+
+		override public function toString():String
+		{
+			return "[NativeDialogListEvent type='"+type+"'  index='"+String(_index)
+				+"' selected='"+String(_selected)+"'  bubbles='"+String(bubbles)
+				+"' cancelable='"+String(cancelable)+"'  eventPhase='"+String(eventPhase)+"' ]";
+		}
 		/**
 		 * @copy flash.events.Event.clone()
 		 */
 		override public function clone() : Event
 		{
-			return new NativeDialogListEvent(type,_index,_selected);
+			return new NativeDialogListEvent(type,_index,_selected,bubbles,cancelable);
 		}
 	}
 }

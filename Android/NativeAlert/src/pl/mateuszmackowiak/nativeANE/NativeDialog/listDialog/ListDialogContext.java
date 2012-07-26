@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import pl.mateuszmackowiak.nativeANE.NativeDialog.NativeExtension;
-import pl.mateuszmackowiak.nativeANE.NativeDialog.isSupportedFunction;
 
 import android.util.Log;
 
@@ -37,7 +36,7 @@ public class ListDialogContext extends FREContext {
 		Log.i(KEY, "getFunctions");
 		
 		map = new HashMap<String, FREFunction>();
-        map.put(isSupportedFunction.KEY, new isSupportedFunction());
+        //map.put(isSupportedFunction.KEY, new isSupportedFunction());
         map.put(showListDialog.KEY, new showListDialog());
         return map;
 	}

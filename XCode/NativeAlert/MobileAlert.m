@@ -120,29 +120,27 @@ FREContext *context;
               otherLabels: (NSString*)otherLabels
                   context: (FREContext *)ctx
 {
-    //clean previous windows
-    [self hide];
     //Hold onto the context so we can dispatch our message later.
     context = ctx;
     
     //Create our alert.
-    self.alert = [[[UIAlertView alloc] initWithTitle:title 
+    alert = [[[UIAlertView alloc] initWithTitle:title 
                                              message:message
                                             delegate:self 
                                    cancelButtonTitle:closeLabel
                                    otherButtonTitles:nil] retain];
     
-    if (otherLabels != nil && ![otherLabels isEqualToString:@""]) { 
+
+    if (otherLabels && ![otherLabels isEqualToString:@""]) { 
         //Split our labels into an array
         NSArray *labels = [otherLabels componentsSeparatedByString:@","];
         
         //Add each label to our array.
         for (NSString *label in labels) 
         {
-            [alert addButtonWithTitle:label];
+            if(label && ![label isEqual:@""])
+                [alert addButtonWithTitle:label];
         }
-       // if(labels)
-         //   [labels release];
     }
     FREDispatchStatusEventAsync(context, (uint8_t*)"nativeDialog_opened", NULL);
     [alert show];
@@ -269,7 +267,7 @@ FREContext *context;
     if(sender != [alert textFieldAtIndex:0])
         index =1;
     NSString* returnString = [NSString stringWithFormat:@"%i#_#%@",index,((UITextField *)sender).text];
-    NSLog(@"text changed: %@",((UITextField *)sender).text);
+   
     FREDispatchStatusEventAsync(context, (uint8_t*)"change", (uint8_t*)[returnString UTF8String]);
    // [returnString release];
 }
@@ -384,73 +382,88 @@ NSMutableArray *tableItemList = nil;
                          buttons: (FREObject*)buttons
                          context: (FREContext *)ctx{
     
+    
+    //clean previous windows
+    //[self hide];
+    
     if(!checked)
         return;
-    //clean previous windows
-    [self hide];
     //Hold onto the context so we can dispatch our message later.
     context = ctx;
     
     
     NSString* closeLabel=nil;
     NSString* otherLabel=nil;
-    uint32_t buttons_len;
-    FREGetArrayLength(buttons, &buttons_len);
     
-    if(buttons_len>0){
-        FREObject button;
-        FREGetArrayElementAt(buttons, 0, &button);
-        
-        uint32_t buttonLabelLength;
-        const uint8_t *buttonLabel;
-        if(button){
-            FREGetObjectAsUTF8(button, &buttonLabelLength, &buttonLabel);
-            closeLabel = [NSString stringWithUTF8String:(char*)buttonLabel];
-        }
-        if(buttons_len>1){
-            FREGetArrayElementAt(buttons, 1, &button);
+    uint32_t buttons_len;
+    if(buttons && FREGetArrayLength(buttons, &buttons_len)==FRE_OK){
+        if(buttons_len>0){
+            FREObject button;
+            FREGetArrayElementAt(buttons, 0, &button);
+            
+            uint32_t buttonLabelLength;
+            const uint8_t *buttonLabel;
             if(button){
                 FREGetObjectAsUTF8(button, &buttonLabelLength, &buttonLabel);
-                otherLabel = [NSString stringWithUTF8String:(char*)buttonLabel];
+                closeLabel = [NSString stringWithUTF8String:(char*)buttonLabel];
+            }
+            if(buttons_len>1){
+                FREGetArrayElementAt(buttons, 1, &button);
+                if(button){
+                    FREGetObjectAsUTF8(button, &buttonLabelLength, &buttonLabel);
+                    otherLabel = [NSString stringWithUTF8String:(char*)buttonLabel];
+                }
             }
         }
     }
-    
     if(!closeLabel || [closeLabel isEqualToString:@""]){
         closeLabel = NSLocalizedString(@"OK", nil);
     }
     
 
     //Create our alert.
-    self.sbAlert = [[[SBTableAlert alloc] initWithTitle:title cancelButtonTitle:closeLabel messageFormat: message] retain];
-    [closeLabel release];
-    if(otherLabel && ![otherLabel isEqualToString:@""]){
-        [sbAlert.view addButtonWithTitle:otherLabel ];
+    self.sbAlert = [[SBTableAlert alloc] initWithTitle:title cancelButtonTitle:closeLabel messageFormat: message];//retain];
+    [closeLabel autorelease];
+    
+    if(otherLabel)
+    { 
+        if (![otherLabel isEqualToString:@""])
+            [sbAlert.view addButtonWithTitle:otherLabel ];
         [otherLabel release];
     }
+    /*if(otherLabel && ![otherLabel isEqualToString:@""]){
+        [sbAlert.view addButtonWithTitle:otherLabel ];
+        [otherLabel autorelease];
+    }*/
     
     uint32_t options_len; // array length
-    FREGetArrayLength(options, &options_len);
+    if(options && FREGetArrayLength(options, &options_len)==FRE_OK){
 
-    for(int32_t i=options_len-1; i>=0;i--){
-        
-        // get an element at index
         FREObject element;
-        FREGetArrayElementAt(options, i, &element);
         
-        if(element){
-            uint32_t elementLength;
-            const uint8_t *elementLabel;
-            FREGetObjectAsUTF8(element, &elementLength, &elementLabel);
-            ListItem* item = [[ListItem listItemWithText:[NSString stringWithUTF8String:(char*)elementLabel]] autorelease];
+        for(int32_t i=options_len-1; i>=0;i--){
             
-            if(tableItemList==nil)
-                tableItemList= [[NSMutableArray alloc] initWithObjects:item, nil];
-            else
-                [tableItemList addObject:item];
+            // get an element at index
+            if(FREGetArrayElementAt(options, i, &element)==FRE_OK){            
+                if(element){
+                    uint32_t elementLength;
+                    const uint8_t *elementLabel;
+                    if(FREGetObjectAsUTF8(element, &elementLength, &elementLabel)==FRE_OK){
+                        ListItem* item = [[ListItem listItemWithText:[NSString stringWithUTF8String:(char*)elementLabel]] autorelease];
+                        
+                       /* if(!tableItemList)
+                            tableItemList= [NSMutableArray arrayWithCapacity:0];
+                        [tableItemList addObject:item];
+                        */
+                        if(tableItemList)
+                            [tableItemList addObject:item];
+                        else
+                            tableItemList= [[NSMutableArray alloc] initWithObjects:item, nil];
+                    }
+                }
+            }
         }
     }
-    
    // options
     if(checked!=nil){
         FREObjectType type;
@@ -546,9 +559,8 @@ NSMutableArray *tableItemList = nil;
 		}
 		[tableAlert.tableView deselectRowAtIndexPath:indexPath animated:YES];
 	}else
-        returnString = [NSString stringWithFormat:@"%d%", [indexPath row]];
+        returnString = [NSString stringWithFormat:@"%d", [indexPath row]];
     
-     
     FREDispatchStatusEventAsync(context, (uint8_t*)"nativeListDialog_change", (uint8_t*)[returnString UTF8String]);
 }
 
@@ -562,7 +574,6 @@ NSMutableArray *tableItemList = nil;
      tableItemList = nil;
     [sbAlert release];
     sbAlert = nil;
-    context = nil;
 }
 
 
@@ -651,15 +662,19 @@ NSMutableArray *tableItemList = nil;
 -(void)hide
 {
     if(sbAlert){
-        [sbAlert release];
         [sbAlert.view dismissWithClickedButtonIndex:0 animated:YES];
+        [sbAlert release];
+        sbAlert = nil;
     }
-    if(progressView)
+    if(progressView){
        [progressView release];
+        progressView = nil;
+    }
     if(alert)
     {
-       [alert release];
-       [alert dismissWithClickedButtonIndex:0 animated:YES];
+        [alert dismissWithClickedButtonIndex:0 animated:YES];
+        [alert release];
+        alert = nil;
     }
 }
 
@@ -674,33 +689,11 @@ NSMutableArray *tableItemList = nil;
     
     //Create our params to pass to the event dispatcher.
     NSString *buttonID = [NSString stringWithFormat:@"%d", buttonIndex];
-
-   /* if(([alert isKindOfClass:[UIAlertView class]] && [alertView alertViewStyle]==UIAlertViewStyleDefault)
-       || ([alert isKindOfClass:[AlertTextView class]] && [alertView alertViewStyle]==AlertTextViewStyleDefault)){
-     */   
-            FREDispatchStatusEventAsync(context, (uint8_t*)"nativeDialog_closed", (uint8_t*)[buttonID UTF8String]);
-    /*}else{
-        
-     
-        NSString* returnString=nil;
-        [[alertView textFieldAtIndex:0] removeTarget:self action:@selector(textFieldDidChange:) forControlEvents:UIControlEventEditingChanged];
-        
-        if(([alert isKindOfClass:[UIAlertView class]] && [alertView alertViewStyle]==UIAlertViewStyleLoginAndPasswordInput) 
-                || ([alert isKindOfClass:[AlertTextView class]] && [alertView alertViewStyle]==AlertTextViewStyleLoginAndPasswordInput)){
-            
-            [[alertView textFieldAtIndex:1] removeTarget:self action:@selector(textFieldDidChange:) forControlEvents:UIControlEventEditingChanged];
-            returnString = [NSString stringWithFormat:@"%@#_#%@#_#%@",buttonID,[[alertView textFieldAtIndex:0] text],[[alertView textFieldAtIndex:1] text]];
-        }else{
-            
-            returnString = [NSString stringWithFormat:@"%@#_#%@",buttonID,[[alertView textFieldAtIndex:0] text]];
-        }
-        FREDispatchStatusEventAsync(context, (uint8_t*)"nativeDialog_closed", (uint8_t*)[returnString UTF8String]);
-    }*/
-
-    
+    FREDispatchStatusEventAsync(context, (uint8_t*)"nativeDialog_closed", (uint8_t*)[buttonID UTF8String]);
     //Cleanup references.
-    [alert release];
-    context = nil;
+    [alertView release];
+//    alert = nil;
+  //  context = nil;
 }
 
 

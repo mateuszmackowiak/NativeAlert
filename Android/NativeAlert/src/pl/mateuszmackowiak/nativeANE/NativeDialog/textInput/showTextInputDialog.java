@@ -63,7 +63,7 @@ public class showTextInputDialog implements FREFunction {
 							theme = args[5].getAsInt();
 					}
 					
-					TextInputDialog textInputDialog = (Integer.parseInt(android.os.Build.VERSION.SDK)<11)?new TextInputDialog(freContext.getActivity(),textInputs):new TextInputDialog(freContext.getActivity(),textInputs,theme);
+					TextInputDialog textInputDialog = (android.os.Build.VERSION.SDK_INT<11)?new TextInputDialog(freContext.getActivity(),textInputs):new TextInputDialog(freContext.getActivity(),textInputs,theme);
 
 					if(title!=null)
 						textInputDialog.setTitle(Html.fromHtml(title));
@@ -73,13 +73,13 @@ public class showTextInputDialog implements FREFunction {
 				    	textInputDialog.setOnCancelListener(new CancelListener(freContext));
 
 				    if(buttons!=null && buttons.length>0){
-				    	textInputDialog.setPositiveButton(buttons[0], new ClickListener(freContext,textInputDialog));
+				    	textInputDialog.setPositiveButton(buttons[0], new ClickListener(freContext,textInputDialog,0));
 						if(buttons.length>1)
-							textInputDialog.setNeutralButton(buttons[1], new ClickListener(freContext,textInputDialog));
+							textInputDialog.setNeutralButton(buttons[1], new ClickListener(freContext,textInputDialog,1));
 						if(buttons.length>2)
-							textInputDialog.setNegativeButton(buttons[2], new ClickListener(freContext,textInputDialog));
+							textInputDialog.setNegativeButton(buttons[2], new ClickListener(freContext,textInputDialog,2));
 					}else
-						textInputDialog.setPositiveButton("OK",new ClickListener(freContext,textInputDialog));
+						textInputDialog.setPositiveButton("OK",new ClickListener(freContext,textInputDialog,0));
 				    
 				    mDialog = textInputDialog.create();
 				    freContext.dispatchStatusEventAsync(NativeExtension.OPENED,"");
@@ -336,10 +336,12 @@ public class showTextInputDialog implements FREFunction {
 	private class ClickListener implements DialogInterface.OnClickListener
 	{
     	private TextInputDialog dlg;
+    	private int index;
     	
-    	ClickListener(FREContext context,TextInputDialog dlg)
+    	ClickListener(FREContext context,TextInputDialog dlg,int index)
     	{
     		this.dlg = dlg;
+    		this.index = index;
     	}
  
         @Override
@@ -363,7 +365,7 @@ public class showTextInputDialog implements FREFunction {
 		        		}
 					}
 
-		        	_freContext.dispatchStatusEventAsync(NativeExtension.CLOSED,String.valueOf(Math.abs(id)));
+		        	_freContext.dispatchStatusEventAsync(NativeExtension.CLOSED,String.valueOf(index));//Math.abs(id)));
 		            //dialog.dismiss();
         		}
         	}catch(Exception e){

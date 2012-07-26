@@ -3,8 +3,6 @@ package pl.mateuszmackowiak.nativeANE.NativeDialog.progressDialog;
 import java.util.HashMap;
 import java.util.Map;
 
-import pl.mateuszmackowiak.nativeANE.NativeDialog.isSupportedFunction;
-
 import com.adobe.fre.FREContext;
 import com.adobe.fre.FREFunction;
 
@@ -30,7 +28,7 @@ public class ProgressContext extends FREContext {
 	@Override
 	public Map<String, FREFunction> getFunctions() {
 		map = new HashMap<String, FREFunction>();
-        map.put(isSupportedFunction.KEY, new isSupportedFunction());
+       // map.put(isSupportedFunction.KEY, new isSupportedFunction());
         map.put(showProgressPopup.KEY, new showProgressPopup());
         return map;
 	}

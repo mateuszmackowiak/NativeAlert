@@ -1,6 +1,13 @@
 # Native Dialogs - Adobe air Native Extension #
 
-###Update: MUCH CHANGES IN THIS UPDATE - remove unnecessary events, IOS List Dialogs ###
+Changes (form commit cac11f3):
+* SystemProperties is now a singelton and requires getInstance() and dispose() before extiting app
+* NativeAlert.badge moved to SystemProperties
+* NativeAlert better handeling close event on static show() method
+* fixed all .defaultTheme problems
+* changed index values on dialogs on Android (now similar to IOS)
+* added platform.xml (linking options)
+* changed isNetworkActivityIndicatorSupported() and isNetworkActivityIndicator() function name!
 
 
 Checked iOS 5.1 / android 2.3/3.1
@@ -28,10 +35,7 @@ Android and iOS:
 iOS only:
 	setting the badge of the app
 
-*Usage (badge):*
 
-	if(NativeAlert.isBadgeSupported())
-		NativeAlert.badge = 4;
 
 
 *Usage:*
@@ -42,7 +46,8 @@ iOS only:
 	
 	NativeAlert.dispose(); //only when exiting app
 	private function someAnswerFunction(event:NativeDialogEvent):void{
-		trace(event.index);
+		//event.preventDefault(); // default behavior is to remove listener for function "someAnswerFunction()"
+		trace(event.toString());
 	}
 
 
@@ -68,7 +73,7 @@ iOS only:
 ![](https://github.com/mateuszmackowiak/NativeAlert/raw/master/images/NetworkActivityIndicatoror.png)
   The ability to show and hide the native status-bar networki busy indicator.
 
-	if(NativeProgress.isNetworkActivityIndicatorAvalieble())
+	if(NativeProgress.isNetworkActivityIndicatorSupported())
 		NativeProgress.showNetworkActivityIndicator(true);
 
 *Usage:*
@@ -295,22 +300,37 @@ IOS limitations - Toast will always be on the bottom of the screen (both functio
 # System Properties (Android / IOS) #
 SystemProperties class can provide some of the missing properties that You can’t get in adobe air
 
+
+*Usage (badge):*
+
+	if(SystemProperties.isBadgeSupported())
+		SystemProperties.getInstance().badge = 4;
+		
+		
 Available parameters: 
 
-* os - like in Capabilities (IOS/Androdi)
-
-* language - the set language in the system (Android)
-* architecture of the cpu (Android)
-* package name (Android)
-* source directory (Android)
-* application uid -always when a application is installed on device the system creates a unique id for setting up the space for it (Android)
+(IOS/Android)
+* version - The current version of the operating system.
+* os - The name of the operating system running on the device.
+* language - the set language in the system
 * UID - created a unique ID for the device based on some of the device properties
+* name - the name of the device
+* MACAddress - MAC Address
+* model
 
-* UDID - ####removed - deprecated on IOS####
-* name - the name of the device (IOS)
-* MACAdress - MAC Adress (IOS)
-* localizedModel (IOS)
-* model (IOS)
+(Android)
+* serial - serial number of Android system 
+* arch - architecture of the cpu
+* packageName - package name
+* sourceDir - source directory
+* AppUid -always when a application is installed on device the system creates a unique id for setting up the space for it
+* phoneNumber
+* IMSI
+* IMEI
+
+(IOS)
+* localizedModel 
+
 
 **requires **
 
@@ -318,7 +338,10 @@ Available parameters:
 *Usage:*
 
 	if(SystemProperties.isSupported()){
-		var dictionary:Dictionary = SystemProperties.getProperites(); 
+	
+		// getProperites(); -Deprecated
+		
+		var dictionary:Dictionary = SystemProperties.getInstance().getSystemProperites();
 		for (var key:String in dictionary) 
 		{ 
 			var readingType:String = key; 
@@ -326,6 +349,15 @@ Available parameters:
 			trace(readingType + "=" + readingValue); 
 		} 
 		dictionary = null;
+		
+		
+		
+		if(SystemPropertie.isIOS()){
+			trace(SystemProperties.getInstance().canOpenUrl("http://maps.google.com/maps?ll=-37.812022,144.969277"));
+		}
+		
+		
+		SystemProperties.getInstance().console("some text to console");
 	}
 	
 	

@@ -1,9 +1,17 @@
 # Native Dialogs - Adobe air Native Extension #
+***
+No projects on the IOS platform (No IOS developers licence) causes that I can not continue working on this project.
+If you are interested in the development of this project (or any other of my projects), pleas donate for the purchase of the license.
+The major change in the project will be support of IOS6, IOS simulator and minor fixes.
+[![Foo](https://www.paypalobjects.com/en_GB/i/btn/btn_donate_SM.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=CMYHNG32SVXZ4)
+***
 
-Changes (form commit cac11f3):
-* SystemProperties is now a singelton and requires getInstance() and dispose() before extiting app
+
+
+#####Changes (from commit cac11f3):
+* SystemProperties is now a singelton and requires getInstance() and dispose() calls before exiting the app
 * NativeAlert.badge moved to SystemProperties
-* NativeAlert better handeling close event on static show() method
+* NativeAlert better handling close event on static show() method
 * fixed all .defaultTheme problems
 * changed index values on dialogs on Android (now similar to IOS)
 * added platform.xml (linking options)
@@ -19,7 +27,7 @@ See more info [here](http://mateuszmackowiak.wordpress.com)
 
 This extension enables showing native dialogs within a Air based project.
 
-Available themes for android:
+#####Available themes for android:
 
 * ANDROID\_DEVICE\_DEFAULT\_DARK\_THEME
 * ANDROID\_DEVICE\_DEFAULT\_LIGHT\_THEME
@@ -361,4 +369,4 @@ Available parameters:
 	}
 	
 	
-###### This project has been started based on [liquid-photo](https://github.com/mccormicka/NativeAlert).
+###### This project has been started based on a project by [liquid-photo](https://github.com/mccormicka/NativeAlert).

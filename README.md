@@ -3,6 +3,8 @@
 # 
 THIS PROJECT HAS BEEN MOVED TO:
 [https://github.com/mateuszmackowiak/NativeDialogs](https://github.com/mateuszmackowiak/NativeDialogs)
+
+And SystemProperties to [https://github.com/mateuszmackowiak/SystemProperties](https://github.com/mateuszmackowiak/SystemProperties)
 #
 ***
 If You like what I make pleas donate:
